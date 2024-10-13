@@ -1,4 +1,4 @@
-package com.ssafyhome.model.dto.entity.mysql;
+package com.ssafyhome.model.entity.mysql;
 
 import lombok.Data;
 

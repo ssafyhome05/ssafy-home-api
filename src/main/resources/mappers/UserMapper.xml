@@ -3,13 +3,13 @@
 <mapper namespace="com.ssafyhome.model.dao.mapper.UserMapper">
 
     <insert id="insertUser"
-            parameterType="com.ssafyhome.model.dto.entity.mysql.UserEntity">
-        INSERT INTO user (user_id, user_pw, user_email)
-        VALUE (#{userId}, #{userPw}, #{userEmail})
+            parameterType="com.ssafyhome.model.entity.mysql.UserEntity">
+        INSERT INTO user (user_id, user_pw, user_email, user_name)
+        VALUE (#{userId}, #{userPw}, #{userEmail}, #{userName})
     </insert>
 
     <update id="updateUser"
-            parameterType="com.ssafyhome.model.dto.entity.mysql.UserEntity">
+            parameterType="com.ssafyhome.model.entity.mysql.UserEntity">
         UPDATE user
         SET user_name = #{userName}
         WHERE user_seq = #{userSeq}
@@ -28,7 +28,7 @@
 
     <select id="getUserBySeqAndEmail"
             parameterType="string"
-            resultType="com.ssafyhome.model.dto.entity.mysql.UserEntity">
+            resultType="com.ssafyhome.model.entity.mysql.UserEntity">
         SELECT *
         FROM user
         WHERE user_seq = #{userSeq} AND user_email = #{userEmail}
@@ -36,7 +36,7 @@
 
     <select id="getUserById"
             parameterType="string"
-            resultType="com.ssafyhome.model.dto.entity.mysql.UserEntity">
+            resultType="com.ssafyhome.model.entity.mysql.UserEntity">
         SELECT *
         FROM user
         WHERE user_id = #{userId}
@@ -66,15 +66,20 @@
     </select>
 
     <select id="getUserList"
-            resultType="com.ssafyhome.model.dto.entity.mysql.UserEntity">
+            resultType="com.ssafyhome.model.entity.mysql.UserEntity">
         SELECT *
         FROM user;
     </select>
 
     <select id="getUserBySeq"
-            resultType="com.ssafyhome.model.dto.entity.mysql.UserEntity">
+            resultType="com.ssafyhome.model.entity.mysql.UserEntity">
         SELECT *
         FROM user
         WHERE user_seq = #{userSeq}
+    </select>
+    <select id="getSeqByEmail" resultType="java.lang.Long">
+        SELECT user_seq
+        FROM user
+        WHERE user_email = #{userEmail}
     </select>
 </mapper>

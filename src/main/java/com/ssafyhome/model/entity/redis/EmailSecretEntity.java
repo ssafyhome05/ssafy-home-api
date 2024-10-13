@@ -1,4 +1,4 @@
-package com.ssafyhome.model.dto.entity.redis;
+package com.ssafyhome.model.entity.redis;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

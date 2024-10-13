@@ -1,6 +1,6 @@
 package com.ssafyhome.model.dto;
 
-import com.ssafyhome.model.dto.entity.mysql.UserEntity;
+import com.ssafyhome.model.entity.mysql.UserEntity;
 import lombok.Data;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;

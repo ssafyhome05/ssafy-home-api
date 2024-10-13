@@ -1,17 +1,12 @@
 package com.ssafyhome.controller;
 
-import com.ssafyhome.model.dto.FindUserDto;
-import com.ssafyhome.model.dto.PasswordDto;
-import com.ssafyhome.model.dto.UserDto;
-import com.ssafyhome.model.dto.UserSearchDto;
-import com.ssafyhome.model.dto.entity.mysql.UserEntity;
-import com.ssafyhome.model.dto.entity.redis.EmailSecretEntity;
+import com.ssafyhome.model.dto.*;
 import com.ssafyhome.model.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -41,7 +36,8 @@ public class UserController {
 			UserDto userDto
 	) {
 
-		return userService.register(userDto);
+		userService.register(userDto);
+		return new ResponseEntity<>(HttpStatus.CREATED);
 	}
 
 	@Operation(
@@ -57,9 +53,14 @@ public class UserController {
 			FindUserDto findUserDto
 	) {
 
-		return type.equals("id") ?
-				userService.findUserId(findUserDto) :
-				userService.findPassword(findUserDto);
+		if (type.equals("id")) {
+			String id = userService.findUserId(findUserDto);
+			return new ResponseEntity<>(id, HttpStatus.OK);
+		}
+		else {
+			userService.findPassword(findUserDto);
+			return new ResponseEntity<>("check email secret", HttpStatus.OK);
+		}
 	}
 
 	@Operation(
@@ -72,7 +73,8 @@ public class UserController {
 			String email
 	) {
 
-		return userService.sendEmail(email);
+		userService.sendEmail(email);
+		return new ResponseEntity<>("send Email success", HttpStatus.CREATED);
 	}
 
 	@Operation(
@@ -86,7 +88,7 @@ public class UserController {
 			String userSeq
 	) {
 
-		return userService.getUserInfo(userSeq);
+		return new ResponseEntity<>(userService.getUserInfo(userSeq), HttpStatus.OK);
 	}
 
 	@Operation(
@@ -100,7 +102,7 @@ public class UserController {
 			UserSearchDto userSearchDto
 	) {
 
-		return userService.getUserList(userSearchDto);
+		return new ResponseEntity<>(userService.getUserList(userSearchDto), HttpStatus.OK);
 	}
 
 	@Operation(
@@ -116,7 +118,7 @@ public class UserController {
 			String key
 	) {
 
-		return userService.checkEmailSecret(new EmailSecretEntity(email, key));
+		return new ResponseEntity<>(userService.checkEmailSecret(new EmailSecretDto(email, key)), HttpStatus.OK);
 	}
 
 	@Operation(
@@ -129,7 +131,7 @@ public class UserController {
 			String userId
 	) {
 
-		return userService.checkIdDuplicate(userId);
+		return new ResponseEntity<>(userService.checkIdDuplicate(userId), HttpStatus.OK);
 	}
 
 	@Operation(
@@ -145,7 +147,8 @@ public class UserController {
 			PasswordDto passwordDto
 	) {
 
-		return userService.changePassword(userSeq, passwordDto);
+		userService.changePassword(userSeq, passwordDto);
+		return new ResponseEntity<>("change password success", HttpStatus.OK);
 	}
 
 	@Operation(
@@ -159,10 +162,11 @@ public class UserController {
 			String userSeq,
 
 			@RequestBody
-			UserEntity userEntity
+			UserDto userDto
 	) {
 
-		return userService.updateUser(userEntity);
+		userService.updateUser(userDto);
+		return new ResponseEntity<>("update user success", HttpStatus.OK);
 	}
 
 	@Operation(
@@ -176,6 +180,7 @@ public class UserController {
 			String userSeq
 	) {
 
-		return userService.deleteUser(userSeq);
+		userService.deleteUser(userSeq);
+		return new ResponseEntity<>("delete user success", HttpStatus.OK);
 	}
 }

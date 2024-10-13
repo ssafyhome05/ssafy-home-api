@@ -1,13 +1,12 @@
 package com.ssafyhome.model.service.impl;
 
 import com.ssafyhome.model.dao.repository.RefreshTokenRepository;
-import com.ssafyhome.model.dto.entity.redis.RefreshTokenEntity;
+import com.ssafyhome.model.entity.redis.RefreshTokenEntity;
 import com.ssafyhome.model.service.JWTService;
 import com.ssafyhome.util.CookieUtil;
 import com.ssafyhome.util.JWTUtil;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 

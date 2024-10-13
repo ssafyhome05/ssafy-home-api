@@ -1,8 +1,7 @@
 package com.ssafyhome.model.dto;
 
-import com.ssafyhome.model.dto.entity.mysql.UserEntity;
+import com.ssafyhome.model.entity.mysql.UserEntity;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 
 import java.util.*;

@@ -1,7 +1,7 @@
 package com.ssafyhome.controller;
 
 import com.ssafyhome.model.dto.ReviewSearchDto;
-import com.ssafyhome.model.dto.entity.mysql.ReviewEntity;
+import com.ssafyhome.model.entity.mysql.ReviewEntity;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;

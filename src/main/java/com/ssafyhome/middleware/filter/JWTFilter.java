@@ -1,7 +1,7 @@
 package com.ssafyhome.middleware.filter;
 
 import com.ssafyhome.model.dao.mapper.UserMapper;
-import com.ssafyhome.model.dto.entity.mysql.UserEntity;
+import com.ssafyhome.model.entity.mysql.UserEntity;
 import com.ssafyhome.model.service.impl.CustomUserDetailsService;
 import com.ssafyhome.util.JWTUtil;
 import jakarta.servlet.FilterChain;

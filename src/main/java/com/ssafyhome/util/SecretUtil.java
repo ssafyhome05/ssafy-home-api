@@ -1,7 +1,7 @@
 package com.ssafyhome.util;
 
 import com.ssafyhome.model.dao.repository.EmailSecretRepository;
-import com.ssafyhome.model.dto.entity.redis.EmailSecretEntity;
+import com.ssafyhome.model.entity.redis.EmailSecretEntity;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -9,6 +9,7 @@ import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
+import java.util.Optional;
 import java.util.Random;
 
 @Component
@@ -50,7 +51,8 @@ public class SecretUtil {
 
 	public boolean checkSecret(String email, String secret) {
 
-		String redisSecret = emailSecretRepository.findById(email).get().getSecret();
+		Optional<EmailSecretEntity> secretEntity = emailSecretRepository.findById(email);
+		String redisSecret = secretEntity.get().getSecret();
 		return secret.equals(redisSecret);
 	}
 

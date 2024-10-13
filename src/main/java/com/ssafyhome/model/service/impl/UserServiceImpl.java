@@ -1,24 +1,24 @@
 package com.ssafyhome.model.service.impl;
 
+import com.ssafyhome.exception.DecryptUserSeqException;
+import com.ssafyhome.exception.EncryptUserSeqException;
+import com.ssafyhome.exception.InvalidEmailSecretException;
+import com.ssafyhome.exception.InvalidPasswordException;
 import com.ssafyhome.model.dao.mapper.UserMapper;
-import com.ssafyhome.model.dto.FindUserDto;
-import com.ssafyhome.model.dto.PasswordDto;
-import com.ssafyhome.model.dto.UserDto;
-import com.ssafyhome.model.dto.UserSearchDto;
-import com.ssafyhome.model.dto.entity.mysql.UserEntity;
-import com.ssafyhome.model.dto.entity.redis.EmailSecretEntity;
+import com.ssafyhome.model.dto.*;
+import com.ssafyhome.model.entity.mysql.UserEntity;
 import com.ssafyhome.model.service.UserService;
 import com.ssafyhome.util.SecretUtil;
+import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.mail.MailSendException;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.webjars.NotFoundException;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -44,159 +44,148 @@ public class UserServiceImpl implements UserService {
 
 
   @Override
-  public ResponseEntity<?> register(UserDto userDto) {
+  public void register(UserDto userDto) {
 
     if(!checkPassword(userDto)) {
-      return new ResponseEntity<>("Incorrect password", HttpStatus.BAD_REQUEST);
+      throw new InvalidPasswordException("invalid password");
     }
 
     UserEntity userEntity = new UserEntity();
     userEntity.setUserId(userDto.getUserId());
     userEntity.setUserPw(passwordEncoder.encode(userDto.getUserPassword()));
     userEntity.setUserEmail(userDto.getUserEmail());
-    try {
-      userMapper.insertUser(userEntity);
-      return new ResponseEntity<>(HttpStatus.CREATED);
-    } catch (Exception e) {
-      return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+    userEntity.setUserName(userDto.getUserName());
+
+    userMapper.insertUser(userEntity);
+  }
+
+  @Override
+  public String findUserId(FindUserDto findUserDto) {
+
+    String userId = userMapper.getIdByNameAndEmail(findUserDto);
+    if (userId != null) {
+      return userId;
+    } else {
+      throw new NotFoundException("user not found");
     }
   }
 
   @Override
-  public ResponseEntity<?> sendEmail(String email) {
+  public void findPassword(FindUserDto findUserDto) {
+
+    if (userMapper.isUserExist(findUserDto)) {
+      sendEmail(findUserDto.getUserEmail());
+    } else {
+      throw new NotFoundException("user not found");
+    }
+  }
+
+  @Override
+  public void sendEmail(String email) {
 
     String secret = secretUtil.makeRandomString(15);
     MimeMessage mimeMessage = mailSender.createMimeMessage();
 
     try {
-
       MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage, false, "UTF-8");
       mimeMessageHelper.setTo(email);
       mimeMessageHelper.setSubject("SSAFY HOME 이메일 인증");
       mimeMessageHelper.setText(secret, true);
       mailSender.send(mimeMessage);
       secretUtil.addSecretOnRedis(email, secret);
-      return new ResponseEntity<>("send Email success", HttpStatus.CREATED);
-
-    } catch (Exception e) {
-
-      e.printStackTrace();
-      return new ResponseEntity<>("send Email failed", HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+    catch (MessagingException e) {
+      throw new MailSendException("send Email fail");
     }
   }
 
   @Override
-  public ResponseEntity<?> findUserId(FindUserDto findUserDto) {
+  public UserDto getUserInfo(String userSeq) {
 
-    String userId = userMapper.getIdByNameAndEmail(findUserDto);
-    if (userId == null) {
-      return new ResponseEntity<>("User not found", HttpStatus.NOT_FOUND);
-    } else {
-      return new ResponseEntity<>(userId, HttpStatus.OK);
-    }
+    UserEntity userEntity = userMapper.getUserBySeq(userSeq);
+    return UserDto.builder()
+        .userSeq(userEntity.getUserSeq())
+        .userId(userEntity.getUserId())
+        .userEmail(userEntity.getUserEmail())
+        .build();
   }
 
   @Override
-  public ResponseEntity<?> findPassword(FindUserDto findUserDto) {
-
-    if (userMapper.isUserExist(findUserDto)) {
-      return sendEmail(findUserDto.getUserEmail());
-    } else {
-      return new ResponseEntity<>("User not found", HttpStatus.NOT_FOUND);
-    }
-  }
-
-  @Override
-  public ResponseEntity<?> changePassword(String userSeq, PasswordDto passwordDto) {
-
-    if (userSeq == null) {
-      userSeq = SecurityContextHolder.getContext().getAuthentication().getName();
-    } else {
-      try {
-        userSeq = secretUtil.decrypt(userSeq);
-        if(!userMapper.checkPassword(
-            userSeq,
-            passwordEncoder.encode(passwordDto.getOldPassword()))
-        ) {
-          return new ResponseEntity<>("Incorrect password", HttpStatus.BAD_REQUEST);
-        }
-      } catch (Exception e) {
-        throw new RuntimeException(e);
-      }
-    }
-
-    if (checkPassword(passwordDto)) {
-      userMapper.patchPassword(userSeq, passwordEncoder.encode(passwordDto.getNewPassword()));
-      return new ResponseEntity<>("Password changed successfully", HttpStatus.OK);
-    } else {
-      return new ResponseEntity<>("Incorrect password", HttpStatus.BAD_REQUEST);
-    }
-  }
-
-  @Override
-  public ResponseEntity<?> checkEmailSecret(EmailSecretEntity emailSecretEntity) {
-
-    if (secretUtil.checkSecret(emailSecretEntity.getEmail(), emailSecretEntity.getSecret())) {
-      secretUtil.removeSecretOnRedis(emailSecretEntity.getEmail());
-      return new ResponseEntity<>("check email secret successfully", HttpStatus.OK);
-    } else {
-      return new ResponseEntity<>("check email secret failed", HttpStatus.BAD_REQUEST);
-    }
-  }
-
-  @Override
-  public ResponseEntity<?> checkIdDuplicate(String id) {
-
-    UserEntity userEntity = userMapper.getUserById(id);
-    if (userEntity == null) {
-      return new ResponseEntity<>("usable user id", HttpStatus.OK);
-    } else {
-      return new ResponseEntity<>("already user exist", HttpStatus.BAD_REQUEST);
-    }
-  }
-
-  @Override
-  public ResponseEntity<?> updateUser(UserEntity userEntity) {
-
-    userMapper.updateUser(userEntity);
-    return new ResponseEntity<>("User updated successfully", HttpStatus.OK);
-  }
-
-  @Override
-  public ResponseEntity<?> deleteUser(String userSeq) {
-
-    try {
-      userMapper.deleteUser(userSeq);
-      return new ResponseEntity<>("User deleted successfully", HttpStatus.OK);
-    } catch (Exception e) {
-      return new ResponseEntity<>("delete user failed", HttpStatus.INTERNAL_SERVER_ERROR);
-    }
-  }
-
-  @Override
-  public ResponseEntity<List<UserDto>> getUserList(UserSearchDto userSearchDto) {
+  public List<UserDto> getUserList(UserSearchDto userSearchDto) {
 
     List<UserEntity> userEntityList = userMapper.getUserList(userSearchDto);
-    List<UserDto> userDtoList = userEntityList.stream()
+    return userEntityList.stream()
         .map(userEntity -> UserDto.builder()
             .userSeq(userEntity.getUserSeq())
             .userId(userEntity.getUserId())
             .userEmail(userEntity.getUserEmail())
             .build())
         .toList();
-    return new ResponseEntity<>(userDtoList, HttpStatus.OK);
   }
 
   @Override
-  public ResponseEntity<UserDto> getUserInfo(String userSeq) {
+  public String checkEmailSecret(EmailSecretDto emailSecretDto) {
 
-    UserEntity userEntity = userMapper.getUserBySeq(userSeq);
-    UserDto userDto = UserDto.builder()
-        .userSeq(userEntity.getUserSeq())
-        .userId(userEntity.getUserId())
-        .userEmail(userEntity.getUserEmail())
-        .build();
-    return new ResponseEntity<>(userDto, HttpStatus.OK);
+    if (secretUtil.checkSecret(emailSecretDto.getEmail(), emailSecretDto.getSecret())) {
+      secretUtil.removeSecretOnRedis(emailSecretDto.getEmail());
+      long userSeq = userMapper.getSeqByEmail(emailSecretDto.getEmail());
+      try {
+        return secretUtil.encrypt(String.valueOf(userSeq));
+      } catch (Exception e) {
+        throw new EncryptUserSeqException("encrypt fail");
+      }
+    }
+    else {
+      throw new InvalidEmailSecretException("invalid email secret");
+    }
+  }
+
+  @Override
+  public boolean checkIdDuplicate(String id) {
+
+    return userMapper.getUserById(id) == null;
+  }
+
+  @Override
+  public void changePassword(String userSeq, PasswordDto passwordDto) {
+
+    if (userSeq == null) {
+      userSeq = SecurityContextHolder.getContext().getAuthentication().getName();
+      if(!userMapper.checkPassword(
+          userSeq,
+          passwordEncoder.encode(passwordDto.getOldPassword()))
+      ) {
+        throw new InvalidPasswordException("invalid password");
+      }
+    } else {
+      try {
+        userSeq = secretUtil.decrypt(userSeq);
+      } catch (Exception e) {
+        throw new DecryptUserSeqException("decrypt fail");
+      }
+    }
+
+    if (checkPassword(passwordDto)) {
+      userMapper.patchPassword(userSeq, passwordEncoder.encode(passwordDto.getNewPassword()));
+    } else {
+      throw new InvalidPasswordException("invalid password");
+    }
+  }
+
+  @Override
+  public void updateUser(UserDto userDto) {
+
+    UserEntity userEntity = new UserEntity();
+    userEntity.setUserId(userDto.getUserId());
+    userEntity.setUserEmail(userDto.getUserEmail());
+    userEntity.setUserName(userDto.getUserName());
+    userMapper.updateUser(userEntity);
+  }
+
+  @Override
+  public void deleteUser(String userSeq) {
+
+    userMapper.deleteUser(userSeq);
   }
 
   private boolean checkPassword(UserDto userDto) {

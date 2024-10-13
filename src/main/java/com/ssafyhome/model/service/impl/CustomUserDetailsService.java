@@ -2,7 +2,7 @@ package com.ssafyhome.model.service.impl;
 
 import com.ssafyhome.model.dao.mapper.UserMapper;
 import com.ssafyhome.model.dto.CustomUserDetails;
-import com.ssafyhome.model.dto.entity.mysql.UserEntity;
+import com.ssafyhome.model.entity.mysql.UserEntity;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;

@@ -1,4 +1,4 @@
-package com.ssafyhome.model.dto.entity.mysql;
+package com.ssafyhome.model.entity.mysql;
 
 import lombok.Data;
 
@@ -9,6 +9,7 @@ public class UserEntity {
   private String userId;
   private String userPw;
   private String userEmail;
+  private String userName;
   private String role = "ROLE_USER";
 
 }
