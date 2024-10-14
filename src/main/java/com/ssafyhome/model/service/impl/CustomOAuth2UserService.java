@@ -1,6 +1,7 @@
 package com.ssafyhome.model.service.impl;
 
 import com.ssafyhome.model.dao.mapper.UserMapper;
+import com.ssafyhome.model.dto.AdminOAuth2User;
 import com.ssafyhome.model.dto.CustomOAuth2User;
 import com.ssafyhome.model.entity.mysql.UserEntity;
 import com.ssafyhome.model.dto.oauth2response.*;
@@ -33,7 +34,17 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 			case "admin" -> new AdminResponse(oAuth2User.getAttributes());
 			default -> null;
 		};
+
 		if (oAuth2Response == null) return null;
+		if (oAuth2Response instanceof AdminResponse) {
+			return new AdminOAuth2User((AdminResponse) oAuth2Response);
+		}
+		else {
+			return handleUser(oAuth2Response);
+		}
+	}
+
+	private OAuth2User handleUser(OAuth2Response oAuth2Response) {
 
 		String userId = oAuth2Response.getProvider() + " " + oAuth2Response.getProviderId();
 		UserEntity existUser = userMapper.getUserById(userId);
@@ -43,12 +54,12 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 			UserEntity userEntity = new UserEntity();
 			userEntity.setUserId(userId);
 			userEntity.setUserEmail(oAuth2Response.getEmail());
-      try {
-        userMapper.insertUser(userEntity);
-      } catch (Exception e) {
-        throw new RuntimeException(e);
-      }
-      existUser = userEntity;
+			try {
+				userMapper.insertUser(userEntity);
+			} catch (Exception e) {
+				throw new RuntimeException(e);
+			}
+			existUser = userEntity;
 		}
 		else {
 			existUser.setUserEmail(oAuth2Response.getEmail());

@@ -128,11 +128,15 @@ public class UserServiceImpl implements UserService {
 
     if (secretUtil.checkSecret(emailSecretDto.getEmail(), emailSecretDto.getSecret())) {
       secretUtil.removeSecretOnRedis(emailSecretDto.getEmail());
-      long userSeq = userMapper.getSeqByEmail(emailSecretDto.getEmail());
       try {
-        return secretUtil.encrypt(String.valueOf(userSeq));
+        long userSeq = userMapper.getSeqByEmail(emailSecretDto.getEmail());
+        try {
+          return secretUtil.encrypt(String.valueOf(userSeq));
+        } catch (Exception e) {
+          throw new EncryptUserSeqException("encrypt fail");
+        }
       } catch (Exception e) {
-        throw new EncryptUserSeqException("encrypt fail");
+        return "mail check success";
       }
     }
     else {

@@ -30,4 +30,6 @@ public class AdminResponse implements OAuth2Response {
   public String getName() {
     return attributes.get("name").toString();
   }
+
+  public String getRole() { return attributes.get("role").toString(); }
 }
