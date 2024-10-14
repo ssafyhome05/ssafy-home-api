@@ -1,6 +1,7 @@
 package com.ssafyhome.handler;
 
 import com.ssafyhome.model.dto.CustomOAuth2User;
+import com.ssafyhome.model.dto.JwtDto;
 import com.ssafyhome.model.service.JWTService;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -31,12 +32,10 @@ public class CustomOAuth2SuccessHandler implements AuthenticationSuccessHandler 
 	public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
 
 		CustomOAuth2User customOAuth2User = (CustomOAuth2User) authentication.getPrincipal();
-		String userId = customOAuth2User.getName();
+		String userSeq = customOAuth2User.getName();
 		String userEmail = customOAuth2User.getEmail();
-		ResponseEntity<?> responseEntity = jwtService.setTokens(userId, userEmail);
-		response.setStatus(HttpStatus.OK.value());
-		responseEntity.getHeaders().forEach((name, values) -> {
-			values.forEach(value -> response.addHeader(name, value));
-		});
+		JwtDto jwtDto = jwtService.setTokens(userSeq, userEmail);
+		response.setHeader("Authorization", "Bearer " + jwtDto.getAccessToken());
+		response.addCookie(jwtDto.getRefreshToken());
 	}
 }

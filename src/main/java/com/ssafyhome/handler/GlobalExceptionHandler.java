@@ -1,9 +1,6 @@
 package com.ssafyhome.handler;
 
-import com.ssafyhome.exception.DecryptUserSeqException;
-import com.ssafyhome.exception.EncryptUserSeqException;
-import com.ssafyhome.exception.InvalidEmailSecretException;
-import com.ssafyhome.exception.InvalidPasswordException;
+import com.ssafyhome.exception.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mail.MailSendException;
@@ -42,6 +39,16 @@ public class GlobalExceptionHandler {
   @ExceptionHandler(DecryptUserSeqException.class)
   public ResponseEntity<String> handleDecryptUserSeqException(DecryptUserSeqException e) {
     return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+  }
+
+  @ExceptionHandler(InvalidJwtException.class)
+  public ResponseEntity<String> handleInvalidJwtException(InvalidJwtException e) {
+    return new ResponseEntity<>(e.getMessage(), HttpStatus.UNAUTHORIZED);
+  }
+
+  @ExceptionHandler(AccessTokenExpiredException.class)
+  public ResponseEntity<String> handleAccessTokenExpiredException(AccessTokenExpiredException e) {
+    return new ResponseEntity<>(e.getMessage(), HttpStatus.UNAUTHORIZED);
   }
 
   @ExceptionHandler(Exception.class)

@@ -1,13 +1,14 @@
 package com.ssafyhome.model.service.impl;
 
+import com.ssafyhome.exception.InvalidJwtException;
 import com.ssafyhome.model.dao.repository.RefreshTokenRepository;
+import com.ssafyhome.model.dto.JwtDto;
 import com.ssafyhome.model.entity.redis.RefreshTokenEntity;
 import com.ssafyhome.model.service.JWTService;
 import com.ssafyhome.util.CookieUtil;
 import com.ssafyhome.util.JWTUtil;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -29,11 +30,11 @@ public class JWTServiceImpl implements JWTService {
   }
 
   @Override
-  public ResponseEntity<?> reissueRefreshToken(String refreshToken) {
+  public JwtDto reissueRefreshToken(String refreshToken) {
 
     String RefreshTokenError = checkRefreshTokenError(refreshToken);
     if (RefreshTokenError != null) {
-      return ResponseEntity.badRequest().body(RefreshTokenError);
+      throw new InvalidJwtException(RefreshTokenError);
     }
 
     String userSeq = jwtUtil.getKey(refreshToken, "userSeq");
@@ -65,16 +66,17 @@ public class JWTServiceImpl implements JWTService {
   }
 
   @Override
-  public ResponseEntity<?> setTokens(String userSeq, String userEmail) {
+  public JwtDto setTokens(String userSeq, String userEmail) {
 
     String accessToken = jwtUtil.createJWT("access", userSeq, userEmail, 5 * 60 * 1000L);
     String refreshToken = jwtUtil.createJWT("refresh", userSeq, userEmail, 24 * 60 * 60 * 1000L);
+    Cookie refreshTokenCookie = cookieUtil.createCookie(refreshToken, "refresh");
 
     saveRefreshTokenToRedis(refreshToken, userSeq);
 
-    return ResponseEntity.ok()
-        .header("Authorization", "Bearer " + accessToken)
-        .header("Cookie", refreshToken)
+    return JwtDto.builder()
+        .accessToken(accessToken)
+        .refreshToken(refreshTokenCookie)
         .build();
   }
 

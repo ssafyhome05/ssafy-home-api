@@ -23,4 +23,23 @@ public class CookieUtil {
     cookie.setMaxAge(0);
     return cookie;
   }
+
+  public String convertToString(Cookie cookie) {
+
+    StringBuilder sb = new StringBuilder();
+    sb.append(cookie.getName()).append('=').append(cookie.getValue());
+    if (cookie.getMaxAge() > 0) {
+      sb.append("; Max-Age=").append(cookie.getMaxAge());
+    }
+    if (cookie.getPath() != null) {
+      sb.append("; Path=").append(cookie.getPath());
+    }
+    if (cookie.isHttpOnly()) {
+      sb.append("; HttpOnly");
+    }
+    if (cookie.getSecure()) {
+      sb.append("; Secure");
+    }
+    return sb.toString();
+  }
 }

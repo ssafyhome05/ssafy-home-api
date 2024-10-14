@@ -1,5 +1,7 @@
 package com.ssafyhome.middleware.filter;
 
+import com.ssafyhome.exception.AccessTokenExpiredException;
+import com.ssafyhome.exception.InvalidJwtException;
 import com.ssafyhome.model.dao.mapper.UserMapper;
 import com.ssafyhome.model.entity.mysql.UserEntity;
 import com.ssafyhome.model.service.impl.CustomUserDetailsService;
@@ -43,17 +45,13 @@ public class JWTFilter extends OncePerRequestFilter {
 		}
 
 		if (!authorizationHeader.startsWith("Bearer ")) {
-
-			response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
-			return;
+			throw new InvalidJwtException("invalid JWT token");
 		}
 
 		String accessToken = authorizationHeader.substring(7);
 
 		if (jwtUtil.isExpired(accessToken)) {
-
-			response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
-			return;
+			throw new AccessTokenExpiredException("access token expired");
 		}
 
 		String category = jwtUtil.getKey(accessToken, "category");
@@ -62,9 +60,7 @@ public class JWTFilter extends OncePerRequestFilter {
 		UserEntity userEntity = userMapper.getUserBySeqAndEmail(userSeq, userEmail);
 
 		if (!category.equals("access") || userEntity == null) {
-
-			response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
-			return;
+			throw new InvalidJwtException("invalid JWT token");
 		}
 
 		UserDetails userDetails = userDetailsService.loadUserByUsername(userEntity.getUserId());
