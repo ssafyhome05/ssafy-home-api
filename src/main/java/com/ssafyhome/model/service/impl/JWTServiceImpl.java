@@ -70,7 +70,7 @@ public class JWTServiceImpl implements JWTService {
 
     String accessToken = jwtUtil.createJWT("access", userSeq, userEmail, 5 * 60 * 1000L);
     String refreshToken = jwtUtil.createJWT("refresh", userSeq, userEmail, 24 * 60 * 60 * 1000L);
-    Cookie refreshTokenCookie = cookieUtil.createCookie(refreshToken, "refresh");
+    Cookie refreshTokenCookie = cookieUtil.createCookie("refresh", refreshToken);
 
     saveRefreshTokenToRedis(refreshToken, userSeq);
 
