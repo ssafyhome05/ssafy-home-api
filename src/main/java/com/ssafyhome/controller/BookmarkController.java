@@ -35,8 +35,8 @@ public class BookmarkController {
 	}
 
 	@Operation(
-			summary = "",
-			description = ""
+			summary = "관심매물 등록",
+			description = "String 객체의 houseId 로 관심매물 등록"
 	)
 	@PostMapping("/house")
 	@PreAuthorize("hasRole('ROLE_USER')")
