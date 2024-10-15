@@ -27,8 +27,8 @@ public class UserController {
 	}
 
 	@Operation(
-			summary = "",
-			description = ""
+			summary = "회원가입",
+			description = "UserDto를 받아 회원 등록"
 	)
 	@PostMapping("/")
 	public ResponseEntity<?> registerUser(
@@ -41,8 +41,8 @@ public class UserController {
 	}
 
 	@Operation(
-			summary = "",
-			description = ""
+			summary = "회원정보 찾기",
+			description = "FindUserDto 를 받아 userId 반환"
 	)
 	@PostMapping("/find/{type}")
 	public ResponseEntity<?> findUserInfo(
@@ -64,8 +64,8 @@ public class UserController {
 	}
 
 	@Operation(
-			summary = "",
-			description = ""
+			summary = "이메일 전송",
+			description = "String 객체의 email 받아 이메일 전송"
 	)
 	@PostMapping("/send/mail")
 	public ResponseEntity<?> sendEmail(
@@ -78,8 +78,8 @@ public class UserController {
 	}
 
 	@Operation(
-			summary = "",
-			description = ""
+			summary = "회원상세정보 제공",
+			description = "String 객체의 userSeq 를 받아 UserDto 반환"
 	)
 	@GetMapping("/")
 	@PreAuthorize("hasRole('ROLE_ADMIN') or  #userSeq == authentication.name")
@@ -92,8 +92,8 @@ public class UserController {
 	}
 
 	@Operation(
-			summary = "",
-			description = ""
+			summary = "사용자 목록 조회",
+			description = "UserSearchDto 받아 List<UserDto> 반환"
 	)
 	@GetMapping("/list")
 	@PreAuthorize("hasRole('ROLE_ADMIN')")
@@ -106,8 +106,8 @@ public class UserController {
 	}
 
 	@Operation(
-			summary = "",
-			description = ""
+			summary = "이메일 확인",
+			description = "String 객체의 key 와 email 받아 이메일 확인"
 	)
 	@GetMapping("/check/mail")
 	public ResponseEntity<?> checkEmailSecret(
@@ -122,8 +122,8 @@ public class UserController {
 	}
 
 	@Operation(
-			summary = "",
-			description = ""
+			summary = "아이디 중복확인",
+			description = "String 객체의 userId 받아 중복확인"
 	)
 	@GetMapping("/check/duplicate")
 	public ResponseEntity<?> checkIdDuplicate(
@@ -135,8 +135,8 @@ public class UserController {
 	}
 
 	@Operation(
-			summary = "",
-			description = ""
+			summary = "비밀번호 변경",
+			description = "String 객체의 userSeq 와 passwordDto 받아 비밀번호 변경"
 	)
 	@PatchMapping("/{userSeq}")
 	public ResponseEntity<?> changePassword(
@@ -152,8 +152,8 @@ public class UserController {
 	}
 
 	@Operation(
-			summary = "",
-			description = ""
+			summary = "회원정보 수정",
+			description = "String 객체의 userSeq 와 UserDto 받아 회원정보 수정"
 	)
 	@PutMapping("/{userSeq}")
 	@PreAuthorize("hasRole('ROLE_ADMIN') or  #userSeq == authentication.name")
@@ -170,8 +170,8 @@ public class UserController {
 	}
 
 	@Operation(
-			summary = "",
-			description = ""
+			summary = "회원정보 삭제",
+			description = "String 객체의 userSeq 받아서 해당하는 회원 삭제"
 	)
 	@DeleteMapping("/{userSeq}")
 	@PreAuthorize("hasRole('ROLE_ADMIN') or  #userSeq == authentication.name")
