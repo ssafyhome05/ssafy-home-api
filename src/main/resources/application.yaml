@@ -28,22 +28,19 @@ spring:
             authorization-grant-type: authorization_code
             scope:
               - email
+              - profile
           naver:
             client-name: naver
             client-id: ${oauth2.naver.id}
             client-secret: ${oauth2.naver.secret}
             redirect-uri: ${oauth2.naver.redirect-uri}
             authorization-grant-type: authorization_code
-            scope:
-              - email
           kakao:
             client-name: kakao
             client-id: ${oauth2.kakao.id}
             client-secret: ${oauth2.kakao.secret}
             redirect-uri: ${oauth2.kakao.redirect-uri}
             authorization-grant-type: authorization_code
-            scope:
-              - email
         provider:
           naver:
             authorization-uri: https://nid.naver.com/oauth2.0/authorize
