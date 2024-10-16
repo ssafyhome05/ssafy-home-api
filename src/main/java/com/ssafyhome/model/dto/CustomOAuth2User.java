@@ -24,7 +24,7 @@ public class CustomOAuth2User implements OAuth2User {
 	public Collection<? extends GrantedAuthority> getAuthorities() {
 
 		Collection<GrantedAuthority> authorities = new ArrayList<>();
-		authorities.add((GrantedAuthority) user::getRole);
+		authorities.add((GrantedAuthority) () -> "ROLE_USER");
 
 		return authorities;
 	}
