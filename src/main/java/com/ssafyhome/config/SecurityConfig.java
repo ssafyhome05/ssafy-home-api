@@ -52,8 +52,6 @@ public class SecurityConfig {
   private final CookieUtil cookieUtil;
   private final ErrorUtil errorUtil;
   private final CustomUserDetailsService userDetailsService;
-  private final CustomOAuth2UserService customOAuth2UserService;
-  private final CustomOAuth2SuccessHandler customOAuth2SuccessHandler;
 
   public SecurityConfig(
       AuthenticationConfiguration authenticationConfiguration,
@@ -63,9 +61,7 @@ public class SecurityConfig {
       JWTUtil jwtUtil,
       CookieUtil cookieUtil,
       ErrorUtil errorUtil,
-      CustomUserDetailsService userDetailsService,
-      CustomOAuth2UserService customOAuth2UserService,
-      CustomOAuth2SuccessHandler customOAuth2SuccessHandler
+      CustomUserDetailsService userDetailsService
   ) {
 
     this.authenticationConfiguration = authenticationConfiguration;
@@ -76,8 +72,6 @@ public class SecurityConfig {
     this.cookieUtil = cookieUtil;
     this.errorUtil = errorUtil;
     this.userDetailsService = userDetailsService;
-    this.customOAuth2UserService = customOAuth2UserService;
-    this.customOAuth2SuccessHandler = customOAuth2SuccessHandler;
   }
 
   @Bean
@@ -127,7 +121,10 @@ public class SecurityConfig {
 
   @Bean
   public SecurityFilterChain securityFilterChain(
-      HttpSecurity http) throws Exception {
+      HttpSecurity http,
+      CustomOAuth2UserService customOAuth2UserService,
+      CustomOAuth2SuccessHandler customOAuth2SuccessHandler
+  ) throws Exception {
 
     http.csrf(AbstractHttpConfigurer::disable);
     http.formLogin(AbstractHttpConfigurer::disable);
