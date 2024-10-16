@@ -20,7 +20,7 @@ public class BookmarkController {
 
 	@Operation(
 			summary = "관심지역 등록",
-			description = "사용자가 보고 있는 지역을 관심지역으로 등록"
+			description = "사용자가 보고 있는 String 객체의 dongcode 를 받아 북마크등록"
 	)
 	@PostMapping("/location")
 	@PreAuthorize("hasRole('ROLE_USER')")
@@ -35,8 +35,8 @@ public class BookmarkController {
 	}
 
 	@Operation(
-			summary = "",
-			description = ""
+			summary = "관심매물 등록",
+			description = "String 객체의 houseId 로 북마크등록"
 	)
 	@PostMapping("/house")
 	@PreAuthorize("hasRole('ROLE_USER')")
@@ -49,8 +49,8 @@ public class BookmarkController {
 	}
 
 	@Operation(
-			summary = "",
-			description = ""
+			summary = "사용자 장소 등록",
+			description = "CustomSpotDto 객체를 받아 북마크등록"
 	)
 	@PostMapping("/custom")
 	@PreAuthorize("hasRole('ROLE_USER')")
@@ -63,8 +63,8 @@ public class BookmarkController {
 	}
 
 	@Operation(
-			summary = "",
-			description = ""
+			summary = "관심지역 목록 조회",
+			description = "북마크한 List<LocationDto> 반환"
 	)
 	@GetMapping("/location")
 	@PreAuthorize("hasRole('ROLE_USER')")
@@ -74,8 +74,8 @@ public class BookmarkController {
 	}
 
 	@Operation(
-			summary = "",
-			description = ""
+			summary = "관심 매물 목록 조회",
+			description = "북마크한 List<HouseDto> 반환"
 	)
 	@GetMapping("/house")
 	@PreAuthorize("hasRole('ROLE_USER')")
@@ -85,8 +85,8 @@ public class BookmarkController {
 	}
 
 	@Operation(
-			summary = "",
-			description = ""
+			summary = "사용자 장소 조회",
+			description = "북마크한 List<CustomSpotDto> 반환"
 	)
 	@GetMapping("/custom")
 	@PreAuthorize("hasRole('ROLE_USER')")
@@ -96,8 +96,8 @@ public class BookmarkController {
 	}
 
 	@Operation(
-			summary = "",
-			description = ""
+			summary = "모든 북마크 요약 조회",
+			description = "북마크한 매물, 지역, 사용자지역의 세부목록  조회"
 	)
 	@GetMapping("/status")
 	@PreAuthorize("hasRole('ROLE_USER')")
@@ -107,8 +107,8 @@ public class BookmarkController {
 	}
 
 	@Operation(
-			summary = "",
-			description = ""
+			summary = "관심지역 삭제",
+			description = "String 객체의 dongcode 를 받아 사용자북마크에서 삭제"
 	)
 	@DeleteMapping("/location/{dongCode}")
 	@PreAuthorize("hasRole('ROLE_USER')")
@@ -121,8 +121,8 @@ public class BookmarkController {
 	}
 
 	@Operation(
-			summary = "",
-			description = ""
+			summary = "관심매물 삭제",
+			description = "String 객체의 houseId 를 받아 사용자북마크에서 삭제"
 	)
 	@DeleteMapping("/house/{houseId}")
 	@PreAuthorize("hasRole('ROLE_USER')")
@@ -135,8 +135,8 @@ public class BookmarkController {
 	}
 
 	@Operation(
-			summary = "",
-			description = ""
+			summary = "사용자장소 삭제",
+			description = "String 객체의 customSeq 를 받아 사용자북마크에서 삭제"
 	)
 	@DeleteMapping("/custom/{customSeq}")
 	@PreAuthorize("hasRole('ROLE_USER')")
