@@ -39,6 +39,7 @@ spring:
             client-name: kakao
             client-id: ${oauth2.kakao.id}
             client-secret: ${oauth2.kakao.secret}
+            client-authentication-method: client_secret_post
             redirect-uri: ${oauth2.kakao.redirect-uri}
             authorization-grant-type: authorization_code
         provider:
