@@ -2,6 +2,8 @@ package com.ssafyhome.model.entity.mysql;
 
 import lombok.Data;
 
+import java.time.LocalDateTime;
+
 @Data
 public class UserEntity {
 
@@ -10,6 +12,11 @@ public class UserEntity {
   private String userPw;
   private String userEmail;
   private String userName;
-  private String role = "ROLE_USER";
-
+  private String userPhone;
+  private String userZipcode;
+  private String userAddress;
+  private String userAddress2;
+  private String socialType;
+  private String socialPlatform;
+  private LocalDateTime createdAt;
 }
