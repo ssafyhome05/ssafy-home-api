@@ -138,15 +138,12 @@ public class UserController {
 			summary = "비밀번호 변경",
 			description = "String 객체의 userSeq 와 passwordDto 받아 비밀번호 변경"
 	)
-	@PatchMapping("/{userSeq}")
+	@PatchMapping("")
 	public ResponseEntity<?> changePassword(
-			@PathVariable(required = false)
-			String userSeq,
-
 			@RequestBody
 			PasswordDto passwordDto
 	) {
-
+		String userSeq = passwordDto.getUserSeq();
 		userService.changePassword(userSeq, passwordDto);
 		return new ResponseEntity<>("change password success", HttpStatus.OK);
 	}
