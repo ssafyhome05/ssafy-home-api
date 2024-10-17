@@ -1,9 +1,41 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.ssafyhome.model.dao.mapper.NoticeMapper">
-    <insert id="insert"></insert>
-    <update id="update"></update>
-    <delete id="deleteBySeq"></delete>
-    <select id="selectBySeq" resultType="com.ssafyhome.model.entity.mysql.NoticeEntity"></select>
-    <select id="selectByPage" resultType="com.ssafyhome.model.entity.mysql.NoticeEntity"></select>
+    <insert id="insert"
+            parameterType="com.ssafyhome.model.entity.mysql.NoticeEntity">
+        INSERT INTO notice (notice_title, notice_content)
+        VALUES (#{noticeTitle}, #{noticeContent})
+    </insert>
+
+    <update id="update"
+            parameterType="com.ssafyhome.model.entity.mysql.NoticeEntity">
+        UPDATE notice
+        SET
+            notice_title = #{noticeTitle},
+            notice_content = #{noticeContent}
+        WHERE
+            notice_seq = #{noticeSeq}
+    </update>
+
+    <delete id="deleteBySeq"
+            parameterType="int">
+        DELETE FROM notice
+        WHERE notice_seq = #{noticeSeq}
+    </delete>
+
+    <select id="selectBySeq"
+            parameterType="int"
+            resultType="com.ssafyhome.model.entity.mysql.NoticeEntity">
+        SELECT *
+        FROM notice
+        WHERE notice_seq = #{noticeSeq}
+    </select>
+
+    <select id="selectByPage"
+            parameterType="int"
+            resultType="com.ssafyhome.model.entity.mysql.NoticeEntity">
+        SELECT *
+        FROM notice
+        LIMIT #{page}, 10
+    </select>
 </mapper>

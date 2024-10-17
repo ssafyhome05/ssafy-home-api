@@ -77,13 +77,13 @@ public class NoticeController {
 	@PreAuthorize("hasRole('ROLE_ADMIN')")
 	public ResponseEntity<?> updateNotice(
 			@PathVariable
-			String noticeSeq,
+			long noticeSeq,
 
 			@RequestBody
 			NoticeDto noticeDto
 	) {
 
-		noticeService.updateNotice(noticeDto);
+		noticeService.updateNotice(noticeSeq, noticeDto);
 		return new ResponseEntity<>("update notice success", HttpStatus.OK);
 	}
 
