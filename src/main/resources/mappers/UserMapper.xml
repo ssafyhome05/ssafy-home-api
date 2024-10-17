@@ -4,8 +4,14 @@
 
     <insert id="insertUser" useGeneratedKeys="true" keyProperty="userSeq"
             parameterType="com.ssafyhome.model.entity.mysql.UserEntity">
-        INSERT INTO user (user_id, user_pw, user_email, user_name)
-        VALUE (#{userId}, #{userPw}, #{userEmail}, #{userName})
+        INSERT INTO user (user_id, user_pw, user_email, user_name, user_phone, user_zipcode, user_address, user_address2, social_type)
+        VALUE (#{userId}, #{userPw}, #{userEmail}, #{userName}, #{userPhone}, #{userZipcode}, #{userAddress}, #{userAddress2}, 0)
+    </insert>
+
+    <insert id="insertOAuth2User" useGeneratedKeys="true" keyProperty="userSeq"
+            parameterType="com.ssafyhome.model.entity.mysql.UserEntity">
+        INSERT INTO user (user_id, user_email, user_name, social_type, social_platform)
+            VALUE (#{userId}, #{userEmail}, #{userName}, 1, #{socialPlatform})
     </insert>
 
     <update id="updateUser"

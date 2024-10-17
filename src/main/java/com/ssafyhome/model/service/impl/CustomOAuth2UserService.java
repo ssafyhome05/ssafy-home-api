@@ -5,7 +5,6 @@ import com.ssafyhome.model.dto.AdminOAuth2User;
 import com.ssafyhome.model.dto.CustomOAuth2User;
 import com.ssafyhome.model.entity.mysql.UserEntity;
 import com.ssafyhome.model.dto.oauth2response.*;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
@@ -16,15 +15,12 @@ import org.springframework.stereotype.Service;
 public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 	
 	private final UserMapper userMapper;
-	private final BCryptPasswordEncoder passwordEncoder;
 	
 	public CustomOAuth2UserService(
-			UserMapper userMapper,
-			BCryptPasswordEncoder passwordEncoder
+			UserMapper userMapper
 	) {
 		
 		this.userMapper = userMapper;
-		this.passwordEncoder = passwordEncoder;
 	}
 
 	@Override
@@ -57,13 +53,15 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
 		if (existUser == null) {
 
-			UserEntity userEntity = new UserEntity();
-			userEntity.setUserId(userId);
-			userEntity.setUserName(oAuth2Response.getName());
-			userEntity.setUserPw(passwordEncoder.encode(userId));
-			userEntity.setUserEmail(oAuth2Response.getEmail());
+			UserEntity userEntity = UserEntity.builder()
+					.userId(userId)
+					.userName(oAuth2Response.getName())
+					.userEmail(oAuth2Response.getEmail())
+					.socialPlatform(oAuth2Response.getProvider())
+					.build();
+
 			try {
-				userMapper.insertUser(userEntity);
+				userMapper.insertOAuth2User(userEntity);
 			} catch (Exception e) {
 				throw new RuntimeException(e);
 			}
