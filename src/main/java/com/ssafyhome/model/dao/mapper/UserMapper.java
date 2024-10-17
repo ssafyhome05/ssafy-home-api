@@ -14,8 +14,9 @@ public interface UserMapper {
   UserEntity getUserBySeqAndEmail(@Param("userSeq") String seq, @Param("userEmail") String email);
   UserEntity getUserById(String id);
   void insertUser(UserEntity user);
+  void insertOAuth2User(UserEntity user);
   void updateUser(UserEntity user);
-  void deleteUser(String userSeq);
+  void deleteUser(long userSeq);
   String getIdByNameAndEmail(FindUserDto findUserDto);
   boolean isUserExist(FindUserDto findUserDto);
   boolean checkPassword(@Param("userSeq") String seq, @Param("password") String password);

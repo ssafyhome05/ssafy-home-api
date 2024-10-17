@@ -15,8 +15,8 @@ public interface UserService {
   String checkEmailSecret(EmailSecretDto emailSecretDto);
   boolean checkIdDuplicate(String id);
   void changePassword(String userSeq, PasswordDto passwordDto);
-  void updateUser(UserDto userDto);
-  void deleteUser(String userSeq);
+  void updateUser(long userSeq, UserDto userDto);
+  void deleteUser(long userSeq);
 
 
 }

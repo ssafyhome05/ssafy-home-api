@@ -156,13 +156,13 @@ public class UserController {
 	@PreAuthorize("hasRole('ROLE_ADMIN') or  #userSeq == authentication.name")
 	public ResponseEntity<?> updateUserInfo(
 			@PathVariable
-			String userSeq,
+			long userSeq,
 
 			@RequestBody
 			UserDto userDto
 	) {
 
-		userService.updateUser(userDto);
+		userService.updateUser(userSeq, userDto);
 		return new ResponseEntity<>("update user success", HttpStatus.OK);
 	}
 
@@ -174,7 +174,7 @@ public class UserController {
 	@PreAuthorize("hasRole('ROLE_ADMIN') or  #userSeq == authentication.name")
 	public ResponseEntity<?> deleteUser(
 			@PathVariable
-			String userSeq
+			long userSeq
 	) {
 
 		userService.deleteUser(userSeq);
