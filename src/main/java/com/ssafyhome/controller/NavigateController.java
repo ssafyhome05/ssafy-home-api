@@ -21,8 +21,8 @@ import java.util.List;
 public class NavigateController {
 
 	@Operation(
-			summary = "",
-			description = ""
+			summary = "매물 과 검색한 장소 간 이동시간",
+			description = "houseSeq 의 장소와 spotSearchDto 장소 간 NavigateDto 반환"
 	)
 	@GetMapping("/search")
 	public ResponseEntity<NavigateDto> getTimeWithSearchSpot(
@@ -37,8 +37,8 @@ public class NavigateController {
 	}
 
 	@Operation(
-			summary = "",
-			description = ""
+			summary = "매물과 모든 사용자 장소간 이동시간",
+			description = "houseSeq 와 등록한 모든 사용자장소 간 List<NavigateDto> 반환"
 	)
 	@GetMapping("/bookmark")
 	@PreAuthorize("hasRole('ROLE_USER')")
@@ -51,8 +51,8 @@ public class NavigateController {
 	}
 
 	@Operation(
-			summary = "",
-			description = ""
+			summary = "각 장소 카테고리별 가장 가까운 곳의 소요시간",
+			description = "다이소 및 편의점(편의시설), 지하철(교통시설), 맛집(상업시설) 별 최소소요거리"
 	)
 	@GetMapping("/spot")
 	public ResponseEntity<List<NavigateDto>> getTimeWithSpots(

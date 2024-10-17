@@ -19,8 +19,8 @@ import java.util.List;
 public class ReviewController {
 
 	@Operation(
-			summary = "",
-			description = ""
+			summary = "평가 등록",
+			description = "ReviewEntity 등록"
 	)
 	@PostMapping("/")
 	@PreAuthorize("hasRole('ROLE_USER')")
@@ -33,8 +33,8 @@ public class ReviewController {
 	}
 
 	@Operation(
-			summary = "",
-			description = ""
+			summary = "리뷰 전체목록 조회",
+			description = "모든 ReviewEntity 를 List<ReviewEntity> 로 반환"
 	)
 	@GetMapping("/list")
 	@PreAuthorize("hasRole('ROLE_ADMIN')")
@@ -47,8 +47,8 @@ public class ReviewController {
 	}
 
 	@Operation(
-			summary = "",
-			description = ""
+			summary = "리뷰 수정",
+			description = "reviewSeq 와 일치하는 ReviewEntity 객체 수정"
 	)
 	@PutMapping("/{reviewSeq}")
 	@PreAuthorize("hasRole('ROLE_USER')")
@@ -64,8 +64,8 @@ public class ReviewController {
 	}
 
 	@Operation(
-			summary = "",
-			description = ""
+			summary = "리뷰 삭제",
+			description = "reviewSeq 와 일치하는 ReviewEntity 객체 삭제"
 	)
 	@DeleteMapping("/{reviewSeq}")
 	@PreAuthorize("hasRole('ROLE_USER')")
