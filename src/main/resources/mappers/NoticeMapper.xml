@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ssafyhome.model.dao.mapper.NoticeMapper">
+    <insert id="insert"></insert>
+    <update id="update"></update>
+    <delete id="deleteBySeq"></delete>
+    <select id="selectBySeq" resultType="com.ssafyhome.model.entity.mysql.NoticeEntity"></select>
+    <select id="selectByPage" resultType="com.ssafyhome.model.entity.mysql.NoticeEntity"></select>
+</mapper>
