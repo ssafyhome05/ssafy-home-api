@@ -27,8 +27,8 @@ public class NoticeController {
 	}
 
 	@Operation(
-			summary = "",
-			description = ""
+			summary = "공지사항 등록",
+			description = "작성한 NoticeDto 객체 저장"
 	)
 	@PostMapping("")
 	@PreAuthorize("hasRole('ROLE_ADMIN')")
@@ -42,8 +42,8 @@ public class NoticeController {
 	}
 
 	@Operation(
-			summary = "",
-			description = ""
+			summary = "공지사항 상세조회",
+			description = "noticeSeq 와 일치하는 NoticeDto 객체 반환"
 	)
 	@GetMapping("/detail")
 	public ResponseEntity<NoticeDto> getNotice(
@@ -56,8 +56,8 @@ public class NoticeController {
 	}
 
 	@Operation(
-			summary = "",
-			description = ""
+			summary = "공지사항 전체조회",
+			description = "모든 NoticeDto 를 List<NoticeDto>로 반환"
 	)
 	@GetMapping("/{page}")
 	public ResponseEntity<List<NoticeDto>> getNoticeList(
@@ -70,8 +70,8 @@ public class NoticeController {
 	}
 
 	@Operation(
-			summary = "",
-			description = ""
+			summary = "공지사항 수정",
+			description = "noticeSeq 와 일치하는 NoticeDto 를 새롭게 저장"
 	)
 	@PutMapping("/{noticeSeq}")
 	@PreAuthorize("hasRole('ROLE_ADMIN')")
@@ -88,8 +88,8 @@ public class NoticeController {
 	}
 
 	@Operation(
-			summary = "",
-			description = ""
+			summary = "공지사항 삭제",
+			description = "noticeSeq 와 일치하는 NoticeDto 객체 삭제"
 	)
 	@DeleteMapping("/{noticeSeq}")
 	@PreAuthorize("hasRole('ROLE_ADMIN')")

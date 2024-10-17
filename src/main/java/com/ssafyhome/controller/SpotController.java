@@ -18,8 +18,8 @@ import java.util.List;
 public class SpotController {
 
 	@Operation(
-			summary = "",
-			description = ""
+			summary = "지도에 표시할 장소 정보",
+			description = "dongCode 와 일치하는 List<SpotDto> 반환"
 	)
 	@GetMapping("/")
 	public ResponseEntity<List<SpotDto>> getSpots(
@@ -31,8 +31,8 @@ public class SpotController {
 	}
 
 	@Operation(
-			summary = "",
-			description = ""
+			summary = "Spot 등록",
+			description = "SpotDto 객체 등록"
 	)
 	@PostMapping("/")
 	@PreAuthorize("hasRole('ROLE_ADMIN')")
