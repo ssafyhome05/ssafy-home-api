@@ -14,6 +14,9 @@ public class UserDto {
   private String userName;
   private String userEmail;
   private String userPhone;
+  private String userZipcode;
   private String userAddress;
-
+  private String userAddress2;
+  private boolean socialType;
+  private String socialPlatform;
 }
