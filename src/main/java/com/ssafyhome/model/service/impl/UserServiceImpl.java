@@ -11,6 +11,7 @@ import com.ssafyhome.model.service.UserService;
 import com.ssafyhome.util.SecretUtil;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
+import org.apache.catalina.User;
 import org.springframework.mail.MailSendException;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
@@ -50,11 +51,16 @@ public class UserServiceImpl implements UserService {
       throw new InvalidPasswordException("invalid password");
     }
 
-    UserEntity userEntity = new UserEntity();
-    userEntity.setUserId(userDto.getUserId());
-    userEntity.setUserPw(passwordEncoder.encode(userDto.getUserPassword()));
-    userEntity.setUserEmail(userDto.getUserEmail());
-    userEntity.setUserName(userDto.getUserName());
+    UserEntity userEntity = UserEntity.builder()
+        .userId(userDto.getUserId())
+        .userPw(passwordEncoder.encode(userDto.getUserPassword()))
+        .userEmail(userDto.getUserEmail())
+        .userName(userDto.getUserName())
+        .userPhone(userDto.getUserPhone())
+        .userZipcode(userDto.getUserZipcode())
+        .userAddress(userDto.getUserAddress())
+        .userAddress2(userDto.getUserAddress2())
+        .build();
 
     userMapper.insertUser(userEntity);
   }
@@ -177,17 +183,22 @@ public class UserServiceImpl implements UserService {
   }
 
   @Override
-  public void updateUser(UserDto userDto) {
+  public void updateUser(long userSeq, UserDto userDto) {
 
-    UserEntity userEntity = new UserEntity();
-    userEntity.setUserId(userDto.getUserId());
-    userEntity.setUserEmail(userDto.getUserEmail());
-    userEntity.setUserName(userDto.getUserName());
+    UserEntity userEntity = UserEntity.builder()
+        .userSeq(userSeq)
+        .userName(userDto.getUserName())
+        .userPhone(userDto.getUserPhone())
+        .userZipcode(userDto.getUserZipcode())
+        .userAddress(userDto.getUserAddress())
+        .userAddress2(userDto.getUserAddress2())
+        .build();
+
     userMapper.updateUser(userEntity);
   }
 
   @Override
-  public void deleteUser(String userSeq) {
+  public void deleteUser(long userSeq) {
 
     userMapper.deleteUser(userSeq);
   }

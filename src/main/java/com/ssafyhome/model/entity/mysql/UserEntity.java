@@ -1,10 +1,12 @@
 package com.ssafyhome.model.entity.mysql;
 
+import lombok.Builder;
 import lombok.Data;
 
 import java.time.LocalDateTime;
 
 @Data
+@Builder
 public class UserEntity {
 
   private long userSeq;
