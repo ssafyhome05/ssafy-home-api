@@ -8,7 +8,7 @@ import java.util.Map;
 public class BookmarkStatusDto {
 
 	//애매함
-	private Map<LocationDto, HouseStatusDto> locationStatuses;
+	private Map<LocationDto, LocationStatusDto> locationStatuses;
 	private Map<HouseDto, NavigateDto> houseStatuses;
 	private Map<CustomSpotDto, NavigateDto> customSpotStatuses;
 }
