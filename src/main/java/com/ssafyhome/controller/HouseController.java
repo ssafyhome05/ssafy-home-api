@@ -83,7 +83,7 @@ public class HouseController {
 			description = ""
 	)
 	@GetMapping("/status")
-	public ResponseEntity<HouseStatusDto> getHouseStatus(
+	public ResponseEntity<LocationStatusDto> getHouseStatus(
 			@RequestParam
 			String dongCode
 	) {

@@ -1,9 +1,10 @@
 package com.ssafyhome.controller;
 
-import com.ssafyhome.model.entity.mysql.NoticeEntity;
+import com.ssafyhome.model.dto.NoticeDto;
+import com.ssafyhome.model.service.NoticeService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -18,18 +19,26 @@ import java.util.List;
 @RequestMapping("/notice")
 public class NoticeController {
 
+	private final NoticeService noticeService;
+
+	public NoticeController(NoticeService noticeService) {
+
+		this.noticeService = noticeService;
+	}
+
 	@Operation(
 			summary = "",
 			description = ""
 	)
-	@PostMapping("/")
+	@PostMapping("")
 	@PreAuthorize("hasRole('ROLE_ADMIN')")
 	public ResponseEntity<?> registerNotice(
 			@RequestBody
-			NoticeEntity noticeEntity
+			NoticeDto noticeDto
 	) {
 
-		return null;
+		noticeService.registerNotice(noticeDto);
+		return new ResponseEntity<>("register notice success", HttpStatus.CREATED);
 	}
 
 	@Operation(
@@ -37,12 +46,13 @@ public class NoticeController {
 			description = ""
 	)
 	@GetMapping("/detail")
-	public ResponseEntity<NoticeEntity> getNotice(
+	public ResponseEntity<NoticeDto> getNotice(
 			@RequestParam
-			String noticeSeq
+			long noticeSeq
 	) {
 
-		return null;
+		NoticeDto noticeDto = noticeService.getNotice(noticeSeq);
+		return new ResponseEntity<>(noticeDto, HttpStatus.OK);
 	}
 
 	@Operation(
@@ -50,13 +60,13 @@ public class NoticeController {
 			description = ""
 	)
 	@GetMapping("/{page}")
-	public ResponseEntity<List<NoticeEntity>> getNoticeList(
-			HttpServletRequest request,
+	public ResponseEntity<List<NoticeDto>> getNoticeList(
 			@PathVariable
-			Long page
+			int page
 	) {
 
-		return null;
+		List<NoticeDto> noticeDtoList = noticeService.getNotices(page);
+		return new ResponseEntity<>(noticeDtoList, HttpStatus.OK);
 	}
 
 	@Operation(
@@ -67,13 +77,14 @@ public class NoticeController {
 	@PreAuthorize("hasRole('ROLE_ADMIN')")
 	public ResponseEntity<?> updateNotice(
 			@PathVariable
-			String noticeSeq,
+			long noticeSeq,
 
 			@RequestBody
-			NoticeEntity noticeEntity
+			NoticeDto noticeDto
 	) {
 
-		return null;
+		noticeService.updateNotice(noticeSeq, noticeDto);
+		return new ResponseEntity<>("update notice success", HttpStatus.OK);
 	}
 
 	@Operation(
@@ -84,9 +95,10 @@ public class NoticeController {
 	@PreAuthorize("hasRole('ROLE_ADMIN')")
 	public ResponseEntity<?> deleteNotice(
 			@PathVariable
-			String noticeSeq
+			long noticeSeq
 	) {
 
-		return null;
+		noticeService.deleteNotice(noticeSeq);
+		return new ResponseEntity<>("delete notice success", HttpStatus.OK);
 	}
 }
