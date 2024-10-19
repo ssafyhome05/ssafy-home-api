@@ -22,6 +22,12 @@ configurations {
 
 repositories {
     mavenCentral()
+    maven {
+        url = uri("https://repo.osgeo.org/repository/release/")
+    }
+    maven {
+        url = uri("https://repo.osgeo.org/repository/snapshot")
+    }
 }
 
 dependencies {
@@ -34,6 +40,10 @@ dependencies {
     implementation("org.mybatis.spring.boot:mybatis-spring-boot-starter:3.0.3")
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.0.2")
     implementation("io.jsonwebtoken:jjwt-api:0.12.5")
+    implementation("org.geotools:gt-referencing:23-RC") {
+        exclude(group = "javax.media", module = "jai_core")
+        exclude(group = "javax.media", module = "jai_codec")
+    }
     implementation("org.springframework.cloud:spring-cloud-starter-openfeign")
     runtimeOnly("io.jsonwebtoken:jjwt-impl:0.12.5")
     runtimeOnly("io.jsonwebtoken:jjwt-jackson:0.12.5")
