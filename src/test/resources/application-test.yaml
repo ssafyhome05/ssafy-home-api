@@ -1,2 +1,3 @@
-kakao:
-  API-KEY:
+spring:
+  config:
+    import: classpath:/env.yaml
