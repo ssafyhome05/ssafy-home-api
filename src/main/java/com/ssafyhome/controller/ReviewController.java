@@ -1,9 +1,11 @@
 package com.ssafyhome.controller;
 
+import com.ssafyhome.model.dto.ReviewDto;
 import com.ssafyhome.model.dto.ReviewSearchDto;
-import com.ssafyhome.model.entity.mysql.ReviewEntity;
+import com.ssafyhome.model.service.ReviewService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -18,6 +20,13 @@ import java.util.List;
 @RequestMapping("/review")
 public class ReviewController {
 
+	private final ReviewService reviewService;
+
+	public ReviewController(ReviewService reviewService) {
+
+		this.reviewService = reviewService;
+	}
+
 	@Operation(
 			summary = "평가 등록",
 			description = "ReviewEntity 등록"
@@ -26,10 +35,11 @@ public class ReviewController {
 	@PreAuthorize("hasRole('ROLE_USER')")
 	public ResponseEntity<?> registerReview(
 			@RequestBody
-			ReviewEntity reviewEntity
+			ReviewDto reviewDto
 	) {
 
-		return null;
+		reviewService.registerReview(reviewDto);
+		return new ResponseEntity<>("review register success", HttpStatus.CREATED);
 	}
 
 	@Operation(
@@ -38,42 +48,45 @@ public class ReviewController {
 	)
 	@GetMapping("/list")
 	@PreAuthorize("hasRole('ROLE_ADMIN')")
-	public ResponseEntity<List<ReviewEntity>> getReview(
+	public ResponseEntity<List<ReviewDto>> getReview(
 			@RequestBody
 			ReviewSearchDto reviewSearchDto
 	) {
 
-		return null;
+		List<ReviewDto> reviewDtoList = reviewService.getReviews(reviewSearchDto);
+		return new ResponseEntity<>(reviewDtoList, HttpStatus.OK);
 	}
 
 	@Operation(
 			summary = "리뷰 수정",
 			description = "reviewSeq 와 일치하는 ReviewEntity 객체 수정"
 	)
-	@PutMapping("/{reviewSeq}")
+	@PutMapping("/{aptSeq}")
 	@PreAuthorize("hasRole('ROLE_USER')")
 	public ResponseEntity<?> updateReview(
 			@PathVariable
-			String reviewSeq,
+			String aptSeq,
 
 			@RequestBody
-			ReviewEntity reviewEntity
+			ReviewDto reviewDto
 	) {
 
-		return null;
+		reviewService.updateReview(aptSeq, reviewDto);
+		return new ResponseEntity<>("review update success", HttpStatus.OK);
 	}
 
 	@Operation(
 			summary = "리뷰 삭제",
 			description = "reviewSeq 와 일치하는 ReviewEntity 객체 삭제"
 	)
-	@DeleteMapping("/{reviewSeq}")
+	@DeleteMapping("/{aptSeq}")
 	@PreAuthorize("hasRole('ROLE_USER')")
 	public ResponseEntity<?> deleteReview(
 			@PathVariable
-			String reviewSeq
+			String aptSeq
 	) {
 
-		return null;
+		reviewService.deleteReview(aptSeq);
+		return new ResponseEntity<>("review delete success", HttpStatus.OK);
 	}
 }
