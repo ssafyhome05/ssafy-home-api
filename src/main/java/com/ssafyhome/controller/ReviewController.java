@@ -22,7 +22,7 @@ public class ReviewController {
 			summary = "평가 등록",
 			description = "ReviewEntity 등록"
 	)
-	@PostMapping("/")
+	@PostMapping("")
 	@PreAuthorize("hasRole('ROLE_USER')")
 	public ResponseEntity<?> registerReview(
 			@RequestBody
