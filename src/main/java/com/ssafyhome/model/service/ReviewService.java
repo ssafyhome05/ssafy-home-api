@@ -9,6 +9,6 @@ public interface ReviewService {
 
 	void registerReview(ReviewDto reviewDto);
 	List<ReviewDto> getReviews(ReviewSearchDto reviewSearchDto);
-	void updateReview(long reviewSeq, ReviewDto reviewDto);
-	void deleteReview(long reviewSeq);
+	void updateReview(String aptSeq, ReviewDto reviewDto);
+	void deleteReview(String aptSeq);
 }

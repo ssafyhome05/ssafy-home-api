@@ -61,17 +61,17 @@ public class ReviewController {
 			summary = "리뷰 수정",
 			description = "reviewSeq 와 일치하는 ReviewEntity 객체 수정"
 	)
-	@PutMapping("/{reviewSeq}")
+	@PutMapping("/{aptSeq}")
 	@PreAuthorize("hasRole('ROLE_USER')")
 	public ResponseEntity<?> updateReview(
 			@PathVariable
-			long reviewSeq,
+			String aptSeq,
 
 			@RequestBody
 			ReviewDto reviewDto
 	) {
 
-		reviewService.updateReview(reviewSeq, reviewDto);
+		reviewService.updateReview(aptSeq, reviewDto);
 		return new ResponseEntity<>("review update success", HttpStatus.OK);
 	}
 
@@ -79,14 +79,14 @@ public class ReviewController {
 			summary = "리뷰 삭제",
 			description = "reviewSeq 와 일치하는 ReviewEntity 객체 삭제"
 	)
-	@DeleteMapping("/{reviewSeq}")
+	@DeleteMapping("/{aptSeq}")
 	@PreAuthorize("hasRole('ROLE_USER')")
 	public ResponseEntity<?> deleteReview(
 			@PathVariable
-			long reviewSeq
+			String aptSeq
 	) {
 
-		reviewService.deleteReview(reviewSeq);
+		reviewService.deleteReview(aptSeq);
 		return new ResponseEntity<>("review delete success", HttpStatus.OK);
 	}
 }
