@@ -81,7 +81,7 @@ public class UserController {
 			summary = "회원상세정보 제공",
 			description = "String 객체의 userSeq 를 받아 UserDto 반환"
 	)
-	@GetMapping("/")
+	@GetMapping("")
 	@PreAuthorize("hasRole('ROLE_ADMIN') or  #userSeq == authentication.name")
 	public ResponseEntity<UserDto> getUserInfo(
 			@RequestParam
