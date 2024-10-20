@@ -30,7 +30,7 @@ public class UserController {
 			summary = "회원가입",
 			description = "UserDto를 받아 회원 등록"
 	)
-	@PostMapping("/")
+	@PostMapping("")
 	public ResponseEntity<?> registerUser(
 			@RequestBody
 			UserDto userDto

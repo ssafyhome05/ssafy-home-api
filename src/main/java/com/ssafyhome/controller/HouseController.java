@@ -95,7 +95,7 @@ public class HouseController {
 			summary = "",
 			description = ""
 	)
-	@GetMapping("/")
+	@GetMapping("")
 	public ResponseEntity<List<HouseDto>> getHouseInfo(
 			@RequestParam
 			String dongCode
@@ -119,7 +119,7 @@ public class HouseController {
 			summary = "",
 			description = ""
 	)
-	@PostMapping("/")
+	@PostMapping("")
 	@PreAuthorize("hasRole('ROLE_ADMIN')")
 	public ResponseEntity<?> updateHouseInfo() {
 
