@@ -98,7 +98,7 @@ public class UserController {
 	@GetMapping("/list")
 	@PreAuthorize("hasRole('ROLE_ADMIN')")
 	public ResponseEntity<List<UserDto>> getUserList(
-			@RequestBody
+			@ModelAttribute
 			UserSearchDto userSearchDto
 	) {
 
