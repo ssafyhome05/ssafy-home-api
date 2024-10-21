@@ -5,6 +5,7 @@ import com.ssafyhome.model.dto.ReviewDto;
 import com.ssafyhome.model.dto.ReviewSearchDto;
 import com.ssafyhome.model.entity.mysql.ReviewEntity;
 import com.ssafyhome.model.service.ReviewService;
+import com.ssafyhome.util.ConvertUtil;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -16,22 +17,22 @@ import java.util.List;
 public class ReviewServiceImpl implements ReviewService {
 
 	private final ReviewMapper reviewMapper;
+	private final ConvertUtil convertUtil;
 
-	public ReviewServiceImpl(ReviewMapper reviewMapper) {
+	public ReviewServiceImpl(
+			ReviewMapper reviewMapper,
+			ConvertUtil convertUtil
+	) {
 
 		this.reviewMapper = reviewMapper;
+		this.convertUtil = convertUtil;
 	}
 
 	@Override
 	public void registerReview(ReviewDto reviewDto) {
 
-		ReviewEntity reviewEntity = ReviewEntity.builder()
-				.aptSeq(reviewDto.getAptSeq())
-				.userSeq(getUserSeq())
-				.reviewTitle(reviewDto.getReviewTitle())
-				.reviewContent(reviewDto.getReviewContent())
-				.reviewRate(reviewDto.getReviewRate())
-				.build();
+		ReviewEntity reviewEntity = convertUtil.convert(reviewDto, ReviewEntity.class);
+		reviewEntity.setUserSeq(getUserSeq());
 		reviewMapper.insertReview(reviewEntity);
 	}
 
@@ -39,30 +40,15 @@ public class ReviewServiceImpl implements ReviewService {
 	public List<ReviewDto> getReviews(ReviewSearchDto reviewSearchDto) {
 
 		List<ReviewEntity> reviewEntityList = reviewMapper.getReviewBySearchDto(reviewSearchDto);
-		return reviewEntityList.stream()
-				.map(reviewEntity -> ReviewDto.builder()
-						.aptSeq(reviewEntity.getAptSeq())
-						.userSeq(getUserSeq())
-						.reviewTitle(reviewEntity.getReviewTitle())
-						.reviewContent(reviewEntity.getReviewContent())
-						.reviewRate(reviewEntity.getReviewRate())
-						.createdAt(reviewEntity.getCreatedAt())
-						.modifiedAt(reviewEntity.getModifiedAt())
-						.build()
-				)
-				.toList();
+		return convertUtil.convert(reviewEntityList, ReviewDto.class);
 	}
 
 	@Override
 	public void updateReview(String aptSeq, ReviewDto reviewDto) {
 
-		ReviewEntity reviewEntity = ReviewEntity.builder()
-				.aptSeq(aptSeq)
-				.userSeq(getUserSeq())
-				.reviewTitle(reviewDto.getReviewTitle())
-				.reviewContent(reviewDto.getReviewContent())
-				.reviewRate(reviewDto.getReviewRate())
-				.build();
+		ReviewEntity reviewEntity = convertUtil.convert(reviewDto, ReviewEntity.class);
+		reviewEntity.setAptSeq(aptSeq);
+		reviewEntity.setUserSeq(getUserSeq());
 		reviewMapper.updateReview(reviewEntity);
 	}
 
