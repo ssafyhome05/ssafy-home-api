@@ -4,6 +4,7 @@ import com.ssafyhome.model.dao.mapper.NoticeMapper;
 import com.ssafyhome.model.dto.NoticeDto;
 import com.ssafyhome.model.entity.mysql.NoticeEntity;
 import com.ssafyhome.model.service.NoticeService;
+import com.ssafyhome.util.ConvertUtil;
 import org.springframework.stereotype.Service;
 
 import java.time.format.DateTimeFormatter;
@@ -13,20 +14,21 @@ import java.util.List;
 public class NoticeServiceImpl implements NoticeService {
 
   private final NoticeMapper noticeMapper;
+  private final ConvertUtil convertUtil;
 
-  public NoticeServiceImpl(NoticeMapper noticeMapper) {
+  public NoticeServiceImpl(
+      NoticeMapper noticeMapper,
+      ConvertUtil convertUtil
+  ) {
 
     this.noticeMapper = noticeMapper;
+    this.convertUtil = convertUtil;
   }
 
   @Override
   public void registerNotice(NoticeDto noticeDto) {
 
-    NoticeEntity noticeEntity = NoticeEntity.builder()
-        .noticeTitle(noticeDto.getNoticeTitle())
-        .noticeContent(noticeDto.getNoticeContent())
-        .build();
-
+    NoticeEntity noticeEntity = convertUtil.convert(noticeDto, NoticeEntity.class);
     noticeMapper.insert(noticeEntity);
   }
 
@@ -54,28 +56,20 @@ public class NoticeServiceImpl implements NoticeService {
 
     if (noticeEntity.getModifiedAt() != null) {
 
-      DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+      DateTimeFormatter formatter = DateTimeFormatter.ofPattern("(수정: yyyy-MM-dd HH:mm:ss)");
       String modifiedString = noticeEntity.getModifiedAt().format(formatter);
       title = title + " " + modifiedString;
     }
 
-    return NoticeDto.builder()
-        .noticeSeq(noticeEntity.getNoticeSeq())
-        .noticeTitle(title)
-        .noticeContent(noticeEntity.getNoticeContent())
-        .createdAt(noticeEntity.getCreatedAt())
-        .build();
+    NoticeDto noticeDto = convertUtil.convert(noticeEntity, NoticeDto.class);
+    noticeDto.setNoticeTitle(title);
+    return noticeDto;
   }
 
   @Override
   public void updateNotice(long noticeSeq, NoticeDto noticeDto) {
 
-    NoticeEntity noticeEntity = NoticeEntity.builder()
-        .noticeSeq(noticeSeq)
-        .noticeTitle(noticeDto.getNoticeTitle())
-        .noticeContent(noticeDto.getNoticeContent())
-        .build();
-
+    NoticeEntity noticeEntity = convertUtil.convert(noticeDto, NoticeEntity.class);
     noticeMapper.update(noticeEntity);
   }
 

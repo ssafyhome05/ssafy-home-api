@@ -8,6 +8,7 @@ import com.ssafyhome.model.dao.mapper.UserMapper;
 import com.ssafyhome.model.dto.*;
 import com.ssafyhome.model.entity.mysql.UserEntity;
 import com.ssafyhome.model.service.UserService;
+import com.ssafyhome.util.ConvertUtil;
 import com.ssafyhome.util.SecretUtil;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
@@ -28,18 +29,21 @@ public class UserServiceImpl implements UserService {
   private final BCryptPasswordEncoder passwordEncoder;
   private final UserMapper userMapper;
   private final SecretUtil secretUtil;
+  private final ConvertUtil convertUtil;
   private final JavaMailSender mailSender;
 
   public UserServiceImpl(
       BCryptPasswordEncoder passwordEncoder,
       UserMapper userMapper,
       SecretUtil secretUtil,
+      ConvertUtil convertUtil,
       JavaMailSender mailSender
   ) {
 
     this.passwordEncoder = passwordEncoder;
     this.userMapper = userMapper;
     this.secretUtil = secretUtil;
+    this.convertUtil = convertUtil;
     this.mailSender = mailSender;
   }
 
@@ -51,16 +55,8 @@ public class UserServiceImpl implements UserService {
       throw new InvalidPasswordException("invalid password");
     }
 
-    UserEntity userEntity = UserEntity.builder()
-        .userId(userDto.getUserId())
-        .userPw(passwordEncoder.encode(userDto.getUserPassword()))
-        .userEmail(userDto.getUserEmail())
-        .userName(userDto.getUserName())
-        .userPhone(userDto.getUserPhone())
-        .userZipcode(userDto.getUserZipcode())
-        .userAddress(userDto.getUserAddress())
-        .userAddress2(userDto.getUserAddress2())
-        .build();
+    UserEntity userEntity = convertUtil.convert(userDto, UserEntity.class);
+    userEntity.setUserPw(passwordEncoder.encode(userEntity.getUserPw()));
 
     userMapper.insertUser(userEntity);
   }
@@ -109,24 +105,14 @@ public class UserServiceImpl implements UserService {
   public UserDto getUserInfo(String userSeq) {
 
     UserEntity userEntity = userMapper.getUserBySeq(userSeq);
-    return UserDto.builder()
-        .userSeq(userEntity.getUserSeq())
-        .userId(userEntity.getUserId())
-        .userEmail(userEntity.getUserEmail())
-        .build();
+    return convertUtil.convert(userEntity, UserDto.class);
   }
 
   @Override
   public List<UserDto> getUserList(UserSearchDto userSearchDto) {
 
     List<UserEntity> userEntityList = userMapper.getUserList(userSearchDto);
-    return userEntityList.stream()
-        .map(userEntity -> UserDto.builder()
-            .userSeq(userEntity.getUserSeq())
-            .userId(userEntity.getUserId())
-            .userEmail(userEntity.getUserEmail())
-            .build())
-        .toList();
+    return convertUtil.convert(userEntityList, UserDto.class);
   }
 
   @Override
@@ -185,14 +171,8 @@ public class UserServiceImpl implements UserService {
   @Override
   public void updateUser(long userSeq, UserDto userDto) {
 
-    UserEntity userEntity = UserEntity.builder()
-        .userSeq(userSeq)
-        .userName(userDto.getUserName())
-        .userPhone(userDto.getUserPhone())
-        .userZipcode(userDto.getUserZipcode())
-        .userAddress(userDto.getUserAddress())
-        .userAddress2(userDto.getUserAddress2())
-        .build();
+    UserEntity userEntity = convertUtil.convert(userDto, UserEntity.class);
+    userEntity.setUserSeq(userSeq);
 
     userMapper.updateUser(userEntity);
   }
