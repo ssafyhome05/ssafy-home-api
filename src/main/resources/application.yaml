@@ -54,9 +54,6 @@ spring:
             user-info-uri: https://kapi.kakao.com/v2/user/me
             user-name-attribute: id
 
-  jackson:
-    property-naming-strategy: SNAKE_CASE
-
   mail:
     host: ${mail.host}
     port: 587
@@ -93,3 +90,10 @@ server:
   servlet:
     session:
       timeout: 90m
+
+logging:
+  level:
+    com:
+      ssafyhome:
+        api:
+          DEBUG
