@@ -1,19 +1,15 @@
 package com.ssafyhome;
 
-import com.ssafyhome.api.KakaoClient;
+import com.ssafyhome.api.kakao.KakaoClient;
 import com.ssafyhome.model.dto.KakaoKeywordPlaceDto;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 
 @SpringBootTest
 @ActiveProfiles("kakao openfeign test")
 public class KakaoOpenFeignTest {
-
-	@Value("${kakao.API-KEY}")
-	private String apiKey;
 
 	private final KakaoClient kakaoClient;
 
@@ -25,7 +21,7 @@ public class KakaoOpenFeignTest {
 
 	@Test
 	public void testKakaoKeywordPlace() {
-		KakaoKeywordPlaceDto kakaoKeywordPlaceDto = kakaoClient.searchKeywordPlace("KakaoAK " + apiKey, "다이소");
+		KakaoKeywordPlaceDto kakaoKeywordPlaceDto = kakaoClient.searchKeywordPlace("다이소");
 		System.out.println(kakaoKeywordPlaceDto);
 	}
 }

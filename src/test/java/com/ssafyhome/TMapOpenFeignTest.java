@@ -1,20 +1,19 @@
 package com.ssafyhome;
 
-import com.ssafyhome.api.TMapClient;
+import com.ssafyhome.api.tmap.TMapClient;
+import com.ssafyhome.model.dto.TMapTransportRouteRequestDto;
+import com.ssafyhome.model.dto.TMapTransportRouteResponseDto;
 import com.ssafyhome.model.dto.TMapWalkRouteRequestDto;
 import com.ssafyhome.model.dto.TMapWalkRouteResponseDto;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 
 @SpringBootTest
 @ActiveProfiles("t-map openfeign test")
 public class TMapOpenFeignTest {
-
-    @Value("${t-map.API_KEY}")
-    private String apiKey;
 
     private final TMapClient tMapClient;
 
@@ -36,11 +35,24 @@ public class TMapOpenFeignTest {
                 .endName("%EB%8F%84%EC%B0%A9")
                 .build();
 
-        TMapWalkRouteResponseDto responseDto = tMapClient.findWalkRoute(
-                apiKey,
-                1,
-                requestDto
-        );
+        TMapWalkRouteResponseDto responseDto = tMapClient.findWalkRoute(1, requestDto);
+
+        System.out.println(responseDto);
+    }
+
+    @Test
+    @Disabled
+    public void tMapTransportTest() {
+
+        TMapTransportRouteRequestDto requestDto = TMapTransportRouteRequestDto.builder()
+            .startX(126.926493082645)
+            .startY(37.6134436427887)
+            .endX(127.126936754911)
+            .endY(37.5004198786564)
+            .count(10)
+            .build();
+
+        TMapTransportRouteResponseDto responseDto = tMapClient.findTransportRoute(requestDto);
 
         System.out.println(responseDto);
     }
