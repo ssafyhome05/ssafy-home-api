@@ -1,9 +1,6 @@
 package com.ssafyhome.api.tmap;
 
-import com.ssafyhome.model.dto.TMapTransportRouteRequestDto;
-import com.ssafyhome.model.dto.TMapTransportRouteResponseDto;
-import com.ssafyhome.model.dto.TMapWalkRouteRequestDto;
-import com.ssafyhome.model.dto.TMapWalkRouteResponseDto;
+import com.ssafyhome.model.dto.*;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -15,6 +12,16 @@ import org.springframework.web.bind.annotation.RequestParam;
 		configuration = TMapHeaderConfig.class
 )
 public interface TMapClient {
+
+	@PostMapping("/tmap/routes")
+	TMapCarRouteResponseDto findCarRoute(
+
+			@RequestParam("version")
+			int version,
+
+			@RequestBody
+			TMapCarRouteRequestDto tMapCarRouteRequestDto
+	);
 
 	@PostMapping("/tmap/routes/pedestrian")
 	TMapWalkRouteResponseDto findWalkRoute(
