@@ -1,10 +1,7 @@
 package com.ssafyhome;
 
 import com.ssafyhome.api.tmap.TMapClient;
-import com.ssafyhome.model.dto.TMapTransportRouteRequestDto;
-import com.ssafyhome.model.dto.TMapTransportRouteResponseDto;
-import com.ssafyhome.model.dto.TMapWalkRouteRequestDto;
-import com.ssafyhome.model.dto.TMapWalkRouteResponseDto;
+import com.ssafyhome.model.dto.*;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,6 +50,21 @@ public class TMapOpenFeignTest {
             .build();
 
         TMapTransportRouteResponseDto responseDto = tMapClient.findTransportRoute(requestDto);
+
+        System.out.println(responseDto);
+    }
+
+    @Test
+    public void tMapCarTest() {
+
+        TMapCarRouteRequestDto requestDto = TMapCarRouteRequestDto.builder()
+            .startX(126.926493082645)
+            .startY(37.6134436427887)
+            .endX(127.126936754911)
+            .endY(37.5004198786564)
+            .build();
+
+        TMapCarRouteResponseDto responseDto = tMapClient.findCarRoute(1, requestDto);
 
         System.out.println(responseDto);
     }
