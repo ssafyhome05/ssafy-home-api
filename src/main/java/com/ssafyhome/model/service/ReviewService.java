@@ -1,7 +1,7 @@
 package com.ssafyhome.model.service;
 
-import com.ssafyhome.model.dto.ReviewDto;
-import com.ssafyhome.model.dto.ReviewSearchDto;
+import com.ssafyhome.model.dto.review.ReviewDto;
+import com.ssafyhome.model.dto.review.ReviewSearchDto;
 
 import java.util.List;
 

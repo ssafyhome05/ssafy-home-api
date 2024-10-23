@@ -1,6 +1,6 @@
 package com.ssafyhome.model.service;
 
-import com.ssafyhome.model.dto.NoticeDto;
+import com.ssafyhome.model.dto.notice.NoticeDto;
 
 import java.util.List;
 

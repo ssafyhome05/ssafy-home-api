@@ -1,8 +1,8 @@
 package com.ssafyhome.model.service.impl;
 
 import com.ssafyhome.model.dao.mapper.UserMapper;
-import com.ssafyhome.model.dto.AdminOAuth2User;
-import com.ssafyhome.model.dto.CustomOAuth2User;
+import com.ssafyhome.model.dto.auth.AdminOAuth2User;
+import com.ssafyhome.model.dto.auth.CustomOAuth2User;
 import com.ssafyhome.model.entity.mysql.UserEntity;
 import com.ssafyhome.model.dto.oauth2response.*;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;

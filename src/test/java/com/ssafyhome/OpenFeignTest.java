@@ -4,7 +4,7 @@ import com.ssafyhome.api.kakao.KakaoClient;
 import com.ssafyhome.api.sgis.SGISClient;
 import com.ssafyhome.api.sgis.SGISUtil;
 import com.ssafyhome.api.tmap.TMapClient;
-import com.ssafyhome.model.dto.*;
+import com.ssafyhome.model.dto.api.*;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

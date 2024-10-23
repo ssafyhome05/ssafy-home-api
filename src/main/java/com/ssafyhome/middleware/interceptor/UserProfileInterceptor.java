@@ -2,7 +2,7 @@ package com.ssafyhome.middleware.interceptor;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ssafyhome.model.dao.mapper.UserMapper;
-import com.ssafyhome.model.dto.UserProfileDto;
+import com.ssafyhome.model.dto.user.UserProfileDto;
 import com.ssafyhome.model.entity.mysql.UserEntity;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -11,9 +11,6 @@ import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
-import org.springframework.web.servlet.ModelAndView;
-
-import javax.json.Json;
 
 @Component
 public class UserProfileInterceptor implements HandlerInterceptor {

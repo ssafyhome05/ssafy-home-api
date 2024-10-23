@@ -1,6 +1,6 @@
 package com.ssafyhome.model.dao.mapper;
 
-import com.ssafyhome.model.dto.ReviewSearchDto;
+import com.ssafyhome.model.dto.review.ReviewSearchDto;
 import com.ssafyhome.model.entity.mysql.ReviewEntity;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;

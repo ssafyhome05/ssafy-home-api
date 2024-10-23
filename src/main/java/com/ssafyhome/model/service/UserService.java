@@ -1,6 +1,6 @@
 package com.ssafyhome.model.service;
 
-import com.ssafyhome.model.dto.*;
+import com.ssafyhome.model.dto.user.*;
 
 import java.util.List;
 
