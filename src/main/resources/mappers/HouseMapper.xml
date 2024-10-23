@@ -1,4 +1,17 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.ssafyhome.model.dao.mapper.HouseMapper">
+    <insert id="insertHouseInfo" parameterType="com.ssafyhome.model.entity.mysql.HouseInfoEntity">
+        INSERT INTO house_info
+        VALUES (#{houseSeq},#{sggCd},#{umdCd},#{umdNm},#{jibun},#{roadNmSggCd},#{roadNm},#{roadNmBonbun},#{roadNmBubun},#{aptNm},#{buildYear},#{latitude},#{longitude})
+    </insert>
+    <insert id="insertHouseDeal" parameterType="com.ssafyhome.model.entity.mysql.HouseDealEntity">
+        INSERT INTO house_deal
+        VALUES (#{dealSeq},#{aptSeq},#{aptDong},#{floor},#{dealYear},#{dealMonth},#{dealDay},#{exclusiveUseAr},#{dealAmount})
+    </insert>
+    <select id="getSidoGugun" parameterType="string" resultType="com.ssafyhome.model.entity.mysql.DongCodeEntity">
+        SELECT *
+        FROM legal_dong_code
+        WHERE dong_code = #{dongCode}
+    </select>
 </mapper>
