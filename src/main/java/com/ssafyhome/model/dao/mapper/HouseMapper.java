@@ -14,4 +14,5 @@ public interface HouseMapper {
 	void insertHouseDeal(HouseDealEntity houseDealEntity);
 	DongCodeEntity getSidoGugun(String dongCode);
 	List<Integer> getLawdCdList();
+	boolean isExistHouseInfo(String houseSeq);
 }
