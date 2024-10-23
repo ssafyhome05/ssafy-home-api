@@ -1,5 +1,6 @@
 package com.ssafyhome;
 
+import com.ssafyhome.api.gonggong.GonggongClient;
 import com.ssafyhome.api.kakao.KakaoClient;
 import com.ssafyhome.api.sgis.SGISClient;
 import com.ssafyhome.api.sgis.SGISUtil;
@@ -17,20 +18,22 @@ public class OpenFeignTest {
     private final SGISClient sgisClient;
     private final SGISUtil sgisUtil;
     private final TMapClient tMapClient;
+    private final GonggongClient gonggongClient;
 
     @Autowired
     public OpenFeignTest(
             KakaoClient kakaoClient,
             SGISClient sgisClient,
             SGISUtil sgisUtil,
-            TMapClient tMapClient
-
+            TMapClient tMapClient,
+            GonggongClient gonggongClient
     ) {
 
         this.kakaoClient = kakaoClient;
         this.sgisClient = sgisClient;
         this.sgisUtil = sgisUtil;
         this.tMapClient = tMapClient;
+        this.gonggongClient = gonggongClient;
     }
 
     @Test
@@ -111,5 +114,19 @@ public class OpenFeignTest {
         TMapCarRouteResponseDto responseDto = tMapClient.findCarRoute(1, requestDto);
 
         System.out.println(responseDto);
+    }
+
+    @Test
+    public void gonggongAptTradeTest() {
+
+        GonggongAptTradeResponse gonggongAptTradeResponse = gonggongClient.getRTMSDataSvcAptTradeDev(
+            11110,
+            202111,
+            "zkPCGLLeYNp7DcQ1XOEYpbo80W8vTNv7cJs5z8VNP8CRbAbI7KMwWdAgBRmHJ/UVxEKnC2F6qi8jjnn9148NgA==",
+            1,
+            10
+        );
+
+        System.out.println(gonggongAptTradeResponse);
     }
 }
