@@ -48,6 +48,7 @@ dependencies {
     implementation("org.modelmapper:modelmapper:3.1.0")
     implementation("io.github.openfeign:feign-slf4j")
     implementation("org.springframework.cloud:spring-cloud-starter-config")
+    implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.17.1")
     runtimeOnly("io.jsonwebtoken:jjwt-impl:0.12.5")
     runtimeOnly("io.jsonwebtoken:jjwt-jackson:0.12.5")
 
