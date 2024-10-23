@@ -29,7 +29,7 @@ public class SGISUtil {
 
 		if (store.containsKey("sgis.access_token")) {
 			SgisAccessToken accessToken = (SgisAccessToken) store.get("sgis.access_token");
-			if (Long.parseLong(accessToken.getResult().getAccessTimeout()) + 4 * 60 * 60 < Instant.now().getEpochSecond()) {
+			if (Long.parseLong(accessToken.getResult().getAccessTimeout()) + 4 * 60 * 60 >= Instant.now().getEpochSecond()) {
 				return accessToken.getResult().getAccessToken();
 			}
 		}
