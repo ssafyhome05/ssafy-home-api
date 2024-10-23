@@ -5,7 +5,7 @@ import lombok.Data;
 import java.util.List;
 
 @Data
-public class KakaoKeywordPlaceDto {
+public class KakaoPlaceDto {
 
 	private List<Document> documents;
 

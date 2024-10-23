@@ -1,4 +1,4 @@
-package com.ssafyhome.config;
+package com.ssafyhome.api.common;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;

@@ -1,4 +1,4 @@
-package com.ssafyhome.config;
+package com.ssafyhome.api.common;
 
 import feign.Logger;
 import org.springframework.context.annotation.Bean;
