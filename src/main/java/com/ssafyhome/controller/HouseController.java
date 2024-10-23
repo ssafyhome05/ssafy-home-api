@@ -8,6 +8,7 @@ import com.ssafyhome.model.dto.spot.LocationStatusDto;
 import com.ssafyhome.model.service.HouseService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -125,13 +126,24 @@ public class HouseController {
 //	@PreAuthorize("hasRole('ROLE_ADMIN')")
 	public ResponseEntity<?> updateHouseInfo(
 			@RequestParam
-			int lawdCd,
-
-			@RequestParam
 			int dealYmd
 	) {
 
-		houseService.insertHouseData(lawdCd, dealYmd);
-		return null;
+		String requestId = houseService.startHouseInfoTask(dealYmd);
+		return new ResponseEntity<>(requestId, HttpStatus.CREATED);
+	}
+
+	@Operation(
+			summary = "",
+			description = ""
+	)
+	@GetMapping("/task/{requestId}/status")
+//	@PreAuthorize("hasRole('ROLE_ADMIN')")
+	public SseEmitter subscribeHouseInfoProcess(
+			@PathVariable
+			String requestId
+	) {
+
+		return houseService.getHouseInfoTask(requestId);
 	}
 }

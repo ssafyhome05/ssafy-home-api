@@ -1,6 +1,9 @@
 package com.ssafyhome.model.service;
 
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
+
 public interface HouseService {
 
-	void insertHouseData(int lawdCd, int dealYmd);
+	String startHouseInfoTask(int dealYmd);
+	SseEmitter getHouseInfoTask(String requestId);
 }
