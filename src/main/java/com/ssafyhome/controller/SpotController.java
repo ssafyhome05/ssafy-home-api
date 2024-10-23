@@ -1,6 +1,6 @@
 package com.ssafyhome.controller;
 
-import com.ssafyhome.model.dto.SpotDto;
+import com.ssafyhome.model.dto.spot.SpotDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;

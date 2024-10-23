@@ -1,8 +1,7 @@
 package com.ssafyhome.model.service;
 
-import com.ssafyhome.model.dto.JwtDto;
+import com.ssafyhome.model.dto.api.JwtDto;
 import jakarta.servlet.http.HttpServletRequest;
-import org.springframework.http.ResponseEntity;
 
 public interface JWTService {
 

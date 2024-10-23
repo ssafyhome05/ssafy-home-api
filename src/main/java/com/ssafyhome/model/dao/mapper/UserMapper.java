@@ -1,7 +1,7 @@
 package com.ssafyhome.model.dao.mapper;
 
-import com.ssafyhome.model.dto.FindUserDto;
-import com.ssafyhome.model.dto.UserSearchDto;
+import com.ssafyhome.model.dto.user.FindUserDto;
+import com.ssafyhome.model.dto.user.UserSearchDto;
 import com.ssafyhome.model.entity.mysql.UserEntity;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;

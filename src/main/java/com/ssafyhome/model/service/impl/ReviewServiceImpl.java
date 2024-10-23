@@ -1,8 +1,8 @@
 package com.ssafyhome.model.service.impl;
 
 import com.ssafyhome.model.dao.mapper.ReviewMapper;
-import com.ssafyhome.model.dto.ReviewDto;
-import com.ssafyhome.model.dto.ReviewSearchDto;
+import com.ssafyhome.model.dto.review.ReviewDto;
+import com.ssafyhome.model.dto.review.ReviewSearchDto;
 import com.ssafyhome.model.entity.mysql.ReviewEntity;
 import com.ssafyhome.model.service.ReviewService;
 import com.ssafyhome.util.ConvertUtil;

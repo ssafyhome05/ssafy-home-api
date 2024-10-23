@@ -1,7 +1,7 @@
 package com.ssafyhome.model.service.impl;
 
 import com.ssafyhome.model.dao.mapper.NoticeMapper;
-import com.ssafyhome.model.dto.NoticeDto;
+import com.ssafyhome.model.dto.notice.NoticeDto;
 import com.ssafyhome.model.entity.mysql.NoticeEntity;
 import com.ssafyhome.model.service.NoticeService;
 import com.ssafyhome.util.ConvertUtil;

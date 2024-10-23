@@ -27,7 +27,7 @@
     </delete>
 
     <select id="getReviewBySearchDto"
-            parameterType="com.ssafyhome.model.dto.ReviewSearchDto"
+            parameterType="com.ssafyhome.model.dto.review.ReviewSearchDto"
             resultType="com.ssafyhome.model.entity.mysql.ReviewEntity">
         SELECT *
         FROM house_review

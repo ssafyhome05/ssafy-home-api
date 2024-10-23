@@ -1,7 +1,7 @@
 package com.ssafyhome.controller;
 
-import com.ssafyhome.model.dto.ReviewDto;
-import com.ssafyhome.model.dto.ReviewSearchDto;
+import com.ssafyhome.model.dto.review.ReviewDto;
+import com.ssafyhome.model.dto.review.ReviewSearchDto;
 import com.ssafyhome.model.service.ReviewService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;

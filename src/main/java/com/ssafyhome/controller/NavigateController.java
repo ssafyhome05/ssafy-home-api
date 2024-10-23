@@ -1,13 +1,11 @@
 package com.ssafyhome.controller;
 
-import com.ssafyhome.model.dto.NavigateDto;
-import com.ssafyhome.model.dto.SpotSearchDto;
+import com.ssafyhome.model.dto.navigate.NavigateDto;
+import com.ssafyhome.model.dto.spot.SpotSearchDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.context.SecurityContext;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;

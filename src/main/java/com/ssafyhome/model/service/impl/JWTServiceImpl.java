@@ -2,7 +2,7 @@ package com.ssafyhome.model.service.impl;
 
 import com.ssafyhome.exception.InvalidJwtException;
 import com.ssafyhome.model.dao.repository.RefreshTokenRepository;
-import com.ssafyhome.model.dto.JwtDto;
+import com.ssafyhome.model.dto.api.JwtDto;
 import com.ssafyhome.model.entity.redis.RefreshTokenEntity;
 import com.ssafyhome.model.service.JWTService;
 import com.ssafyhome.util.CookieUtil;

@@ -49,7 +49,7 @@
     </select>
 
     <select id="getIdByNameAndEmail"
-            parameterType="com.ssafyhome.model.dto.FindUserDto"
+            parameterType="com.ssafyhome.model.dto.user.FindUserDto"
             resultType="java.lang.String">
         SELECT user.user_id
         FROM user
@@ -57,7 +57,7 @@
     </select>
 
     <select id="isUserExist"
-            parameterType="com.ssafyhome.model.dto.FindUserDto"
+            parameterType="com.ssafyhome.model.dto.user.FindUserDto"
             resultType="java.lang.Boolean">
         SELECT COUNT(*) > 0
         FROM user

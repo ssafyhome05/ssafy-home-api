@@ -1,6 +1,6 @@
 package com.ssafyhome.controller;
 
-import com.ssafyhome.model.dto.*;
+import com.ssafyhome.model.dto.user.*;
 import com.ssafyhome.model.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -50,7 +50,7 @@ public class UserController {
 			String type,
 
 			@RequestBody
-			FindUserDto findUserDto
+            FindUserDto findUserDto
 	) {
 
 		if (type.equals("id")) {

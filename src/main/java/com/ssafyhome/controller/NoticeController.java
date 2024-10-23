@@ -1,6 +1,6 @@
 package com.ssafyhome.controller;
 
-import com.ssafyhome.model.dto.NoticeDto;
+import com.ssafyhome.model.dto.notice.NoticeDto;
 import com.ssafyhome.model.service.NoticeService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;

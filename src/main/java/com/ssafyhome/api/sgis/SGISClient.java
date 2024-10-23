@@ -1,8 +1,8 @@
 package com.ssafyhome.api.sgis;
 
 import com.ssafyhome.api.common.FeignSnakeCaseConfig;
-import com.ssafyhome.model.dto.SgisAccessToken;
-import com.ssafyhome.model.dto.SgisGeoCode;
+import com.ssafyhome.model.dto.api.SgisAccessToken;
+import com.ssafyhome.model.dto.api.SgisGeoCode;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
