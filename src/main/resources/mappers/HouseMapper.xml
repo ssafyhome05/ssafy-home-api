@@ -14,4 +14,8 @@
         FROM legal_dong_code
         WHERE dong_code = #{dongCode}
     </select>
+    <select id="getLawdCdList" resultType="int">
+        SELECT DISTINCT SUBSTR(dong_code, 1, 5)
+        FROM legal_dong_code
+    </select>
 </mapper>
