@@ -67,7 +67,7 @@ public class GonggongAptTradeResponse {
 		private String roadNmbCd;
 
 		private Double excluUseAr;
-		private Integer floor;
+		private String floor;
 		private String landCd;
 		private String landLeaseholdGbn;
 		private String rgstDate;

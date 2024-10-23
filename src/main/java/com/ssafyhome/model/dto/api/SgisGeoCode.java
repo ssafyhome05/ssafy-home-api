@@ -18,7 +18,7 @@ public class SgisGeoCode {
 	private String trId;
 
 	@Data
-	private static class Result {
+	public static class Result {
 
 		private int totalcount;
 		private List<ResultData> resultdata;
@@ -27,7 +27,7 @@ public class SgisGeoCode {
 		private int returncount;
 
 		@Data
-		private static class ResultData {
+		public static class ResultData {
 
 			private String riNm;
 			private String roadNmSubNo;
