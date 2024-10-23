@@ -1,6 +1,6 @@
 package com.ssafyhome.controller;
 
-import com.ssafyhome.model.dto.api.JwtDto;
+import com.ssafyhome.model.dto.auth.JwtDto;
 import com.ssafyhome.model.service.JWTService;
 import com.ssafyhome.util.CookieUtil;
 import io.swagger.v3.oas.annotations.Operation;

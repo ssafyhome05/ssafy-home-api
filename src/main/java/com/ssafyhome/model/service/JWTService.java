@@ -1,6 +1,6 @@
 package com.ssafyhome.model.service;
 
-import com.ssafyhome.model.dto.api.JwtDto;
+import com.ssafyhome.model.dto.auth.JwtDto;
 import jakarta.servlet.http.HttpServletRequest;
 
 public interface JWTService {

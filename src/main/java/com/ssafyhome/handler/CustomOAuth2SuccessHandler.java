@@ -2,7 +2,7 @@ package com.ssafyhome.handler;
 
 import com.ssafyhome.model.dto.auth.AdminOAuth2User;
 import com.ssafyhome.model.dto.auth.CustomOAuth2User;
-import com.ssafyhome.model.dto.api.JwtDto;
+import com.ssafyhome.model.dto.auth.JwtDto;
 import com.ssafyhome.model.service.JWTService;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

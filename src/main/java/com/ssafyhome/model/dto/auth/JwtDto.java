@@ -1,4 +1,4 @@
-package com.ssafyhome.model.dto.api;
+package com.ssafyhome.model.dto.auth;
 
 import jakarta.servlet.http.Cookie;
 import lombok.Builder;
