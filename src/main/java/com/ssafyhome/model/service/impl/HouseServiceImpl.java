@@ -6,6 +6,7 @@ import com.ssafyhome.api.sgis.SGISUtil;
 import com.ssafyhome.model.dao.mapper.HouseMapper;
 import com.ssafyhome.model.dto.api.GonggongAptTradeResponse;
 import com.ssafyhome.model.dto.api.SgisGeoCode;
+import com.ssafyhome.model.dto.house.HouseInfoSseEmitter;
 import com.ssafyhome.model.entity.mysql.DongCodeEntity;
 import com.ssafyhome.model.entity.mysql.HouseDealEntity;
 import com.ssafyhome.model.entity.mysql.HouseInfoEntity;
@@ -15,9 +16,20 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
+
+import java.io.IOException;
+import java.util.List;
+import java.util.Map;
+import java.util.NoSuchElementException;
+import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Service
 public class HouseServiceImpl implements HouseService {
+
+	private final Map<String, HouseInfoSseEmitter> sseEmitters = new ConcurrentHashMap<>();
 
 	@Value("${gonggong.API-KEY.decode}")
 	private String gonggongApiKey;
@@ -44,15 +56,65 @@ public class HouseServiceImpl implements HouseService {
 	}
 
 	@Override
-	@Transactional
-	public void insertHouseData(int lawdCd, int dealYmd) {
+	public String startHouseInfoTask(int dealYmd) {
 
-		int totalRows, repeat = 1, seq = 1;
+		String requestId = UUID.randomUUID().toString();
+
+
+		SseEmitter sseEmitter = new SseEmitter(Long.MAX_VALUE);
+		sseEmitters.put(requestId, new HouseInfoSseEmitter(sseEmitter));
+
+		CompletableFuture.runAsync(() -> {
+			try {
+				List<Integer> lawdCdList = houseMapper.getLawdCdList();
+				int seq = 1;
+				for (int lawdCd : lawdCdList) {
+					insertHouseData(lawdCd, dealYmd, requestId);
+					sseEmitter.send(SseEmitter.event()
+							.name(sseEmitters.get(requestId).getTaskName())
+							.data("Task completed!! commit (" + seq++ + "/" + lawdCdList.size() + ")" )
+					);
+				}
+			} catch (Exception e) {
+				sseEmitter.completeWithError(e);
+			} finally {
+				sseEmitters.remove(requestId);
+			}
+		});
+
+		return requestId;
+	}
+
+	@Override
+	public SseEmitter getHouseInfoTask(String requestId) {
+
+		if (!sseEmitters.containsKey(requestId)) {
+			throw new NoSuchElementException();
+		}
+		return sseEmitters.get(requestId).getEmitter();
+	}
+
+	@Transactional
+	protected void insertHouseData(int lawdCd, int dealYmd, String requestId) {
+
+		int totalRows = 0 , repeat = 1, seq = 1;
 		do {
 
 			GonggongAptTradeResponse response =
 					gonggongClient.getRTMSDataSvcAptTradeDev(lawdCd, dealYmd, gonggongApiKey, repeat, 100);
-			totalRows = response.getBody().getTotalCount();
+			if (totalRows == 0) {
+				totalRows = response.getBody().getTotalCount();
+				sseEmitters.get(requestId).setTaskName(lawdCd + "-" + dealYmd);
+				sseEmitters.get(requestId).setTotalRows(totalRows);
+				try {
+					HouseInfoSseEmitter houseInfoTask = sseEmitters.get(requestId);
+					houseInfoTask.getEmitter().send(
+							SseEmitter.event()
+									.name(houseInfoTask.getTaskName())
+									.data("Total rows: " + houseInfoTask.getTotalRows())
+					);
+				} catch (Exception e) {}
+			}
 
 			for(GonggongAptTradeResponse.Item item : response.getBody().getItems()) {
 
@@ -71,16 +133,23 @@ public class HouseServiceImpl implements HouseService {
 				HouseDealEntity houseDealEntity = convertUtil.convert(item, HouseDealEntity.class);
 				houseDealEntity.setDealSeq(lawdCd + "-" + dealYmd + "-" + seq++);
 
+				String alert = "";
 				try{
 					houseMapper.insertHouseInfo(houseInfoEntity);
+					alert += houseInfoEntity.getHouseSeq() + ": commit ready\n";
 				} catch (DuplicateKeyException e) {
-					System.out.println(houseInfoEntity.getHouseSeq() + " is already exist");
+					alert += houseInfoEntity.getHouseSeq() + " is already exist\n";
 				}
 				try{
 					houseMapper.insertHouseDeal(houseDealEntity);
+					alert += houseDealEntity.getDealSeq() + ": commit ready";
 				} catch (DuplicateKeyException e) {
-					System.out.println(houseDealEntity.getDealSeq() + " is already exist");
+					alert += houseDealEntity.getDealSeq() + " is already exist";
 				}
+
+				try {
+					sseEmitters.get(requestId).getEmitter().send(SseEmitter.event().name(alert));
+				} catch (Exception e) {}
 			}
 
 		} while (repeat++ * 100 < totalRows);
