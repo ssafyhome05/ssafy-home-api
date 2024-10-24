@@ -5,8 +5,10 @@ import com.ssafyhome.model.dto.house.HouseDetailDto;
 import com.ssafyhome.model.dto.house.HouseDto;
 import com.ssafyhome.model.dto.house.HouseGraphDto;
 import com.ssafyhome.model.dto.spot.LocationStatusDto;
+import com.ssafyhome.model.service.HouseService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -21,6 +23,12 @@ import java.util.List;
 @RestController
 @RequestMapping("/house")
 public class HouseController {
+
+	private final HouseService houseService;
+
+	public HouseController(HouseService houseService) {
+		this.houseService = houseService;
+	}
 
 	@Operation(
 			summary = "",
@@ -105,7 +113,7 @@ public class HouseController {
 			String dongCode
 	) {
 
-		return null;
+		return new ResponseEntity<>(houseService.getHouseInfo(dongCode), HttpStatus.OK);
 	}
 
 	@Operation(
