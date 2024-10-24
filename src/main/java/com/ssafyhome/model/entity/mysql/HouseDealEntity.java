@@ -1,11 +1,17 @@
 package com.ssafyhome.model.entity.mysql;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class HouseDealEntity {
 
-	private long dealSeq;
+	private String dealSeq;
 	private String aptSeq;
 	private String aptDong;
 	private String floor;

@@ -8,7 +8,6 @@ import lombok.Data;
 import java.util.List;
 
 @Data
-@XmlRootElement(name = "response")
 @XmlAccessorType(XmlAccessType.FIELD)
 public class GonggongAptTradeResponse {
 
@@ -67,10 +66,20 @@ public class GonggongAptTradeResponse {
 		private String roadNmbCd;
 
 		private Double excluUseAr;
-		private Integer floor;
+		private String floor;
 		private String landCd;
 		private String landLeaseholdGbn;
 		private String rgstDate;
 		private String estateAgentSggNm;
+	}
+
+	private CmmMsgHeader cmmMsgHeader;
+
+	@Data
+	public static class CmmMsgHeader {
+
+		private String errMsg;
+		private String returnAuthMsg;
+		private String returnReasonCode;
 	}
 }

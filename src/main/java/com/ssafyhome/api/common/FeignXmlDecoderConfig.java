@@ -1,5 +1,6 @@
 package com.ssafyhome.api.common;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import feign.codec.Decoder;
 import feign.optionals.OptionalDecoder;
@@ -16,6 +17,7 @@ public class FeignXmlDecoderConfig {
 	Decoder feignDecoder() {
 
 		XmlMapper xmlMapper = new XmlMapper();
+		xmlMapper.enable(DeserializationFeature.UNWRAP_ROOT_VALUE);
 
 		ObjectFactory<HttpMessageConverters> objectFactory = () -> new HttpMessageConverters(
 				new MappingJackson2HttpMessageConverter(xmlMapper)
