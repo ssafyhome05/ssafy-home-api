@@ -6,4 +6,11 @@
         FROM house_info
         WHERE CONCAT(sgg_cd, umd_cd) = #{dongCode};
     </select>
+
+    <select id="getHouseDeals" resultType="com.ssafyhome.model.dto.house.HouseDealsDto">
+        SELECT *
+        FROM house_deal
+        WHERE apt_seq = #{houseSeq}
+            LIMIT #{limit} OFFSET #{offset};
+    </select>
 </mapper>

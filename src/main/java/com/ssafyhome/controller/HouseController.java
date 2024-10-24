@@ -71,10 +71,14 @@ public class HouseController {
 	@GetMapping("/deal")
 	public ResponseEntity<List<HouseDealsDto>> getHouseDeals(
 			@RequestParam
-			String houseSeq
+			String houseSeq,
+			@RequestParam
+			int page,
+			@RequestParam
+			int limit
 	) {
 
-		return null;
+		return new ResponseEntity<>(houseService.getHouseDeals(houseSeq, page, limit), HttpStatus.OK);
 	}
 
 	@Operation(
