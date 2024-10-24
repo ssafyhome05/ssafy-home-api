@@ -49,8 +49,9 @@ public class HouseInternalService {
 	}
 
 	@Transactional
-	protected Duration insertHouseData(int lawdCd, int dealYmd, HouseInfoTask houseInfoTask) throws Exception {
+	protected HouseInfoTask insertHouseData(int lawdCd, int dealYmd, SseEmitter sseEmitter) throws Exception {
 
+		HouseInfoTask houseInfoTask = new HouseInfoTask();
 		LocalDateTime start = LocalDateTime.now();
 		int totalRows = 0 , repeat = 1, seq = 1;
 		do {
@@ -68,62 +69,61 @@ public class HouseInternalService {
 				totalRows = response.getBody().getTotalCount();
 				houseInfoTask.setTaskName(lawdCd + "-" + dealYmd);
 				houseInfoTask.setTotalRows(totalRows);
-				try {
-					houseInfoTask.getEmitter().send(
-							SseEmitter.event()
-									.name(houseInfoTask.getTaskName())
-									.data("Total rows: " + houseInfoTask.getTotalRows())
-					);
-				} catch (Exception e) {}
 			}
 
 			for(GonggongAptTradeResponse.Item item : response.getBody().getItems()) {
-
-				HouseInfoEntity houseInfoEntity = convertUtil.convert(item, HouseInfoEntity.class);
-				houseInfoEntity.setHouseSeq(item.getAptSeq());
-
-				DongCodeEntity dongCodeEntity = houseMapper.getSidoGugun(item.getSggCd() + item.getUmdCd());
-				String dongName;
-				try {
-					dongName = dongCodeEntity.getSidoName() + " " + dongCodeEntity.getGugunName() + " " + houseInfoEntity.getUmdNm();
-				} catch (Exception e) {
-					continue;
-				}
-
-				if(!houseMapper.isExistHouseInfo(houseInfoEntity.getHouseSeq())) {
-					SgisGeoCode geoCode = sgisClient.getGeocode(sgisUtil.getAccessToken(), dongName + " " + item.getJibun());
-					if(geoCode.getResult() != null){
-						SgisGeoCode.Result.ResultData resultData =
-								sgisClient.getGeocode(sgisUtil.getAccessToken(), dongName + " " + item.getJibun())
-										.getResult().getResultdata().get(0);
-						houseInfoEntity.setLatitude(resultData.getY());
-						houseInfoEntity.setLongitude(resultData.getX());
-					}
-					else {
-						try {
-							houseInfoTask.getEmitter().send(
-									SseEmitter.event()
-											.name("Not found jibun")
-											.data(lawdCd + "-" + dealYmd + "-" + seq)
-							);
-						} catch (Exception e) {}
-					}
-
-					try{
-						houseMapper.insertHouseInfo(houseInfoEntity);
-					} catch (DuplicateKeyException e) {}
-				}
 
 				HouseDealEntity houseDealEntity = convertUtil.convert(item, HouseDealEntity.class);
 				houseDealEntity.setDealSeq(lawdCd + "-" + dealYmd + "-" + seq++);
 
 				try{
 					houseMapper.insertHouseDeal(houseDealEntity);
-				} catch (DuplicateKeyException e) {}
+				} catch (DuplicateKeyException e) {
+				} catch (Exception ex) {
+
+					HouseInfoEntity houseInfoEntity = convertUtil.convert(item, HouseInfoEntity.class);
+					houseInfoEntity.setHouseSeq(item.getAptSeq());
+
+					DongCodeEntity dongCodeEntity = houseMapper.getSidoGugun(item.getSggCd() + item.getUmdCd());
+					String dongName;
+					try {
+						dongName = dongCodeEntity.getSidoName() + " " + dongCodeEntity.getGugunName() + " " + houseInfoEntity.getUmdNm();
+					} catch (Exception e) {
+						continue;
+					}
+
+					if(!houseMapper.isExistHouseInfo(houseInfoEntity.getHouseSeq())) {
+						SgisGeoCode geoCode = sgisClient.getGeocode(sgisUtil.getAccessToken(), dongName + " " + item.getJibun());
+						if(geoCode.getResult() != null){
+							SgisGeoCode.Result.ResultData resultData =
+									sgisClient.getGeocode(sgisUtil.getAccessToken(), dongName + " " + item.getJibun())
+											.getResult().getResultdata().get(0);
+							houseInfoEntity.setLatitude(resultData.getY());
+							houseInfoEntity.setLongitude(resultData.getX());
+						}
+						else {
+							try {
+								sseEmitter.send(
+										SseEmitter.event()
+												.name("Not found jibun")
+												.data(lawdCd + "-" + dealYmd + "-" + seq)
+								);
+							} catch (Exception e) {}
+						}
+
+						try{
+							houseMapper.insertHouseInfo(houseInfoEntity);
+						} catch (DuplicateKeyException e) {}
+						try{
+							houseMapper.insertHouseDeal(houseDealEntity);
+						} catch (DuplicateKeyException e) {}
+					}
+				}
 			}
 
 		} while (repeat++ * 100 < totalRows);
 		LocalDateTime end = LocalDateTime.now();
-		return Duration.between(start, end);
+		houseInfoTask.setDuration(Duration.between(start, end));
+		return houseInfoTask;
 	}
 }

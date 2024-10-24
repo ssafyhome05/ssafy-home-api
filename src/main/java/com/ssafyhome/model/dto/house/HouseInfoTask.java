@@ -1,17 +1,13 @@
 package com.ssafyhome.model.dto.house;
 
 import lombok.Data;
-import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
+
+import java.time.Duration;
 
 @Data
 public class HouseInfoTask {
 
-	private SseEmitter emitter;
+	private Duration duration;
 	private int totalRows;
 	private String TaskName;
-
-	public HouseInfoTask(SseEmitter emitter) {
-
-		this.emitter = emitter;
-	}
 }
