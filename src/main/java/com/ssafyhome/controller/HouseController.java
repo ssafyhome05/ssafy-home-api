@@ -126,13 +126,16 @@ public class HouseController {
 //	@PreAuthorize("hasRole('ROLE_ADMIN')")
 	public ResponseEntity<?> updateHouseInfo(
 			@RequestParam(required = false, defaultValue = "11110")
-			int lawdCd,
+			int startCd,
+
+			@RequestParam(required = false, defaultValue = "60000")
+			int endCd,
 
 			@RequestParam
 			int dealYmd
 	) {
 
-		String requestId = houseService.startHouseInfoTask(dealYmd, lawdCd);
+		String requestId = houseService.startHouseInfoTask(dealYmd, startCd, endCd);
 		return new ResponseEntity<>(requestId, HttpStatus.CREATED);
 	}
 

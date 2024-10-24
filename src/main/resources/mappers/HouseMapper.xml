@@ -10,13 +10,14 @@
         VALUES (#{dealSeq},#{aptSeq},#{aptDong},#{floor},#{dealYear},#{dealMonth},#{dealDay},#{exclusiveUseAr},#{dealAmount})
     </insert>
     <select id="getSidoGugun" parameterType="string" resultType="com.ssafyhome.model.entity.mysql.DongCodeEntity">
-        SELECT *
-        FROM legal_dong_code
-        WHERE dong_code = #{dongCode}
+        SELECT DISTINCT sido_name, gugun_name, bdong_code, bdong_name
+        FROM dong_code
+        WHERE bdong_code = #{dongCode}
     </select>
-    <select id="getLawdCdList" resultType="int">
-        SELECT DISTINCT SUBSTR(dong_code, 1, 5)
-        FROM legal_dong_code
+    <select id="getLawdCdList" resultType="Integer">
+        SELECT DISTINCT SUBSTR(bdong_code, 1, 5)
+        FROM dong_code
+        WHERE bdong_code BETWEEN #{startCd} AND #{endCd}
     </select>
     <select id="isExistHouseInfo" resultType="java.lang.Boolean">
         SELECT COUNT(*) > 0
