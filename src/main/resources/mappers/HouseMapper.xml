@@ -12,6 +12,7 @@
         FROM house_deal
         WHERE apt_seq = #{houseSeq}
             LIMIT #{limit} OFFSET #{offset};
+    </select>
     <insert id="insertHouseInfo" parameterType="com.ssafyhome.model.entity.mysql.HouseInfoEntity">
         INSERT INTO house_info
         VALUES (#{houseSeq},#{sggCd},#{umdCd},#{umdNm},#{jibun},#{roadNmSggCd},#{roadNm},#{roadNmBonbun},#{roadNmBubun},#{aptNm},#{buildYear},#{latitude},#{longitude})
