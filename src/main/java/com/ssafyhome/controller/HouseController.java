@@ -12,6 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import java.util.List;
 
@@ -27,6 +28,10 @@ public class HouseController {
 	private final HouseService houseService;
 
 	public HouseController(HouseService houseService) {
+<<<<<<< HEAD
+=======
+
+>>>>>>> main
 		this.houseService = houseService;
 	}
 
@@ -124,21 +129,34 @@ public class HouseController {
 			summary = "",
 			description = ""
 	)
-	@PostMapping("/deal")
-	@PreAuthorize("hasRole('ROLE_ADMIN')")
-	public ResponseEntity<?> updateHouseDealsInfo() {
+	@PostMapping("/admin/register")
+//	@PreAuthorize("hasRole('ROLE_ADMIN')")
+	public ResponseEntity<?> updateHouseInfo(
+			@RequestParam(required = false, defaultValue = "11110")
+			int startCd,
 
-		return null;
+			@RequestParam(required = false, defaultValue = "60000")
+			int endCd,
+
+			@RequestParam
+			int dealYmd
+	) {
+
+		String requestId = houseService.startHouseInfoTask(dealYmd, startCd, endCd);
+		return new ResponseEntity<>(requestId, HttpStatus.CREATED);
 	}
 
 	@Operation(
 			summary = "",
 			description = ""
 	)
-	@PostMapping("")
-	@PreAuthorize("hasRole('ROLE_ADMIN')")
-	public ResponseEntity<?> updateHouseInfo() {
+	@GetMapping("/task/{requestId}/status")
+//	@PreAuthorize("hasRole('ROLE_ADMIN')")
+	public SseEmitter subscribeHouseInfoProcess(
+			@PathVariable
+			String requestId
+	) {
 
-		return null;
+		return houseService.getHouseInfoTask(requestId);
 	}
 }

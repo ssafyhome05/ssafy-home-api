@@ -5,8 +5,10 @@ import lombok.Data;
 @Data
 public class DongCodeEntity {
 
-	private String dongCode;
+	private String bdongCode;
+	private String bdongName;
+	private String hdongCode;
+	private String hdongName;
 	private String sidoName;
 	private String gugunName;
-	private String dongName;
 }
