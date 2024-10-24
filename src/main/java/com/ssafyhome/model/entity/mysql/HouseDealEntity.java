@@ -5,7 +5,7 @@ import lombok.Data;
 @Data
 public class HouseDealEntity {
 
-	private long dealSeq;
+	private String dealSeq;
 	private String aptSeq;
 	private String aptDong;
 	private String floor;
