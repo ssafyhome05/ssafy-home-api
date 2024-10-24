@@ -1,8 +1,14 @@
 package com.ssafyhome.model.service.impl;
 
+<<<<<<< HEAD
+import com.ssafyhome.model.dao.mapper.HouseMapper;
+import com.ssafyhome.model.dto.house.HouseDealsDto;
+import com.ssafyhome.model.dto.house.HouseDto;
+=======
 import com.ssafyhome.exception.GonggongApplicationErrorException;
 import com.ssafyhome.model.dao.mapper.HouseMapper;
 import com.ssafyhome.model.dto.house.HouseInfoTask;
+>>>>>>> main
 import com.ssafyhome.model.service.HouseService;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
@@ -17,8 +23,34 @@ import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 
+import java.util.List;
+
 @Service
 public class HouseServiceImpl implements HouseService {
+<<<<<<< HEAD
+    private final HouseMapper houseMapper;
+
+    public HouseServiceImpl(HouseMapper houseMapper) {
+        this.houseMapper = houseMapper;
+    }
+
+    @Override
+    public List<HouseDto> getHouseInfo(String dongCode) {
+
+        List<HouseDto> houseInfoList = houseMapper.getHouseInfo(dongCode);
+
+        return houseInfoList;
+    }
+
+    @Override
+    public List<HouseDealsDto> getHouseDeals(String houseSeq, int page, int limit) {
+
+        int offset = page * limit;
+        List<HouseDealsDto> houseDealsList = houseMapper.getHouseDeals(houseSeq, limit, offset);
+
+        return houseDealsList;
+    }
+=======
 
 	private final Map<String, HouseInfoTask> sseEmitters = new ConcurrentHashMap<>();
 
@@ -104,6 +136,7 @@ public class HouseServiceImpl implements HouseService {
 
 		return DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 	}
+>>>>>>> main
 }
 
 

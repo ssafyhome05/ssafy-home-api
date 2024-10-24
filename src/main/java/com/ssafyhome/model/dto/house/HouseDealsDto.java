@@ -5,7 +5,7 @@ import lombok.Data;
 @Data
 public class HouseDealsDto {
 
-  private long dealSeq;
+  private String dealSeq;
   private String aptDong;
   private String floor;
   private String dealYear;

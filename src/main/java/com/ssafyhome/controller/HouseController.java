@@ -73,10 +73,14 @@ public class HouseController {
 	@GetMapping("/deal")
 	public ResponseEntity<List<HouseDealsDto>> getHouseDeals(
 			@RequestParam
-			String houseSeq
+			String houseSeq,
+			@RequestParam
+			int page,
+			@RequestParam
+			int limit
 	) {
 
-		return null;
+		return new ResponseEntity<>(houseService.getHouseDeals(houseSeq, page, limit), HttpStatus.OK);
 	}
 
 	@Operation(
@@ -115,7 +119,7 @@ public class HouseController {
 			String dongCode
 	) {
 
-		return null;
+		return new ResponseEntity<>(houseService.getHouseInfo(dongCode), HttpStatus.OK);
 	}
 
 	@Operation(

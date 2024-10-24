@@ -1,6 +1,17 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.ssafyhome.model.dao.mapper.HouseMapper">
+    <select id="getHouseInfo" parameterType="String" resultType="com.ssafyhome.model.dto.house.HouseDto">
+        SELECT *
+        FROM house_info
+        WHERE CONCAT(sgg_cd, umd_cd) = #{dongCode};
+    </select>
+
+    <select id="getHouseDeals" resultType="com.ssafyhome.model.dto.house.HouseDealsDto">
+        SELECT *
+        FROM house_deal
+        WHERE apt_seq = #{houseSeq}
+            LIMIT #{limit} OFFSET #{offset};
     <insert id="insertHouseInfo" parameterType="com.ssafyhome.model.entity.mysql.HouseInfoEntity">
         INSERT INTO house_info
         VALUES (#{houseSeq},#{sggCd},#{umdCd},#{umdNm},#{jibun},#{roadNmSggCd},#{roadNm},#{roadNmBonbun},#{roadNmBubun},#{aptNm},#{buildYear},#{latitude},#{longitude})
