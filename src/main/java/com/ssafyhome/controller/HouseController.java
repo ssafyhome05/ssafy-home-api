@@ -28,10 +28,7 @@ public class HouseController {
 	private final HouseService houseService;
 
 	public HouseController(HouseService houseService) {
-<<<<<<< HEAD
-=======
 
->>>>>>> main
 		this.houseService = houseService;
 	}
 
