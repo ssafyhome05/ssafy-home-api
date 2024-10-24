@@ -1,14 +1,14 @@
 package com.ssafyhome.model.service.impl;
 
-<<<<<<< HEAD
 import com.ssafyhome.model.dao.mapper.HouseMapper;
 import com.ssafyhome.model.dto.house.HouseDealsDto;
 import com.ssafyhome.model.dto.house.HouseDto;
-=======
 import com.ssafyhome.exception.GonggongApplicationErrorException;
 import com.ssafyhome.model.dao.mapper.HouseMapper;
+import com.ssafyhome.model.dto.house.HouseDealsDto;
+import com.ssafyhome.model.dto.house.HouseDto;
+import com.ssafyhome.exception.GonggongApplicationErrorException;
 import com.ssafyhome.model.dto.house.HouseInfoTask;
->>>>>>> main
 import com.ssafyhome.model.service.HouseService;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
@@ -27,11 +27,19 @@ import java.util.List;
 
 @Service
 public class HouseServiceImpl implements HouseService {
-<<<<<<< HEAD
-    private final HouseMapper houseMapper;
 
-    public HouseServiceImpl(HouseMapper houseMapper) {
-        this.houseMapper = houseMapper;
+    private final Map<String, HouseInfoTask> sseEmitters = new ConcurrentHashMap<>();
+
+    private final HouseMapper houseMapper;
+    private final HouseInternalService houseInternalService;
+
+    public HouseServiceImpl(
+        HouseMapper houseMapper,
+        HouseInternalService houseInternalService
+    ) {
+
+      this.houseMapper = houseMapper;
+      this.houseInternalService = houseInternalService;
     }
 
     @Override
@@ -50,21 +58,23 @@ public class HouseServiceImpl implements HouseService {
 
         return houseDealsList;
     }
-=======
 
-	private final Map<String, HouseInfoTask> sseEmitters = new ConcurrentHashMap<>();
+    @Override
+    public List<HouseDto> getHouseInfo(String dongCode) {
 
-	private final HouseMapper houseMapper;
-	private final HouseInternalService houseInternalService;
+        List<HouseDto> houseInfoList = houseMapper.getHouseInfo(dongCode);
 
-	public HouseServiceImpl(
-			HouseMapper houseMapper,
-			HouseInternalService houseInternalService
-	) {
+        return houseInfoList;
+    }
 
-		this.houseMapper = houseMapper;
-		this.houseInternalService = houseInternalService;
-	}
+    @Override
+    public List<HouseDealsDto> getHouseDeals(String houseSeq, int page, int limit) {
+
+        int offset = page * limit;
+        List<HouseDealsDto> houseDealsList = houseMapper.getHouseDeals(houseSeq, limit, offset);
+
+        return houseDealsList;
+    }
 
 	@Override
 	public String startHouseInfoTask(int dealYmd, int startCd, int endCd) {
@@ -136,7 +146,7 @@ public class HouseServiceImpl implements HouseService {
 
 		return DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 	}
->>>>>>> main
+
 }
 
 
