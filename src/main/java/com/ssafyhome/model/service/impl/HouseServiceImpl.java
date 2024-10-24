@@ -4,6 +4,10 @@ import com.ssafyhome.model.dao.mapper.HouseMapper;
 import com.ssafyhome.model.dto.house.HouseDealsDto;
 import com.ssafyhome.model.dto.house.HouseDto;
 import com.ssafyhome.exception.GonggongApplicationErrorException;
+import com.ssafyhome.model.dao.mapper.HouseMapper;
+import com.ssafyhome.model.dto.house.HouseDealsDto;
+import com.ssafyhome.model.dto.house.HouseDto;
+import com.ssafyhome.exception.GonggongApplicationErrorException;
 import com.ssafyhome.model.dto.house.HouseInfoTask;
 import com.ssafyhome.model.service.HouseService;
 import org.springframework.stereotype.Service;
@@ -19,22 +23,41 @@ import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 
+import java.util.List;
+
 @Service
 public class HouseServiceImpl implements HouseService {
 
-	private final Map<String, HouseInfoTask> sseEmitters = new ConcurrentHashMap<>();
+    private final Map<String, HouseInfoTask> sseEmitters = new ConcurrentHashMap<>();
 
-	private final HouseMapper houseMapper;
-	private final HouseInternalService houseInternalService;
+    private final HouseMapper houseMapper;
+    private final HouseInternalService houseInternalService;
 
-	public HouseServiceImpl(
-			HouseMapper houseMapper,
-			HouseInternalService houseInternalService
-	) {
+    public HouseServiceImpl(
+        HouseMapper houseMapper,
+        HouseInternalService houseInternalService
+    ) {
 
-		this.houseMapper = houseMapper;
-		this.houseInternalService = houseInternalService;
-	}
+      this.houseMapper = houseMapper;
+      this.houseInternalService = houseInternalService;
+    }
+
+    @Override
+    public List<HouseDto> getHouseInfo(String dongCode) {
+
+        List<HouseDto> houseInfoList = houseMapper.getHouseInfo(dongCode);
+
+        return houseInfoList;
+    }
+
+    @Override
+    public List<HouseDealsDto> getHouseDeals(String houseSeq, int page, int limit) {
+
+        int offset = page * limit;
+        List<HouseDealsDto> houseDealsList = houseMapper.getHouseDeals(houseSeq, limit, offset);
+
+        return houseDealsList;
+    }
 
     @Override
     public List<HouseDto> getHouseInfo(String dongCode) {
@@ -123,6 +146,7 @@ public class HouseServiceImpl implements HouseService {
 
 		return DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 	}
+
 }
 
 
