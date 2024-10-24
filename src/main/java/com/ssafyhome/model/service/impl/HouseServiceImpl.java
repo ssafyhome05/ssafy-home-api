@@ -68,7 +68,7 @@ public class HouseServiceImpl implements HouseService {
 		SseEmitter sseEmitter = new SseEmitter(Long.MAX_VALUE);
 		sseEmitters.put(requestId, new HouseInfoTask(sseEmitter));
 
-		CompletableFuture.runAsync(() -> {
+		Thread.startVirtualThread(() -> {
 			try {
 				LocalDateTime start = LocalDateTime.now();
 				sseEmitter.send(SseEmitter.event()
