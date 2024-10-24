@@ -79,47 +79,52 @@ public class HouseInternalService {
 
 			for(GonggongAptTradeResponse.Item item : response.getBody().getItems()) {
 
-				HouseInfoEntity houseInfoEntity = convertUtil.convert(item, HouseInfoEntity.class);
-				houseInfoEntity.setHouseSeq(item.getAptSeq());
-
-				DongCodeEntity dongCodeEntity = houseMapper.getSidoGugun(item.getSggCd() + item.getUmdCd());
-				String dongName;
-				try {
-					dongName = dongCodeEntity.getSidoName() + " " + dongCodeEntity.getGugunName() + " " + houseInfoEntity.getUmdNm();
-				} catch (Exception e) {
-					continue;
-				}
-
-				if(!houseMapper.isExistHouseInfo(houseInfoEntity.getHouseSeq())) {
-					SgisGeoCode geoCode = sgisClient.getGeocode(sgisUtil.getAccessToken(), dongName + " " + item.getJibun());
-					if(geoCode.getResult() != null){
-						SgisGeoCode.Result.ResultData resultData =
-								sgisClient.getGeocode(sgisUtil.getAccessToken(), dongName + " " + item.getJibun())
-										.getResult().getResultdata().get(0);
-						houseInfoEntity.setLatitude(resultData.getY());
-						houseInfoEntity.setLongitude(resultData.getX());
-					}
-					else {
-						try {
-							houseInfoTask.getEmitter().send(
-									SseEmitter.event()
-											.name("Not found jibun")
-											.data(lawdCd + "-" + dealYmd + "-" + seq)
-							);
-						} catch (Exception e) {}
-					}
-
-					try{
-						houseMapper.insertHouseInfo(houseInfoEntity);
-					} catch (DuplicateKeyException e) {}
-				}
-
 				HouseDealEntity houseDealEntity = convertUtil.convert(item, HouseDealEntity.class);
 				houseDealEntity.setDealSeq(lawdCd + "-" + dealYmd + "-" + seq++);
 
 				try{
 					houseMapper.insertHouseDeal(houseDealEntity);
-				} catch (DuplicateKeyException e) {}
+				} catch (DuplicateKeyException e) {
+				} catch (Exception ex) {
+
+					HouseInfoEntity houseInfoEntity = convertUtil.convert(item, HouseInfoEntity.class);
+					houseInfoEntity.setHouseSeq(item.getAptSeq());
+
+					DongCodeEntity dongCodeEntity = houseMapper.getSidoGugun(item.getSggCd() + item.getUmdCd());
+					String dongName;
+					try {
+						dongName = dongCodeEntity.getSidoName() + " " + dongCodeEntity.getGugunName() + " " + houseInfoEntity.getUmdNm();
+					} catch (Exception e) {
+						continue;
+					}
+
+					if(!houseMapper.isExistHouseInfo(houseInfoEntity.getHouseSeq())) {
+						SgisGeoCode geoCode = sgisClient.getGeocode(sgisUtil.getAccessToken(), dongName + " " + item.getJibun());
+						if(geoCode.getResult() != null){
+							SgisGeoCode.Result.ResultData resultData =
+									sgisClient.getGeocode(sgisUtil.getAccessToken(), dongName + " " + item.getJibun())
+											.getResult().getResultdata().get(0);
+							houseInfoEntity.setLatitude(resultData.getY());
+							houseInfoEntity.setLongitude(resultData.getX());
+						}
+						else {
+							try {
+								houseInfoTask.getEmitter().send(
+										SseEmitter.event()
+												.name("Not found jibun")
+												.data(lawdCd + "-" + dealYmd + "-" + seq)
+								);
+							} catch (Exception e) {}
+						}
+
+						try{
+							houseMapper.insertHouseInfo(houseInfoEntity);
+						} catch (DuplicateKeyException e) {}
+						try{
+							houseMapper.insertHouseDeal(houseDealEntity);
+						} catch (DuplicateKeyException e) {}
+					}
+				}
 			}
 
 		} while (repeat++ * 100 < totalRows);
