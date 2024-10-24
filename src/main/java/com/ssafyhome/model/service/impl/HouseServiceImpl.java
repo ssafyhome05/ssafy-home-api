@@ -1,5 +1,6 @@
 package com.ssafyhome.model.service.impl;
 
+import com.ssafyhome.exception.GonggongApplicationErrorException;
 import com.ssafyhome.model.dao.mapper.HouseMapper;
 import com.ssafyhome.model.dto.house.HouseInfoTask;
 import com.ssafyhome.model.service.HouseService;
@@ -34,7 +35,7 @@ public class HouseServiceImpl implements HouseService {
 	}
 
 	@Override
-	public String startHouseInfoTask(int dealYmd, int startLawdCd) {
+	public String startHouseInfoTask(int dealYmd, int startCd, int endCd) {
 
 		String requestId = UUID.randomUUID().toString();
 
@@ -49,15 +50,22 @@ public class HouseServiceImpl implements HouseService {
 						.name("Task start time")
 						.data(start.format(timeFormatter()))
 				);
-				List<Integer> lawdCdList = houseMapper.getLawdCdList();
+				List<Integer> lawdCdList = houseMapper.getLawdCdList(String.valueOf(startCd), String.valueOf(endCd));
 				int seq = 1;
 				int size = lawdCdList.size();
 				for (int lawdCd : lawdCdList) {
-					if (lawdCd < startLawdCd) {
-						size--;
-						continue;
+					Duration partTime = null;
+					int tryTimes = 5;
+					while(tryTimes-- > 0) {
+						try {
+							partTime = houseInternalService.insertHouseData(lawdCd, dealYmd, sseEmitters.get(requestId));
+							break;
+						} catch(GonggongApplicationErrorException e) {
+							Thread.sleep(5000);
+						} catch (Exception e) {
+							throw new Exception();
+						}
 					}
-					Duration partTime = houseInternalService.insertHouseData(lawdCd, dealYmd, sseEmitters.get(requestId));
 					sseEmitter.send(SseEmitter.event()
 							.name(sseEmitters.get(requestId).getTaskName())
 							.data("Task completed!! commit (" + seq++ + "/" + size + ") " + partTime.toSeconds() + " seconds")
@@ -71,7 +79,7 @@ public class HouseServiceImpl implements HouseService {
 				Duration duration = Duration.between(start, end);
 				sseEmitter.send(SseEmitter.event()
 						.name("Task duration")
-						.data(String.format("%d:%d:%d", duration.toHours(), duration.toMinutes(), duration.toSeconds()))
+						.data(String.format("%d:%d:%d", duration.toHours(), duration.toMinutes() - 60 * duration.toHours(), duration.toSeconds() - 60 * duration.toMinutes()))
 				);
 			} catch (Exception e) {
 				sseEmitter.completeWithError(e);

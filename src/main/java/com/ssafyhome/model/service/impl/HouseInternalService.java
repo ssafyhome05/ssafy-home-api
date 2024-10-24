@@ -3,6 +3,7 @@ package com.ssafyhome.model.service.impl;
 import com.ssafyhome.api.gonggong.GonggongClient;
 import com.ssafyhome.api.sgis.SGISClient;
 import com.ssafyhome.api.sgis.SGISUtil;
+import com.ssafyhome.exception.GonggongApplicationErrorException;
 import com.ssafyhome.model.dao.mapper.HouseMapper;
 import com.ssafyhome.model.dto.api.GonggongAptTradeResponse;
 import com.ssafyhome.model.dto.api.SgisGeoCode;
@@ -48,7 +49,7 @@ public class HouseInternalService {
 	}
 
 	@Transactional
-	protected Duration insertHouseData(int lawdCd, int dealYmd, HouseInfoTask houseInfoTask) {
+	protected Duration insertHouseData(int lawdCd, int dealYmd, HouseInfoTask houseInfoTask) throws Exception {
 
 		LocalDateTime start = LocalDateTime.now();
 		int totalRows = 0 , repeat = 1, seq = 1;
@@ -56,6 +57,13 @@ public class HouseInternalService {
 
 			GonggongAptTradeResponse response =
 					gonggongClient.getRTMSDataSvcAptTradeDev(lawdCd, dealYmd, gonggongApiKey, repeat, 100);
+			if (response.getCmmMsgHeader() != null) {
+				GonggongAptTradeResponse.CmmMsgHeader header = response.getCmmMsgHeader();
+				switch (header.getReturnReasonCode()) {
+					case "01" -> throw new GonggongApplicationErrorException("Gonggong application error");
+					default -> throw new Exception();
+				}
+			}
 			if (totalRows == 0) {
 				totalRows = response.getBody().getTotalCount();
 				houseInfoTask.setTaskName(lawdCd + "-" + dealYmd);
@@ -77,11 +85,10 @@ public class HouseInternalService {
 				DongCodeEntity dongCodeEntity = houseMapper.getSidoGugun(item.getSggCd() + item.getUmdCd());
 				String dongName;
 				try {
-					dongName = dongCodeEntity.getSidoName() + " " + dongCodeEntity.getGugunName() + " " + dongCodeEntity.getDongName();
+					dongName = dongCodeEntity.getSidoName() + " " + dongCodeEntity.getGugunName() + " " + houseInfoEntity.getUmdNm();
 				} catch (Exception e) {
 					continue;
 				}
-
 
 				if(!houseMapper.isExistHouseInfo(houseInfoEntity.getHouseSeq())) {
 					SgisGeoCode geoCode = sgisClient.getGeocode(sgisUtil.getAccessToken(), dongName + " " + item.getJibun());
