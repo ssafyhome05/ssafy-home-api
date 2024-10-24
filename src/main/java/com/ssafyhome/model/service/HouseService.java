@@ -13,5 +13,5 @@ public interface HouseService {
 
     String startHouseInfoTask(int dealYmd, int startCd, int endCd);
 
-    SseEmitter getHouseInfoTask(String requestId);
+    SseEmitter getSseEmitter(String requestId);
 }

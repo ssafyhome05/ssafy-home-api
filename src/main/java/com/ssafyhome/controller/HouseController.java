@@ -154,6 +154,6 @@ public class HouseController {
 			String requestId
 	) {
 
-		return houseService.getHouseInfoTask(requestId);
+		return houseService.getSseEmitter(requestId);
 	}
 }

@@ -49,8 +49,9 @@ public class HouseInternalService {
 	}
 
 	@Transactional
-	protected Duration insertHouseData(int lawdCd, int dealYmd, HouseInfoTask houseInfoTask) throws Exception {
+	protected HouseInfoTask insertHouseData(int lawdCd, int dealYmd, SseEmitter sseEmitter) throws Exception {
 
+		HouseInfoTask houseInfoTask = new HouseInfoTask();
 		LocalDateTime start = LocalDateTime.now();
 		int totalRows = 0 , repeat = 1, seq = 1;
 		do {
@@ -68,13 +69,6 @@ public class HouseInternalService {
 				totalRows = response.getBody().getTotalCount();
 				houseInfoTask.setTaskName(lawdCd + "-" + dealYmd);
 				houseInfoTask.setTotalRows(totalRows);
-				try {
-					houseInfoTask.getEmitter().send(
-							SseEmitter.event()
-									.name(houseInfoTask.getTaskName())
-									.data("Total rows: " + houseInfoTask.getTotalRows())
-					);
-				} catch (Exception e) {}
 			}
 
 			for(GonggongAptTradeResponse.Item item : response.getBody().getItems()) {
@@ -109,7 +103,7 @@ public class HouseInternalService {
 						}
 						else {
 							try {
-								houseInfoTask.getEmitter().send(
+								sseEmitter.send(
 										SseEmitter.event()
 												.name("Not found jibun")
 												.data(lawdCd + "-" + dealYmd + "-" + seq)
@@ -129,6 +123,7 @@ public class HouseInternalService {
 
 		} while (repeat++ * 100 < totalRows);
 		LocalDateTime end = LocalDateTime.now();
-		return Duration.between(start, end);
+		houseInfoTask.setDuration(Duration.between(start, end));
+		return houseInfoTask;
 	}
 }
