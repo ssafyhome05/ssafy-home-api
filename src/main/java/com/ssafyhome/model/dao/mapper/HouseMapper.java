@@ -9,6 +9,7 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
+import java.util.Set;
 
 @Mapper
 public interface HouseMapper {
@@ -16,9 +17,10 @@ public interface HouseMapper {
     List<HouseDealsDto> getHouseDeals(@Param("houseSeq") String houseSeq,
                                       @Param("limit") int limit,
                                       @Param("offset") int offset);
-	void insertHouseInfo(HouseInfoEntity houseInfoEntity);
-	void insertHouseDeal(HouseDealEntity houseDealEntity);
+	void insertHouseInfo(List<HouseInfoEntity> infoEntityList);
+	void insertHouseDeal(List<HouseDealEntity> dealEntityList);
 	DongCodeEntity getSidoGugun(String dongCode);
 	List<Integer> getLawdCdList(@Param("startCd") String startCd, @Param("endCd") String endCd);
 	boolean isExistHouseInfo(String houseSeq);
+	Set<String> getExistAptSeq(String sggCode);
 }

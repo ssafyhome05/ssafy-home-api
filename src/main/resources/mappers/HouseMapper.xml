@@ -13,13 +13,25 @@
         WHERE apt_seq = #{houseSeq}
             LIMIT #{limit} OFFSET #{offset};
     </select>
-    <insert id="insertHouseInfo" parameterType="com.ssafyhome.model.entity.mysql.HouseInfoEntity">
+    <insert id="insertHouseInfo" parameterType="java.util.List">
         INSERT INTO house_info
-        VALUES (#{houseSeq},#{sggCd},#{umdCd},#{umdNm},#{jibun},#{roadNmSggCd},#{roadNm},#{roadNmBonbun},#{roadNmBubun},#{aptNm},#{buildYear},#{latitude},#{longitude})
+        VALUES
+        <foreach
+                collection="list"
+                item="item"
+                separator=",">
+            (#{item.houseSeq},#{item.sggCd},#{item.umdCd},#{item.umdNm},#{item.jibun},#{item.roadNmSggCd},#{item.roadNm},#{item.roadNmBonbun},#{item.roadNmBubun},#{item.aptNm},#{item.buildYear},#{item.latitude},#{item.longitude})
+        </foreach>
     </insert>
-    <insert id="insertHouseDeal" parameterType="com.ssafyhome.model.entity.mysql.HouseDealEntity">
+    <insert id="insertHouseDeal" parameterType="java.util.List">
         INSERT INTO house_deal
-        VALUES (#{dealSeq},#{aptSeq},#{aptDong},#{floor},#{dealYear},#{dealMonth},#{dealDay},#{exclusiveUseAr},#{dealAmount})
+        VALUES
+        <foreach
+                collection="list"
+                item="item"
+                separator=",">
+            (#{item.dealSeq},#{item.aptSeq},#{item.aptDong},#{item.floor},#{item.dealYear},#{item.dealMonth},#{item.dealDay},#{item.exclusiveUseAr},#{item.dealAmount})
+        </foreach>
     </insert>
     <select id="getSidoGugun" parameterType="string" resultType="com.ssafyhome.model.entity.mysql.DongCodeEntity">
         SELECT DISTINCT sido_name, gugun_name, bdong_code, bdong_name
@@ -31,9 +43,14 @@
         FROM dong_code
         WHERE bdong_code BETWEEN #{startCd} AND #{endCd}
     </select>
-    <select id="isExistHouseInfo" resultType="java.lang.Boolean">
+    <select id="isExistHouseInfo" resultType="Boolean">
         SELECT COUNT(*) > 0
         FROM house_info
         WHERE apt_seq = #{houseSeq}
+    </select>
+    <select id="getExistAptSeq" resultType="String">
+        SELECT apt_seq
+        FROM house_info
+        WHERE sgg_cd = #{sggCode}
     </select>
 </mapper>
