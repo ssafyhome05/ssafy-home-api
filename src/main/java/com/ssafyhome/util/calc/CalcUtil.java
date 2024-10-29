@@ -17,20 +17,21 @@ public class CalcUtil {
 
 class ConvexHullAlgorithm {
 
-	private static final double EPSILON = 1e-9;
-
 	protected static List<Point> getPoints(List<Point> points) {
 
-		Point base = new Point(Double.MAX_VALUE, Double.MAX_VALUE);
+		Point base = points.get(0);
 		for (Point point : points) {
 			if (point.getLat() < base.getLat() || (point.getLat() == base.getLat() && point.getLng() < base.getLng())) {
 				base = point;
 			}
 		}
-		Point finalBase = base;
 
+		Point finalBase = base;
 		Point[] sortedPoint = points.stream()
 				.sorted((point1, point2) -> {
+					if (point1 == finalBase) return -1;
+					if (point2 == finalBase) return 1;
+
 					int ccw = counterClockWise(finalBase, point1, point2);
 					return ccw == 0 ? checkDistance(finalBase, point1, point2) : ccw;
 				})
@@ -54,17 +55,28 @@ class ConvexHullAlgorithm {
 
 	private static int counterClockWise(Point base, Point point1, Point point2) {
 
-		double ccw = (point1.getLat() - base.getLat()) * (point2.getLng() - point1.getLng()) - (point2.getLat() - point1.getLat()) * (point1.getLng() - base.getLng());
-		if (Math.abs(ccw) < EPSILON) return 0;
-		return ccw < 0 ? -1 : 1;
+		double angle1 = getLeftAngle(base, point1);
+		double angle2 = getLeftAngle(base, point2);
+		return Double.compare(angle1, angle2);
+	}
+
+	private static double getLeftAngle(Point base, Point point) {
+
+		return Math.atan2(point.getLat() - base.getLat(), point.getLng() - base.getLng());
 	}
 
 	private static int checkDistance(Point base, Point point1, Point point2) {
-		double dist1 = Math.pow(point1.getLat() - base.getLat(), 2) + Math.pow(point1.getLng() - base.getLng(), 2);
-		double dist2 = Math.pow(point2.getLat() - base.getLat(), 2) + Math.pow(point2.getLng() - base.getLng(), 2);
-		double diff = dist1 - dist2;
-		if (Math.abs(diff) < EPSILON) return 0;
-		return diff < 0 ? -1 : 1;
+
+		double dist1 = getSquaredDistance(base, point1);
+		double dist2 = getSquaredDistance(base, point2);
+		return Double.compare(dist1, dist2);
+	}
+
+	private static double getSquaredDistance(Point point1, Point point2) {
+
+		double dx = point1.getLat() - point2.getLat();
+		double dy = point1.getLng() - point2.getLng();
+		return dx * dx + dy * dy;
 	}
 }
 
