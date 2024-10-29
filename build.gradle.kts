@@ -22,6 +22,7 @@ configurations {
 
 repositories {
     mavenCentral()
+    //Geometry OpenGis Repository
     maven {
         url = uri("https://repo.osgeo.org/repository/release/")
     }
@@ -31,35 +32,44 @@ repositories {
 }
 
 dependencies {
+    //Web
+    implementation("org.springframework.boot:spring-boot-starter-web")
+    //Database
     implementation("org.springframework.boot:spring-boot-starter-data-redis")
     implementation("org.springframework.boot:spring-boot-starter-jdbc")
+    implementation("org.mybatis.spring.boot:mybatis-spring-boot-starter:3.0.3")
+    runtimeOnly("com.mysql:mysql-connector-j")
+    //Auth
     implementation("org.springframework.boot:spring-boot-starter-mail")
     implementation("org.springframework.boot:spring-boot-starter-oauth2-client")
     implementation("org.springframework.boot:spring-boot-starter-security")
-    implementation("org.springframework.boot:spring-boot-starter-web")
-    implementation("org.mybatis.spring.boot:mybatis-spring-boot-starter:3.0.3")
-    implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.0.2")
     implementation("io.jsonwebtoken:jjwt-api:0.12.5")
+    runtimeOnly("io.jsonwebtoken:jjwt-impl:0.12.5")
+    runtimeOnly("io.jsonwebtoken:jjwt-jackson:0.12.5")
+    //Config
+    implementation("org.springframework.cloud:spring-cloud-starter-config")
+    //Docs
+    implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.0.2")
+    //Geometry
+    implementation("org.locationtech.jts:jts-core:1.20.0")
     implementation("org.geotools:gt-referencing:23-RC") {
         exclude(group = "javax.media", module = "jai_core")
         exclude(group = "javax.media", module = "jai_codec")
     }
+    //Feign
     implementation("org.springframework.cloud:spring-cloud-starter-openfeign")
-    implementation("org.modelmapper:modelmapper:3.1.0")
     implementation("io.github.openfeign:feign-slf4j")
-    implementation("org.springframework.cloud:spring-cloud-starter-config")
+    //Convert
+    implementation("org.modelmapper:modelmapper:3.1.0")
     implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.17.1")
-    runtimeOnly("io.jsonwebtoken:jjwt-impl:0.12.5")
-    runtimeOnly("io.jsonwebtoken:jjwt-jackson:0.12.5")
-
+    //Tools
+    annotationProcessor("org.projectlombok:lombok")
     compileOnly("org.projectlombok:lombok")
     developmentOnly("org.springframework.boot:spring-boot-devtools")
-    runtimeOnly("com.mysql:mysql-connector-j")
-    annotationProcessor("org.projectlombok:lombok")
-
+    //Test
     testImplementation("org.springframework.boot:spring-boot-starter-test")
-    testImplementation("org.mybatis.spring.boot:mybatis-spring-boot-starter-test:3.0.3")
     testImplementation("org.springframework.security:spring-security-test")
+    testImplementation("org.mybatis.spring.boot:mybatis-spring-boot-starter-test:3.0.3")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 dependencyManagement {
