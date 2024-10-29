@@ -9,10 +9,14 @@ import com.ssafyhome.model.dto.api.*;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
 public class OpenFeignTest {
+
+    @Value("${gonggong.API-KEY.decode}")
+    private String gonggongApiKey;
 
     private final KakaoClient kakaoClient;
     private final SGISClient sgisClient;
@@ -122,8 +126,8 @@ public class OpenFeignTest {
         GonggongAptTradeResponse gonggongAptTradeResponse = gonggongClient.getRTMSDataSvcAptTradeDev(
             11110,
             202111,
-            "zkPCGLLeYNp7DcQ1XOEYpbo80W8vTNv7cJs5z8VNP8CRbAbI7KMwWdAgBRmHJ/UVxEKnC2F6qi8jjnn9148NgA==",
-            1,
+                gonggongApiKey,
+                1,
             10
         );
 
