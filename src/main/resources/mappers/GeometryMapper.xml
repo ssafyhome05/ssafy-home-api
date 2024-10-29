@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ssafyhome.model.dao.mapper.GeometryMapper">
+    <select id="selectByDongCode"
+            resultType="com.ssafyhome.model.entity.mysql.GeometryEntity">
+        SELECT dong_name, dong_code, ST_AsBinary(geom) as geom, center_lng, center_lat, radius
+        FROM geometry
+        WHERE dong_code = #{dong_code}
+    </select>
+
+    <select id="selectDongCodes"
+            resultType="string">
+        SELECT dong_code
+        FROM geometry
+    </select>
+
+    <update id="update"
+            parameterType="com.ssafyhome.model.entity.mysql.GeometryEntity">
+        UPDATE geometry
+        SET
+            center_lat = #{centerLat},
+            center_lng = #{centerLng},
+            radius = #{radius}
+        WHERE
+            dong_code = #{dongCode}
+    </update>
+</mapper>
