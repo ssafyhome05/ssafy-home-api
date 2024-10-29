@@ -13,13 +13,15 @@ import com.ssafyhome.model.entity.mysql.HouseDealEntity;
 import com.ssafyhome.model.entity.mysql.HouseInfoEntity;
 import com.ssafyhome.util.ConvertUtil;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 
 @Service
 public class HouseInternalService {
@@ -54,8 +56,11 @@ public class HouseInternalService {
 		HouseInfoTask houseInfoTask = new HouseInfoTask();
 		LocalDateTime start = LocalDateTime.now();
 		int totalRows = 0 , repeat = 1, seq = 1;
-		do {
+		List<HouseInfoEntity> infoEntityList = new ArrayList<>();
+		List<HouseDealEntity> dealEntityList = new ArrayList<>();
+		Set<String> existAptSeq = houseMapper.getExistAptSeq(String.valueOf(lawdCd));
 
+		do {
 			GonggongAptTradeResponse response =
 					gonggongClient.getRTMSDataSvcAptTradeDev(lawdCd, dealYmd, gonggongApiKey, repeat, 100);
 			if (response.getCmmMsgHeader() != null) {
@@ -75,53 +80,54 @@ public class HouseInternalService {
 
 				HouseDealEntity houseDealEntity = convertUtil.convert(item, HouseDealEntity.class);
 				houseDealEntity.setDealSeq(lawdCd + "-" + dealYmd + "-" + seq++);
+				dealEntityList.add(houseDealEntity);
 
-				try{
-					houseMapper.insertHouseDeal(houseDealEntity);
-				} catch (DuplicateKeyException e) {
-				} catch (Exception ex) {
+				if (existAptSeq.contains(houseDealEntity.getAptSeq())) continue;
 
-					HouseInfoEntity houseInfoEntity = convertUtil.convert(item, HouseInfoEntity.class);
-					houseInfoEntity.setHouseSeq(item.getAptSeq());
+				HouseInfoEntity houseInfoEntity = convertUtil.convert(item, HouseInfoEntity.class);
+				houseInfoEntity.setHouseSeq(item.getAptSeq());
 
-					DongCodeEntity dongCodeEntity = houseMapper.getSidoGugun(item.getSggCd() + item.getUmdCd());
-					String dongName;
-					try {
-						dongName = dongCodeEntity.getSidoName() + " " + dongCodeEntity.getGugunName() + " " + houseInfoEntity.getUmdNm();
-					} catch (Exception e) {
-						continue;
+				DongCodeEntity dongCodeEntity = houseMapper.getSidoGugun(item.getSggCd() + item.getUmdCd());
+				String dongName;
+				try {
+					dongName = dongCodeEntity.getSidoName() + " " + dongCodeEntity.getGugunName() + " " + houseInfoEntity.getUmdNm();
+				} catch (Exception e) {
+					continue;
+				}
+
+				if(!houseMapper.isExistHouseInfo(houseInfoEntity.getHouseSeq())) {
+					SgisGeoCode geoCode = sgisClient.getGeocode(sgisUtil.getAccessToken(), dongName + " " + item.getJibun());
+					if(geoCode.getResult() != null){
+						SgisGeoCode.Result.ResultData resultData =
+								sgisClient.getGeocode(sgisUtil.getAccessToken(), dongName + " " + item.getJibun())
+										.getResult().getResultdata().get(0);
+						houseInfoEntity.setLatitude(resultData.getY());
+						houseInfoEntity.setLongitude(resultData.getX());
 					}
-
-					if(!houseMapper.isExistHouseInfo(houseInfoEntity.getHouseSeq())) {
-						SgisGeoCode geoCode = sgisClient.getGeocode(sgisUtil.getAccessToken(), dongName + " " + item.getJibun());
-						if(geoCode.getResult() != null){
-							SgisGeoCode.Result.ResultData resultData =
-									sgisClient.getGeocode(sgisUtil.getAccessToken(), dongName + " " + item.getJibun())
-											.getResult().getResultdata().get(0);
-							houseInfoEntity.setLatitude(resultData.getY());
-							houseInfoEntity.setLongitude(resultData.getX());
-						}
-						else {
-							try {
-								sseEmitter.send(
-										SseEmitter.event()
-												.name("Not found jibun")
-												.data(lawdCd + "-" + dealYmd + "-" + seq)
-								);
-							} catch (Exception e) {}
-						}
-
-						try{
-							houseMapper.insertHouseInfo(houseInfoEntity);
-						} catch (DuplicateKeyException e) {}
-						try{
-							houseMapper.insertHouseDeal(houseDealEntity);
-						} catch (DuplicateKeyException e) {}
+					else {
+						try {
+							sseEmitter.send(
+									SseEmitter.event()
+											.name("Not found jibun")
+											.data(lawdCd + "-" + dealYmd + "-" + seq)
+							);
+						} catch (Exception e) {}
 					}
 				}
+
+				infoEntityList.add(houseInfoEntity);
+				existAptSeq.add(houseInfoEntity.getHouseSeq());
 			}
 
 		} while (repeat++ * 100 < totalRows);
+
+		try {
+			if (!infoEntityList.isEmpty()) houseMapper.insertHouseInfo(infoEntityList);
+			if (!dealEntityList.isEmpty()) houseMapper.insertHouseDeal(dealEntityList);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
 		LocalDateTime end = LocalDateTime.now();
 		houseInfoTask.setDuration(Duration.between(start, end));
 		return houseInfoTask;

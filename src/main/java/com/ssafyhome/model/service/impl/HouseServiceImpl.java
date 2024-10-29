@@ -57,7 +57,6 @@ public class HouseServiceImpl implements HouseService {
 
 		String requestId = UUID.randomUUID().toString();
 
-
 		SseEmitter sseEmitter = new SseEmitter(Long.MAX_VALUE);
 		sseEmitters.put(requestId, sseEmitter);
 
@@ -92,10 +91,10 @@ public class HouseServiceImpl implements HouseService {
 
 					Thread vThread = Thread.startVirtualThread(() -> {
 
-						try {
-							Boolean existingValue = processingLawdMap.putIfAbsent(lawdCd, true);
-							if (existingValue != null) return;
+						Boolean existingValue = processingLawdMap.putIfAbsent(lawdCd, true);
+						if (existingValue != null) return;
 
+						try {
 							semaphore.acquire();
 
 							HouseInfoTask houseInfoTask = null;
