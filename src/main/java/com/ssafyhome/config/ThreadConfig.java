@@ -5,7 +5,6 @@ import org.springframework.context.annotation.Configuration;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.Semaphore;
 
 @Configuration
 public class ThreadConfig {
@@ -14,11 +13,5 @@ public class ThreadConfig {
     public ExecutorService executorService() {
 
         return Executors.newVirtualThreadPerTaskExecutor();
-    }
-
-    @Bean
-    public Semaphore semaphore() {
-
-        return new Semaphore(Runtime.getRuntime().availableProcessors() * 2);
     }
 }

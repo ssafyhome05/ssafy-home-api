@@ -40,7 +40,6 @@ public class SpotInternalService {
     private final SpotMapper spotMapper;
     private final GeometryMapper geometryMapper;
     private final ExecutorService executorService;
-    private final Semaphore semaphore;
 
     public SpotInternalService(
             RedisTemplate<String, String> redisTemplate,
@@ -50,8 +49,7 @@ public class SpotInternalService {
             SGISUtil sgisUtil,
             SpotMapper spotMapper,
             GeometryMapper geometryMapper,
-            ExecutorService executorService,
-            Semaphore semaphore
+            ExecutorService executorService
     ) {
 
         this.redisTemplate = redisTemplate;
@@ -62,7 +60,6 @@ public class SpotInternalService {
         this.spotMapper = spotMapper;
         this.geometryMapper = geometryMapper;
         this.executorService = executorService;
-        this.semaphore = semaphore;
     }
 
     @Transactional

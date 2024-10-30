@@ -26,19 +26,16 @@ public class HouseServiceImpl implements HouseService {
     private final HouseMapper houseMapper;
     private final HouseInternalService houseInternalService;
 	private final ExecutorService executorService;
-	private final Semaphore semaphore;
 
     public HouseServiceImpl(
         HouseMapper houseMapper,
         HouseInternalService houseInternalService,
-		ExecutorService executorService,
-		Semaphore semaphore
+		ExecutorService executorService
     ) {
 
       this.houseMapper = houseMapper;
       this.houseInternalService = houseInternalService;
 	  this.executorService = executorService;
-	  this.semaphore = semaphore;
     }
 
     @Override
@@ -96,8 +93,6 @@ public class HouseServiceImpl implements HouseService {
 						if (existingValue != null) return;
 
 						try {
-							semaphore.acquire();
-
 							HouseInfoTask houseInfoTask = null;
 							int tryTimes = 5;
 							while (tryTimes-- > 0) {
@@ -123,8 +118,6 @@ public class HouseServiceImpl implements HouseService {
 						} catch (Exception e) {
 							throw new CompletionException(e);
 						} finally {
-
-							semaphore.release();
 							countDownLatch.countDown();
 						}
 					});
