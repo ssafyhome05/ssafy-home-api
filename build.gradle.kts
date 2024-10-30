@@ -36,6 +36,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-web")
     //Database
     implementation("org.springframework.boot:spring-boot-starter-data-redis")
+    implementation("org.redisson:redisson-spring-boot-starter:3.37.0")
     implementation("org.springframework.boot:spring-boot-starter-jdbc")
     implementation("org.mybatis.spring.boot:mybatis-spring-boot-starter:3.0.3")
     runtimeOnly("com.mysql:mysql-connector-j")
