@@ -5,7 +5,9 @@ import com.ssafyhome.api.kakao.KakaoClient;
 import com.ssafyhome.api.sgis.SGISClient;
 import com.ssafyhome.api.sgis.SGISUtil;
 import com.ssafyhome.api.tmap.TMapClient;
+import com.ssafyhome.model.dao.mapper.GeometryMapper;
 import com.ssafyhome.model.dto.api.*;
+import com.ssafyhome.model.entity.mysql.GeometryEntity;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +25,7 @@ public class OpenFeignTest {
     private final SGISUtil sgisUtil;
     private final TMapClient tMapClient;
     private final GonggongClient gonggongClient;
+    private final GeometryMapper geometryMapper;
 
     @Autowired
     public OpenFeignTest(
@@ -30,7 +33,8 @@ public class OpenFeignTest {
             SGISClient sgisClient,
             SGISUtil sgisUtil,
             TMapClient tMapClient,
-            GonggongClient gonggongClient
+            GonggongClient gonggongClient,
+            GeometryMapper geometryMapper
     ) {
 
         this.kakaoClient = kakaoClient;
@@ -38,19 +42,34 @@ public class OpenFeignTest {
         this.sgisUtil = sgisUtil;
         this.tMapClient = tMapClient;
         this.gonggongClient = gonggongClient;
+        this.geometryMapper = geometryMapper;
     }
 
     @Test
     public void testKakaoKeywordPlace() {
 
-        KakaoPlaceDto kakaoPlaceDto = kakaoClient.searchKeywordPlace("다이소");
+        GeometryEntity geometry = geometryMapper.selectByDongCode("1168010100");
+        KakaoPlaceDto kakaoPlaceDto = kakaoClient.searchKeywordPlace(
+                "다이소",
+                geometry.getCenterLng(),
+                geometry.getCenterLat(),
+                (int)geometry.getRadius() + 1,
+                15
+        );
         System.out.println(kakaoPlaceDto);
     }
 
     @Test
     public void testKakaoCategoryPlace() {
 
-        KakaoPlaceDto kakaoPlaceDto = kakaoClient.searchCategoryPlace("CS2");
+        GeometryEntity geometry = geometryMapper.selectByDongCode("1168010100");
+        KakaoPlaceDto kakaoPlaceDto = kakaoClient.searchCategoryPlace(
+                "CS2",
+                geometry.getCenterLng(),
+                geometry.getCenterLat(),
+                (int)geometry.getRadius() + 1,
+                15
+        );
         System.out.println(kakaoPlaceDto);
     }
 
