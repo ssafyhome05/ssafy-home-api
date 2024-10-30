@@ -1,8 +1,10 @@
 package com.ssafyhome.model.entity.mysql;
 
+import lombok.Builder;
 import lombok.Data;
 
 @Data
+@Builder
 public class SpotEntity {
 
 	private String spotSeq;
