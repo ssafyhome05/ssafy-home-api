@@ -22,7 +22,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 
 
 @Slf4j
@@ -39,6 +39,8 @@ public class SpotInternalService {
     private final SGISUtil sgisUtil;
     private final SpotMapper spotMapper;
     private final GeometryMapper geometryMapper;
+    private final ExecutorService executorService;
+    private final Semaphore semaphore;
 
     public SpotInternalService(
             RedisTemplate<String, String> redisTemplate,
@@ -47,7 +49,9 @@ public class SpotInternalService {
             SGISClient sgisClient,
             SGISUtil sgisUtil,
             SpotMapper spotMapper,
-            GeometryMapper geometryMapper
+            GeometryMapper geometryMapper,
+            ExecutorService executorService,
+            Semaphore semaphore
     ) {
 
         this.redisTemplate = redisTemplate;
@@ -57,6 +61,8 @@ public class SpotInternalService {
         this.sgisUtil = sgisUtil;
         this.spotMapper = spotMapper;
         this.geometryMapper = geometryMapper;
+        this.executorService = executorService;
+        this.semaphore = semaphore;
     }
 
     @Transactional
@@ -80,11 +86,34 @@ public class SpotInternalService {
                 log.info(dongCode + " save task starting");
                 List<SpotEntity> spotEntityList = new ArrayList<>();
                 Map<String, KakaoPlaceDto> kakaoPlaceDtoMap = connectWithKakaoAPI(dongCode);
+
+                int size = kakaoPlaceDtoMap.values().stream().mapToInt(list -> list.getDocuments().size()).sum();
+                ConcurrentHashMap<String, Boolean> processingSpotMap = new ConcurrentHashMap<>();
+                CountDownLatch countDownLatch = new CountDownLatch(size);
+
                 for (String key : kakaoPlaceDtoMap.keySet()) {
                     for(KakaoPlaceDto.Document document : kakaoPlaceDtoMap.get(key).getDocuments()) {
-                        spotEntityList.add(convertToSpotEntity(document, key));
+                        executorService.submit(() -> {
+                            Boolean existingValue = processingSpotMap.putIfAbsent(document.getId(), true);
+                            if (existingValue != null) return;
+
+                            try {
+                                spotEntityList.add(convertToSpotEntity(document, key));
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            } finally {
+                                countDownLatch.countDown();
+                            }
+                        });
                     }
                 }
+
+                try {
+                    countDownLatch.await();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+
                 spotMapper.insertSpots(spotEntityList);
                 redisTemplate.opsForValue().set(
                         TASK_COMPLETE_KEY,
