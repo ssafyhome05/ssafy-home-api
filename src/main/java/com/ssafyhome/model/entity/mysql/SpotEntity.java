@@ -1,8 +1,10 @@
 package com.ssafyhome.model.entity.mysql;
 
+import lombok.Builder;
 import lombok.Data;
 
 @Data
+@Builder
 public class SpotEntity {
 
 	private String spotSeq;
@@ -12,10 +14,10 @@ public class SpotEntity {
 	private String umdCd;
 	private String umdNm;
 	private String jibun;
-	private String roadNmSggCd;
 	private String roadNm;
-	private String roadNmBonbun;
-	private String roadNmBubun;
+//	private String roadNmSggCd;
+//	private String roadNmBonbun;
+//	private String roadNmBubun;
 	private String latitude;
 	private String longitude;
 }
