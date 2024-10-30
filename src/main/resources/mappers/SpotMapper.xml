@@ -1,4 +1,27 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.ssafyhome.model.dao.mapper.SpotMapper">
+    <insert id="insertSpots"
+            parameterType="java.util.List">
+        INSERT IGNORE INTO spot
+        VALUES
+        <foreach
+                collection="list"
+                item="item"
+                separator=",">
+            (#{item.spotSeq},#{item.spotName},#{item.spotType},#{item.sggCd},#{item.umdCd},#{item.umdNm},#{item.jibun},#{item.roadNm},#{item.latitude},#{item.longitude})
+        </foreach>
+    </insert>
+    <select id="getCategories"
+            resultType="com.ssafyhome.model.entity.mysql.CategoryEntity">
+        SELECT *
+        FROM category;
+    </select>
+
+    <select id="getSpotsByCategory"
+            resultType="com.ssafyhome.model.entity.mysql.SpotEntity">
+        SELECT *
+        FROM spot
+        WHERE concat(sgg_cd,umd_cd) = #{dongCode} AND spot_type = #{category}
+    </select>
 </mapper>
