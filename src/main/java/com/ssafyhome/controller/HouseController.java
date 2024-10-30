@@ -1,11 +1,14 @@
 package com.ssafyhome.controller;
 
+import com.ssafyhome.model.dao.mapper.GeometryMapper;
 import com.ssafyhome.model.dto.house.HouseDealsDto;
 import com.ssafyhome.model.dto.house.HouseDetailDto;
 import com.ssafyhome.model.dto.house.HouseDto;
 import com.ssafyhome.model.dto.house.HouseGraphDto;
 import com.ssafyhome.model.dto.spot.LocationStatusDto;
 import com.ssafyhome.model.service.HouseService;
+import com.ssafyhome.util.GeometryUtil;
+import com.ssafyhome.util.calc.Point;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.HttpStatus;
@@ -26,10 +29,14 @@ import java.util.List;
 public class HouseController {
 
 	private final HouseService houseService;
+	private final GeometryUtil geometryUtil;
+	private final GeometryMapper geometryMapper;
 
-	public HouseController(HouseService houseService) {
+	public HouseController(HouseService houseService, GeometryUtil geometryUtil, GeometryMapper geometryMapper) {
 
 		this.houseService = houseService;
+		this.geometryUtil = geometryUtil;
+		this.geometryMapper = geometryMapper;
 	}
 
 	@Operation(
@@ -120,6 +127,19 @@ public class HouseController {
 	) {
 
 		return new ResponseEntity<>(houseService.getHouseInfo(dongCode), HttpStatus.OK);
+	}
+
+	@Operation(
+			summary = "",
+			description = ""
+	)
+	@GetMapping("/polygon")
+	public List<Point> getDongPolygon(
+			@RequestParam
+			String dongCode
+	){
+		List<Point> dongPolygonList = geometryUtil.getPoints(geometryMapper.selectByDongCode(dongCode));
+		return dongPolygonList;
 	}
 
 	@Operation(
