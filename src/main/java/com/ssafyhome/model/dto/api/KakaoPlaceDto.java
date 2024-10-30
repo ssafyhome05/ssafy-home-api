@@ -10,7 +10,7 @@ public class KakaoPlaceDto {
 	private List<Document> documents;
 
 	@Data
-	private static class Document {
+	public static class Document {
 
 		private String placeName;
 		private String distance;
