@@ -1,13 +1,16 @@
 package com.ssafyhome.controller;
 
 import com.ssafyhome.model.dto.spot.SpotDto;
+import com.ssafyhome.model.service.SpotService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @Tag(
 		name = "Spot Controller",
@@ -17,17 +20,24 @@ import java.util.List;
 @RequestMapping("/spot")
 public class SpotController {
 
+	private final SpotService spotService;
+
+	public SpotController(SpotService spotService) {
+
+		this.spotService = spotService;
+	}
+
 	@Operation(
 			summary = "지도에 표시할 장소 정보",
 			description = "dongCode 와 일치하는 List<SpotDto> 반환"
 	)
 	@GetMapping("")
-	public ResponseEntity<List<SpotDto>> getSpots(
+	public ResponseEntity<Map<String,List<SpotDto>>> getSpots(
 			@RequestParam
 			String dongCode
 	) {
 
-		return null;
+		return new ResponseEntity<>(spotService.getSpotsByDongCode(dongCode), HttpStatus.OK);
 	}
 
 	@Operation(
