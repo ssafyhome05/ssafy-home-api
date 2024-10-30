@@ -18,15 +18,20 @@ public interface KakaoClient {
 
 	@GetMapping("/v2/local/search/keyword.json")
 	KakaoPlaceDto searchKeywordPlace(
-
-			@RequestParam("query")
-			String query
+			@RequestParam("query") String query,
+			@RequestParam("x") double lng,
+			@RequestParam("y") double lat,
+			@RequestParam("radius") int radius,
+			@RequestParam("page") int page
 	);
 
 	@GetMapping("/v2/local/search/category.json")
 	KakaoPlaceDto searchCategoryPlace(
-
-			@RequestParam("category_group_code")
-			String code
+			@RequestParam("category_group_code") String code,
+			@RequestParam("x") double lng,
+			@RequestParam("y") double lat,
+			@RequestParam("radius") int radius,
+			@RequestParam("page") int page
 	);
 }
+
