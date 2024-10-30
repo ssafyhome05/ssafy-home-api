@@ -25,14 +25,20 @@ public class HouseServiceImpl implements HouseService {
 
     private final HouseMapper houseMapper;
     private final HouseInternalService houseInternalService;
+	private final ExecutorService executorService;
+	private final Semaphore semaphore;
 
     public HouseServiceImpl(
         HouseMapper houseMapper,
-        HouseInternalService houseInternalService
+        HouseInternalService houseInternalService,
+		ExecutorService executorService,
+		Semaphore semaphore
     ) {
 
       this.houseMapper = houseMapper;
       this.houseInternalService = houseInternalService;
+	  this.executorService = executorService;
+	  this.semaphore = semaphore;
     }
 
     @Override
@@ -59,11 +65,6 @@ public class HouseServiceImpl implements HouseService {
 
 		SseEmitter sseEmitter = new SseEmitter(Long.MAX_VALUE);
 		sseEmitters.put(requestId, sseEmitter);
-
-		ExecutorService executorService = Executors.newVirtualThreadPerTaskExecutor();
-
-		int maxConcurrentThreads = 10;
-		Semaphore semaphore = new Semaphore(maxConcurrentThreads);
 
 		ConcurrentHashMap<Integer, Boolean> processingLawdMap = new ConcurrentHashMap<>();
 
