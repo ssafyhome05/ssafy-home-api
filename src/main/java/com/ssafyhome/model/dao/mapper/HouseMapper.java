@@ -9,11 +9,13 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 @Mapper
 public interface HouseMapper {
-    List<HouseDto> getHouseInfo(@Param("dongCode") String dongCode);
+//    List<HouseDto> getHouseInfo(@Param("dongCode") String dongCode);
+	List<HouseDto> getHouseInfo(Map<String, Object> params);
     List<HouseDealsDto> getHouseDeals(@Param("houseSeq") String houseSeq,
                                       @Param("limit") int limit,
                                       @Param("offset") int offset);

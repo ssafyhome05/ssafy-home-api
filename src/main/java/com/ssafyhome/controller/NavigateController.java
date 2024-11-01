@@ -33,7 +33,6 @@ public class NavigateController {
 
 		return null;
 	}
-
 	@Operation(
 			summary = "매물과 모든 사용자 장소간 이동시간",
 			description = "houseSeq 와 등록한 모든 사용자장소 간 List<NavigateDto> 반환"
