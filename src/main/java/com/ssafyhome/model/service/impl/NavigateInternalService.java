@@ -1,15 +1,11 @@
 package com.ssafyhome.model.service.impl;
 
 import com.ssafyhome.api.kakao.KakaoClient;
-import com.ssafyhome.api.sgis.SGISClient;
-import com.ssafyhome.api.sgis.SGISUtil;
-import com.ssafyhome.model.dao.mapper.GeometryMapper;
 import com.ssafyhome.model.dao.mapper.SpotMapper;
 import com.ssafyhome.model.dto.api.KakaoPlaceDto;
-import com.ssafyhome.model.dto.api.SgisGeoCode;
+import com.ssafyhome.model.dto.api.TMapPoint;
 import com.ssafyhome.model.entity.mysql.CategoryEntity;
-import com.ssafyhome.model.entity.mysql.GeometryEntity;
-import com.ssafyhome.model.entity.mysql.SpotEntity;
+import com.ssafyhome.model.entity.mysql.NearestSpotEntity;
 import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
@@ -22,67 +18,60 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.*;
-
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.TimeUnit;
 
 @Slf4j
 @Service
-public class SpotInternalService {
+public class NavigateInternalService {
 
-    private final String COMPLETE_KEY_FORMAT = "SPOT_API_TASK:%s:COMPLETE";
-    private final String LOCK_KEY_FORMAT = "SPOT_API_TASK:%s:LOCK";
+    private final String COMPLETE_KEY_FORMAT = "NEAREST_API_TASK:%s:COMPLETE";
+    private final String LOCK_KEY_FORMAT = "NEAREST_API_TASK:%s:LOCK";
 
     private final RedisTemplate<String, String> redisTemplate;
     private final RedissonClient redissonClient;
     private final KakaoClient kakaoClient;
-    private final SGISClient sgisClient;
-    private final SGISUtil sgisUtil;
     private final SpotMapper spotMapper;
-    private final GeometryMapper geometryMapper;
     private final ExecutorService executorService;
 
-    public SpotInternalService(
+    public NavigateInternalService(
             RedisTemplate<String, String> redisTemplate,
             RedissonClient redissonClient,
             KakaoClient kakaoClient,
-            SGISClient sgisClient,
-            SGISUtil sgisUtil,
             SpotMapper spotMapper,
-            GeometryMapper geometryMapper,
             ExecutorService executorService
     ) {
 
         this.redisTemplate = redisTemplate;
         this.redissonClient = redissonClient;
         this.kakaoClient = kakaoClient;
-        this.sgisClient = sgisClient;
-        this.sgisUtil = sgisUtil;
         this.spotMapper = spotMapper;
-        this.geometryMapper = geometryMapper;
         this.executorService = executorService;
     }
 
     @Transactional
-    public void getSpotsFromAPI(String dongCode) throws InterruptedException {
+    public void findNearestSpot(String aptSeq, TMapPoint start) throws InterruptedException {
 
-        String TASK_COMPLETE_KEY = String.format(COMPLETE_KEY_FORMAT, dongCode);
-        String TASK_LOCK_KEY = String.format(LOCK_KEY_FORMAT, dongCode);
+        String TASK_COMPLETE_KEY = String.format(COMPLETE_KEY_FORMAT, aptSeq);
+        String TASK_LOCK_KEY = String.format(LOCK_KEY_FORMAT, aptSeq);
 
         if (isCompleted(TASK_COMPLETE_KEY)) {
-            log.info(dongCode + " is already updated");
+            log.info(aptSeq + " is already updated");
             return;
         }
 
         RLock lock = redissonClient.getLock(TASK_LOCK_KEY);
         if (lock.tryLock(10, 30, TimeUnit.SECONDS)) {
-            log.info(dongCode + "lock acquired");
+            log.info(aptSeq + "lock acquired");
             if (isCompleted(TASK_COMPLETE_KEY)) {
-                log.info(dongCode + " is already updated");
+                log.info(aptSeq + " is already updated");
             }
             else {
-                log.info(dongCode + " save task starting");
-                List<SpotEntity> spotEntityList = new ArrayList<>();
-                Map<String, KakaoPlaceDto> kakaoPlaceDtoMap = connectWithKakaoAPI(dongCode);
+                log.info(aptSeq + " save task starting");
+                List<NearestSpotEntity> nearestSpotEntityList = new ArrayList<>();
+                Map<String, KakaoPlaceDto> kakaoPlaceDtoMap = connectWithKakaoAPI(start);
 
                 int size = kakaoPlaceDtoMap.values().stream().mapToInt(list -> list.getDocuments().size()).sum();
                 ConcurrentHashMap<String, Boolean> processingSpotMap = new ConcurrentHashMap<>();
@@ -95,7 +84,7 @@ public class SpotInternalService {
                             if (existingValue != null) return;
 
                             try {
-                                spotEntityList.add(convertToSpotEntity(document, key));
+                                nearestSpotEntityList.add(convertToSpotEntity(document, aptSeq, key));
                             } catch (Exception e) {
                                 e.printStackTrace();
                             } finally {
@@ -111,11 +100,11 @@ public class SpotInternalService {
                     e.printStackTrace();
                 }
 
-                spotMapper.insertSpots(spotEntityList);
+                spotMapper.insertNearestSpots(nearestSpotEntityList);
                 redisTemplate.opsForValue().set(
                         TASK_COMPLETE_KEY,
                         String.valueOf(LocalDateTime.now()),
-                        1, TimeUnit.HOURS
+                        10, TimeUnit.DAYS
                 );
             }
             lock.unlock();
@@ -128,29 +117,30 @@ public class SpotInternalService {
         return Boolean.TRUE.equals(isCompleted);
     }
 
-    private Map<String, KakaoPlaceDto> connectWithKakaoAPI(String dongCode) {
+    private Map<String, KakaoPlaceDto> connectWithKakaoAPI(TMapPoint start) {
 
         Map<String, KakaoPlaceDto> kakaoPlaceDtoMap = new HashMap<>();
-        GeometryEntity geometry = geometryMapper.selectByDongCode(dongCode);
 
         for (CategoryEntity category : spotMapper.getCategories()) {
             KakaoPlaceDto kakaoPlaceDto = null;
             if (category.isCategoryType()) {
                 kakaoPlaceDto = kakaoClient.searchCategoryPlace(
                         category.getCategoryCode(),
-                        geometry.getCenterLng(),
-                        geometry.getCenterLat(),
-                        (int)geometry.getRadius() + 1,
-                        15
+                        start.getX(),
+                        start.getY(),
+                        2000,
+                        1,
+                        "distance"
                 );
             }
             else {
                 kakaoPlaceDto = kakaoClient.searchKeywordPlace(
                         category.getCategoryCode(),
-                        geometry.getCenterLng(),
-                        geometry.getCenterLat(),
-                        (int)geometry.getRadius() + 1,
-                        15
+                        start.getX(),
+                        start.getY(),
+                        2000,
+                        1,
+                        "distance"
                 );
             }
             kakaoPlaceDtoMap.put(category.getCategoryName(), kakaoPlaceDto);
@@ -159,25 +149,15 @@ public class SpotInternalService {
         return kakaoPlaceDtoMap;
     }
 
-    private SpotEntity convertToSpotEntity(KakaoPlaceDto.Document document, String category) {
+    private NearestSpotEntity convertToSpotEntity(KakaoPlaceDto.Document document, String aptSeq, String category) {
 
-        SpotEntity spotEntity = SpotEntity.builder()
-                .spotSeq(document.getId())
+        return NearestSpotEntity.builder()
+                .categoryName(category)
+                .aptSeq(aptSeq)
                 .spotName(document.getPlaceName())
-                .spotType(category)
-                .jibun(document.getAddressName())
-                .roadNm(document.getRoadAddressName())
-                .latitude(document.getY())
                 .longitude(document.getX())
+                .latitude(document.getY())
                 .build();
-
-        SgisGeoCode sgisGeoCode = sgisClient.getGeocode(sgisUtil.getAccessToken(), spotEntity.getJibun());
-        SgisGeoCode.Result result = sgisGeoCode.getResult();
-        SgisGeoCode.Result.ResultData resultData = result.getResultdata().get(0);
-        spotEntity.setSggCd(resultData.getLegCd().substring(0,5));
-        spotEntity.setUmdCd(resultData.getLegCd().substring(5,10));
-        spotEntity.setUmdNm(resultData.getLegNm());
-        return spotEntity;
     }
 
 }

@@ -12,6 +12,18 @@
             (#{item.spotSeq},#{item.spotName},#{item.spotType},#{item.sggCd},#{item.umdCd},#{item.umdNm},#{item.jibun},#{item.roadNm},#{item.latitude},#{item.longitude})
         </foreach>
     </insert>
+    <insert id="insertNearestSpots"
+            parameterType="java.util.List">
+        INSERT INTO nearest_spot
+        VALUES
+        <foreach
+                collection="list"
+                item="item"
+                separator=",">
+                (#{item.aptSeq},#{item.categoryName},#{item.spotName},#{item.latitude},#{item.longitude})
+        </foreach>
+
+    </insert>
     <select id="getCategories"
             resultType="com.ssafyhome.model.entity.mysql.CategoryEntity">
         SELECT *
@@ -23,5 +35,24 @@
         SELECT *
         FROM spot
         WHERE concat(sgg_cd,umd_cd) = #{dongCode} AND spot_type = #{category}
+    </select>
+    <select id="getCustomSpotByUser"
+            resultType="com.ssafyhome.model.entity.mysql.CustomSpotEntity">
+        SELECT *
+        FROM custom_spot
+        WHERE user_seq = #{userSeq}
+    </select>
+    <select id="getNearestSpotByStartPoint"
+            resultType="com.ssafyhome.model.entity.mysql.NearestSpotEntity">
+        SELECT *
+        FROM nearest_spot
+        WHERE apt_seq = #{aptSeq}
+    </select>
+    <select id="getTMapPointByAptSeq"
+            resultType="com.ssafyhome.model.dto.api.TMapPoint">
+        SELECT apt_nm as name, longitude as x, latitude as y
+        FROM house_info
+        WHERE apt_seq = #{apt_seq}
+
     </select>
 </mapper>
