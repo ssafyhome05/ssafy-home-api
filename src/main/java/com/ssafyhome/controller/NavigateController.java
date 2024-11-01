@@ -2,8 +2,10 @@ package com.ssafyhome.controller;
 
 import com.ssafyhome.model.dto.navigate.NavigateDto;
 import com.ssafyhome.model.dto.spot.SpotSearchDto;
+import com.ssafyhome.model.service.NavigateService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -17,6 +19,13 @@ import java.util.List;
 @RestController
 @RequestMapping("/navigate")
 public class NavigateController {
+
+	private final NavigateService navigateService;
+
+	public NavigateController(NavigateService navigateService) {
+
+		this.navigateService = navigateService;
+	}
 
 	@Operation(
 			summary = "매물 과 검색한 장소 간 이동시간",
@@ -58,6 +67,6 @@ public class NavigateController {
 			String houseSeq
 	) {
 
-		return null;
+		return new ResponseEntity<>(navigateService.getNavigates("spot", houseSeq), HttpStatus.OK);
 	}
 }
