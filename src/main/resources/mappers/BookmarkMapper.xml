@@ -1,4 +1,26 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.ssafyhome.model.dao.mapper.BookmarkMapper">
+
+    <insert id="addBookmark" parameterType="map">
+        INSERT INTO favorite_house
+        VALUES(#{userSeq}, #{aptSeq})
+    </insert>
+    
+    <delete id="deleteBookmark" parameterType="map">
+        DELETE
+        FROM favorite_house
+        WHERE apt_seq = #{aptSeq}
+    </delete>
+
+    <insert id="addLocationBookmark" parameterType="map">
+        INSERT INTO favorite_spot
+        VALUES(#{dongCode}, #{userSeq})
+    </insert>
+
+    <delete id="deleteLocationBookmark" parameterType="map">
+        DELETE
+        FROM favorite_spot
+        WHERE dong_code = #{dongCode}
+    </delete>
 </mapper>

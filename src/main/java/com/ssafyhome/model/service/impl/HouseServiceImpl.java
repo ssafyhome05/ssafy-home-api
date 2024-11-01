@@ -39,9 +39,9 @@ public class HouseServiceImpl implements HouseService {
     }
 
     @Override
-    public List<HouseDto> getHouseInfo(String dongCode) {
+    public List<HouseDto> getHouseInfo(Map<String, Object> params) {
 
-        List<HouseDto> houseInfoList = houseMapper.getHouseInfo(dongCode);
+        List<HouseDto> houseInfoList = houseMapper.getHouseInfo(params);
 
         return houseInfoList;
     }

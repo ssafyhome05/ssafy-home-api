@@ -17,7 +17,9 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 
 @Tag(
@@ -123,10 +125,38 @@ public class HouseController {
 	@GetMapping("")
 	public ResponseEntity<List<HouseDto>> getHouseInfo(
 			@RequestParam
-			String dongCode
+			String dongCode,
+			@RequestParam(required = false)
+			String startDate,
+			@RequestParam(required = false)
+			String endDate,
+			@RequestParam(required = false)
+			String keyWord
 	) {
+		Map<String, Object> params = new HashMap<>();
+		params.put("dongCode", dongCode);
 
-		return new ResponseEntity<>(houseService.getHouseInfo(dongCode), HttpStatus.OK);
+		if (startDate != null && !startDate.isEmpty()) {
+			String[] start = startDate.split("-");
+			params.put("startYear", start[0]);
+			params.put("startMonth", start[1]);
+		}else{
+			params.put("startYear", "");
+			params.put("startMonth", "");
+		}
+
+		if (endDate != null && !endDate.isEmpty()) {
+			String[] end = endDate.split("-");
+			params.put("endYear", end[0]);
+			params.put("endMonth", end[1]);
+		} else{
+			params.put("endYear", "");
+			params.put("endMonth", "");
+		}
+		params.put("keyWord", keyWord);
+
+		return new ResponseEntity<>(houseService.getHouseInfo(params), HttpStatus.OK);
+//		return new ResponseEntity<>(houseService.getHouseInfo(dongCode), HttpStatus.OK);
 	}
 
 	@Operation(

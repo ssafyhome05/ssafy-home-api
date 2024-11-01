@@ -6,9 +6,9 @@ import lombok.Data;
 public class HouseDto {
 
 	private String aptSeq;
-	private String aptName;
+	private String aptNm;
 	private String jibun;
-	private String roadName;
+	private String roadNm;
 	private String latitude;
 	private String longitude;
 	private String AvgDealAmount;

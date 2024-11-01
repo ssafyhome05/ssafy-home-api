@@ -4,13 +4,21 @@ import com.ssafyhome.model.dto.bookmark.BookmarkStatusDto;
 import com.ssafyhome.model.dto.house.HouseDto;
 import com.ssafyhome.model.dto.spot.CustomSpotDto;
 import com.ssafyhome.model.dto.spot.LocationDto;
+import com.ssafyhome.model.service.BookmarkService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springdoc.core.configuration.SpringDocSecurityConfiguration;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.context.SecurityContextHolderFilter;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 
 @Tag(
@@ -21,6 +29,15 @@ import java.util.List;
 @RequestMapping("/bookmark")
 public class BookmarkController {
 
+	private static BookmarkService bookmarkService;
+
+	public BookmarkController(
+			BookmarkService bookmarkService
+	)
+	{
+		BookmarkController.bookmarkService = bookmarkService;
+	}
+
 	@Operation(
 			summary = "관심지역 등록",
 			description = "사용자가 보고 있는 String 객체의 dongcode 를 받아 북마크등록"
@@ -30,11 +47,15 @@ public class BookmarkController {
 	public ResponseEntity<?> addLocation(
 			@RequestBody
 			String dongCode
-
-
 	) {
 
-		return null;
+		Map<String, Object> params = new HashMap<>();
+		params.put("dongCode", dongCode);
+		params.put("userSeq", SecurityContextHolder.getContext().getAuthentication().getName());
+
+		bookmarkService.addLocationBookmark(params);
+
+		return new ResponseEntity<>("add location bookmark success", HttpStatus.OK);
 	}
 
 	@Operation(
@@ -48,7 +69,13 @@ public class BookmarkController {
 			String houseId
 	) {
 
-		return null;
+		Map<String, Object> params = new HashMap<>();
+		params.put("userSeq", SecurityContextHolder.getContext().getAuthentication().getName());
+		params.put("aptSeq", houseId);
+
+		bookmarkService.addBookmark(params);
+
+		return new ResponseEntity<>("add bookmark success", HttpStatus.OK);
 	}
 
 	@Operation(
@@ -119,8 +146,13 @@ public class BookmarkController {
 			@PathVariable
 			String dongCode
 	) {
+		Map<String, Object> params = new HashMap<>();
+		params.put("dongCode", dongCode);
+		params.put("userSeq", SecurityContextHolder.getContext().getAuthentication().getName());
 
-		return null;
+		bookmarkService.deleteLocationBookmark(params);
+
+		return new ResponseEntity<>("delete location bookmark success", HttpStatus.OK);
 	}
 
 	@Operation(
@@ -134,7 +166,13 @@ public class BookmarkController {
 			String houseId
 	) {
 
-		return null;
+		Map<String, Object> params = new HashMap<>();
+		params.put("userSeq", SecurityContextHolder.getContext().getAuthentication().getName());
+		params.put("aptSeq", houseId);
+
+		bookmarkService.deleteBookmark(params);
+
+		return new ResponseEntity<>("delete bookmark success", HttpStatus.OK);
 	}
 
 	@Operation(
