@@ -15,5 +15,5 @@ public class HouseDto {
 	private double reviewRate;
 	private boolean isBookmark;
 	private int dealCnt;
-	private double avgDealAmount;
+	private String avgDealAmount;
 }
