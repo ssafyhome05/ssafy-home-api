@@ -2,33 +2,32 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.ssafyhome.model.dao.mapper.HouseMapper">
     <select id="getHouseInfo" parameterType="map" resultType="com.ssafyhome.model.dto.house.HouseDto">
-        SELECT *
+        SELECT
+            apt_seq,
+            sgg_cd,
+            umd_cd,
+            umd_nm,
+            jibun,
+            road_um_sgg_cd,
+            road_nm,
+            road_nm_bonbun,
+            road_nm_bubun,
+            apt_nm,
+            build_year,
+            latitude,
+            longitude,
+            (SELECT COUNT(*)
+                FROM house_deal
+                WHERE house_deal.apt_seq = house_info.apt_seq) AS deal_cnt,
+            (SELECT ROUND(AVG(CAST(REPLACE(deal_amount, ',', '') AS DOUBLE)))
+                FROM house_deal
+                WHERE house_deal.apt_seq = house_info.apt_seq) AS avg_deal_amount
         FROM house_info
         WHERE CONCAT(sgg_cd, umd_cd) = #{dongCode}
         <if test="keyWord != null and keyWord != ''">
             AND apt_nm LIKE CONCAT('%', #{keyWord}, '%')
         </if>
     </select>
-<!--    <select id="getHouseInfo" parameterType="map" resultType="com.ssafyhome.model.dto.house.HouseDto">-->
-<!--        SELECT *-->
-<!--        FROM house_info-->
-<!--        WHERE CONCAT(sgg_cd, umd_cd) = #{dongCode}-->
-
-<!--        <if test="startYear != null and startMonth != null">-->
-<!--            AND (dealYear > #{startYear} OR (dealYear = #{startYear} AND dealMonth >= #{startMonth}))-->
-<!--        </if>-->
-
-<!--        <if test="endYear != null and endMonth != null">-->
-<!--            AND (dealYear < #{endYear} OR (dealYear = #{endYear} AND dealMonth <= #{endMonth}))-->
-<!--        </if>-->
-
-<!--        <if test="keyWord != null and keyWord != ''">-->
-<!--            AND aptDong LIKE CONCAT('%', #{keyWord}, '%')-->
-<!--        </if>-->
-<!--    </select>-->
-
-
-
 
     <select id="getHouseDeals" resultType="com.ssafyhome.model.dto.house.HouseDealsDto">
         SELECT *
