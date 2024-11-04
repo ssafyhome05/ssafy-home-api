@@ -1,56 +1,37 @@
 package com.ssafyhome.model.dto.api;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import java.util.List;
 
+@EqualsAndHashCode(callSuper = true)
 @Data
-public class TMapCarRouteResponseDto{
+public class TMapCarRouteResponseDto extends TMapResponse<TMapCarRouteResponseDto.Feature>{
 
-	private String type;
-	private List<Feature> features;
-
+	@EqualsAndHashCode(callSuper = true)
 	@Data
-	public static class Feature {
+	public static class Feature extends TMapResponse.Feature<TMapCarRouteResponseDto.Feature.Geometry, TMapCarRouteResponseDto.Feature.Properties> {
 
-		private String type;
-		private Geometry geometry;
-		private Properties properties;
-
+		@EqualsAndHashCode(callSuper = true)
 		@Data
-		public static class Geometry {
+		public static class Geometry extends TMapResponse.Feature.Geometry {
 
-			private String type;
-			private List<Object> coordinates;
 			private String traffic;
 		}
 
+		@EqualsAndHashCode(callSuper = true)
 		@Data
-		public static class Properties {
+		public static class Properties extends TMapResponse.Feature.Properties {
 
-			//SP
-			private int totalDistance;
-			private int totalTime;
 			private int totalFare;
 			private int taxiFare;
 
-			private int index;
-			private int pointIndex;
-			private int lineIndex;
 			private int departIdx;
 			private int destIdx;
 
-			private String name;
 			private String nextRoadName;
-			private String description;
-			private String direction;
-			private int time;
 			private int distance;
-
-			private int turnType;
-			private int roadType;
-			private String facilityType;
-			private String pointType;
 		}
 	}
 }
