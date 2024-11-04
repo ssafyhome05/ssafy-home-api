@@ -40,32 +40,23 @@ public class NavigateController {
 			SpotSearchDto spotSearchDto
 	) {
 
-		return null;
+		return new ResponseEntity<>(navigateService.getNavigate("search", houseSeq, navigateService.getEndPoint(spotSearchDto)), HttpStatus.OK);
 	}
+
 	@Operation(
-			summary = "매물과 모든 사용자 장소간 이동시간",
-			description = "houseSeq 와 등록한 모든 사용자장소 간 List<NavigateDto> 반환"
+			summary = "매물과 모든 장소간 이동시간 및 경로 (사용자 정의 장소 / 카테고리별 최단거리)",
+			description = "houseSeq 와 모든 장소간 List<NavigateDto> 반환"
 	)
-	@GetMapping("/bookmark")
+	@GetMapping("/{type}")
 	@PreAuthorize("hasRole('ROLE_USER')")
 	public ResponseEntity<List<NavigateDto>> getTimeWithCustomSpots(
+			@PathVariable
+			String type,
+
 			@RequestParam
 			String houseSeq
 	) {
 
-		return null;
-	}
-
-	@Operation(
-			summary = "각 장소 카테고리별 가장 가까운 곳의 소요시간",
-			description = "다이소 및 편의점(편의시설), 지하철(교통시설), 맛집(상업시설) 별 최소소요거리"
-	)
-	@GetMapping("/spot")
-	public ResponseEntity<List<NavigateDto>> getTimeWithSpots(
-			@RequestParam
-			String houseSeq
-	) {
-
-		return new ResponseEntity<>(navigateService.getNavigates("spot", houseSeq), HttpStatus.OK);
+		return new ResponseEntity<>(navigateService.getNavigates(type, houseSeq), HttpStatus.OK);
 	}
 }

@@ -4,6 +4,7 @@ import com.ssafyhome.api.tmap.TMapClient;
 import com.ssafyhome.model.dao.mapper.SpotMapper;
 import com.ssafyhome.model.dto.api.*;
 import com.ssafyhome.model.dto.navigate.NavigateDto;
+import com.ssafyhome.model.dto.spot.SpotSearchDto;
 import com.ssafyhome.model.service.NavigateService;
 import com.ssafyhome.util.ConvertUtil;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -70,6 +71,11 @@ public class NavigateServiceImpl implements NavigateService {
                 .build();
     }
 
+    @Override
+    public TMapPoint getEndPoint(SpotSearchDto spotSearchDto) {
+        return null;
+    }
+
     private List<TMapPoint> getEndpoints(String type, String aptSeq, TMapPoint start) {
         if (type.equals("spot")) {
             try {
@@ -108,23 +114,7 @@ public class NavigateServiceImpl implements NavigateService {
                 .build();
         TMapCarRouteResponseDto response = tMapClient.findCarRoute(1, request);
 
-        List<NavigateDto.Route> routes = new ArrayList<>();
-        NavigateDto.Route route = new NavigateDto.Route();
-
-        TMapCarRouteResponseDto.Feature startFeature = response.getFeatures().get(0);
-        route.setTotalTime(startFeature.getProperties().getTotalTime());
-        route.setTotalDistance(startFeature.getProperties().getTotalDistance());
-        route.setFare(response.getFeatures().get(0).getProperties().getTaxiFare());
-        route.setRouteInfos(
-                response.getFeatures().stream()
-                        .map(feature -> NavigateDto.Route.RouteInfo.builder()
-                                .type(feature.getGeometry().getType())
-                                .coordinates(feature.getGeometry().getCoordinates())
-                                .build())
-                        .toList()
-        );
-        routes.add(route);
-        return routes;
+        return getRouteByResponse(response);
     }
 
     private List<NavigateDto.Route> getWalkRoute(TMapPoint start, TMapPoint end) {
@@ -139,22 +129,7 @@ public class NavigateServiceImpl implements NavigateService {
                 .build();
         TMapWalkRouteResponseDto response = tMapClient.findWalkRoute(1, request);
 
-        List<NavigateDto.Route> routes = new ArrayList<>();
-        NavigateDto.Route route = new NavigateDto.Route();
-
-        TMapWalkRouteResponseDto.Feature startFeature = response.getFeatures().get(0);
-        route.setTotalTime(startFeature.getProperties().getTotalTime());
-        route.setTotalDistance(startFeature.getProperties().getTotalDistance());
-        route.setRouteInfos(
-                response.getFeatures().stream()
-                        .map(feature -> NavigateDto.Route.RouteInfo.builder()
-                                .type(feature.getGeometry().getType())
-                                .coordinates(feature.getGeometry().getCoordinates())
-                                .build())
-                        .toList()
-        );
-        routes.add(route);
-        return routes;
+        return getRouteByResponse(response);
     }
 
     private List<NavigateDto.Route> getTransportRoute(TMapPoint start, TMapPoint end) {
@@ -170,6 +145,34 @@ public class NavigateServiceImpl implements NavigateService {
         if (response.getMetaData() == null) return  new ArrayList<>();
 
         return response.getMetaData().getPlan().getItineraries().stream().map(this::getRouteByItinerary).toList();
+    }
+
+    private <T extends TMapResponse> List<NavigateDto.Route> getRouteByResponse(T response) {
+
+        List<NavigateDto.Route> routes = new ArrayList<>();
+        NavigateDto.Route route = new NavigateDto.Route();
+
+        List features = response.getFeatures();
+        TMapResponse.Feature startFeature = (TMapResponse.Feature) features.get(0);
+        route.setTotalTime(startFeature.getProperties().getTotalTime());
+        route.setTotalDistance(startFeature.getProperties().getTotalDistance());
+        if (response instanceof TMapCarRouteResponseDto) {
+            route.setFare(((TMapCarRouteResponseDto.Feature.Properties)startFeature.getProperties()).getTaxiFare());
+        }
+        route.setRouteInfos(
+                features.stream()
+                        .map(obj -> {
+                            TMapResponse.Feature feature = (TMapResponse.Feature) obj;
+                            return NavigateDto.Route.RouteInfo.builder()
+                                    .type(feature.getGeometry().getType())
+                                    .coordinates(feature.getGeometry().getCoordinates())
+                                    .build();
+                        })
+                        .toList()
+        );
+        routes.add(route);
+        return routes;
+
     }
 
     private NavigateDto.Route getRouteByItinerary(TMapTransportRouteResponseDto.MetaData.Plan.Itinerary itinerary) {

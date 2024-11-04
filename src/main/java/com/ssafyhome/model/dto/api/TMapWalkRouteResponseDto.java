@@ -1,58 +1,35 @@
 package com.ssafyhome.model.dto.api;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
-import java.util.List;
-
+@EqualsAndHashCode(callSuper = true)
 @Data
-public class TMapWalkRouteResponseDto {
+public class TMapWalkRouteResponseDto extends TMapResponse<TMapWalkRouteResponseDto.Feature> {
 
-    private String type;
-    private List<Feature> features;
-
+    @EqualsAndHashCode(callSuper = true)
     @Data
-    public static class Feature {
+    public static class Feature extends TMapResponse.Feature<TMapWalkRouteResponseDto.Feature.Geometry, TMapWalkRouteResponseDto.Feature.Properties> {
 
-        private String type;
-        private Geometry geometry;
-        private Properties properties;
-    }
+        @EqualsAndHashCode(callSuper = true)
+        @Data
+        public static class Geometry extends TMapResponse.Feature.Geometry {}
 
-    @Data
-    public static class Geometry {
+        @EqualsAndHashCode(callSuper = true)
+        @Data
+        public static class Properties extends TMapResponse.Feature.Properties {
 
-        private String type;
-        private List<Object> coordinates;
-    }
+            //COMMON
+            private String facilityName;
 
-    @Data
-    public static class Properties {
+            //POINT
+            private String nearPoiName;
+            private String nearPoiX;
+            private String nearPoiY;
+            private String intersectionName;
 
-        //COMMON
-        private int index;
-        private String name;
-        private String description;
-        private String facilityType;
-        private String facilityName;
-
-        //SP
-        private int totalDistance;
-        private int totalTime;
-
-        //POINT
-        private int pointIndex;
-        private String direction;
-        private String nearPoiName;
-        private String nearPoiX;
-        private String nearPoiY;
-        private String intersectionName;
-        private int turnType;
-        private String pointType;
-
-        //LINE
-        private int lineIndex;
-        private int time;
-        private int roadType;
-        private int categoryRoadType;
+            //LINE
+            private int categoryRoadType;
+        }
     }
 }
