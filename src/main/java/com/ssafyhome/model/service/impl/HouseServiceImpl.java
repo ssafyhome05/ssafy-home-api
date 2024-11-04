@@ -21,39 +21,45 @@ import java.util.concurrent.atomic.AtomicInteger;
 @Service
 public class HouseServiceImpl implements HouseService {
 
-    private final Map<String, SseEmitter> sseEmitters = new ConcurrentHashMap<>();
+	/**
+	 * 작업을 비동기로 진행하고 완료가 된 경우, 실시간으로 알림을 사용자에게 전송하기 위해서
+	 * SSE protocol (Server Send Event)를 이용함
+	 * SSE protocol로 연결 시 클라이언트와 response를 끊지않고 유지하면서 sse emitter가 event를 sent함
+	 * WebSocket과의 차이점은 연결을 6개의 클라이언트와 유지할 수 있고 Request는 연결을 유지하지 않음
+	 */
+	private final Map<String, SseEmitter> sseEmitters = new ConcurrentHashMap<>();
 
-    private final HouseMapper houseMapper;
-    private final HouseInternalService houseInternalService;
+	private final HouseMapper houseMapper;
+	private final HouseInternalService houseInternalService;
 	private final ExecutorService executorService;
 
-    public HouseServiceImpl(
-        HouseMapper houseMapper,
-        HouseInternalService houseInternalService,
-		ExecutorService executorService
-    ) {
+	public HouseServiceImpl(
+			HouseMapper houseMapper,
+			HouseInternalService houseInternalService,
+			ExecutorService executorService
+	) {
 
-      this.houseMapper = houseMapper;
-      this.houseInternalService = houseInternalService;
-	  this.executorService = executorService;
-    }
+		this.houseMapper = houseMapper;
+		this.houseInternalService = houseInternalService;
+		this.executorService = executorService;
+	}
 
-    @Override
-    public List<HouseDto> getHouseInfo(Map<String, Object> params) {
+	@Override
+	public List<HouseDto> getHouseInfo(Map<String, Object> params) {
 
-        List<HouseDto> houseInfoList = houseMapper.getHouseInfo(params);
+		List<HouseDto> houseInfoList = houseMapper.getHouseInfo(params);
 
-        return houseInfoList;
-    }
+		return houseInfoList;
+	}
 
-    @Override
-    public List<HouseDealsDto> getHouseDeals(String houseSeq, int page, int limit) {
+	@Override
+	public List<HouseDealsDto> getHouseDeals(String houseSeq, int page, int limit) {
 
-        int offset = page * limit;
-        List<HouseDealsDto> houseDealsList = houseMapper.getHouseDeals(houseSeq, limit, offset);
+		int offset = page * limit;
+		List<HouseDealsDto> houseDealsList = houseMapper.getHouseDeals(houseSeq, limit, offset);
 
-        return houseDealsList;
-    }
+		return houseDealsList;
+	}
 
 	@Override
 	public String startHouseInfoTask(int dealYmd, int startCd, int endCd) {
@@ -137,10 +143,10 @@ public class HouseServiceImpl implements HouseService {
 						.name("Task duration")
 						.data(
 								String.format(
-									"%d:%d:%d",
-									duration.toHours(),
-									duration.toMinutes() - 60 * duration.toHours(),
-									duration.toSeconds() - 60 * duration.toMinutes()
+										"%d:%d:%d",
+										duration.toHours(),
+										duration.toMinutes() - 60 * duration.toHours(),
+										duration.toSeconds() - 60 * duration.toMinutes()
 								)
 						)
 				);
