@@ -60,6 +60,7 @@ public class SecurityConfig {
   private final ErrorUtil errorUtil;
   private final CustomUserDetailsService userDetailsService;
 
+  
   public SecurityConfig(
       AuthenticationConfiguration authenticationConfiguration,
       RefreshTokenRepository refreshTokenRepository,
@@ -127,6 +128,8 @@ public class SecurityConfig {
     };
   }
 
+  
+  
   @Bean
   public AuthenticationEntryPoint customAuthenticationEntryPoint() {
 
@@ -140,6 +143,7 @@ public class SecurityConfig {
     };
   }
 
+  
   /**
    * Spring Security에서의 Cors권한 설정
    */
@@ -148,7 +152,7 @@ public class SecurityConfig {
     CorsConfiguration corsConfiguration = new CorsConfiguration();
     corsConfiguration.setAllowedOrigins(Collections.singletonList(frontEndUrl));
     corsConfiguration.setAllowedMethods(Collections.singletonList("*"));
-    corsConfiguration.setAllowCredentials(true);
+    corsConfiguration.setAllowCredentials(true); // 쿠키 등의 자격증명 전송을 허용
     corsConfiguration.setAllowedHeaders(Collections.singletonList("*"));
     corsConfiguration.setMaxAge(60 * 60L);
     corsConfiguration.setExposedHeaders(Collections.singletonList("Authorization"));
@@ -174,7 +178,7 @@ public class SecurityConfig {
      * Rest API의 경우 Stateless하고 JWT를 사용하므로 csrf공격이 유효하지 않으므로 disable
      * Vue.js를 통한 FE에서 로그인 페이지를 별도로 구현하므로 기본 제공 로그인 방식을 막음
      */
-    http.csrf(AbstractHttpConfigurer::disable);
+    http.csrf(AbstractHttpConfigurer::disable); // 사용자 요청 위조 (Cross Site Request Forgery)
     http.formLogin(AbstractHttpConfigurer::disable);
     http.httpBasic(AbstractHttpConfigurer::disable);
     /**
@@ -200,6 +204,8 @@ public class SecurityConfig {
         jwtService,
         userMapper
     );
+    
+    
     customLoginFilter.setFilterProcessesUrl("/auth/login");
     http.addFilterAt(customLoginFilter, UsernamePasswordAuthenticationFilter.class);
 
@@ -219,6 +225,7 @@ public class SecurityConfig {
     JWTFilter jwtFilter = new JWTFilter(jwtUtil, userMapper, userDetailsService);
     http.addFilterBefore(jwtFilter, CustomLoginFilter.class);
 
+    
     /**
      * OAtuh2 관련 설정
      */

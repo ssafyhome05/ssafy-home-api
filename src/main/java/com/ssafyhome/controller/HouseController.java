@@ -42,10 +42,9 @@ public class HouseController {
 	}
 
 	@Operation(
-			summary = "",
-			description = ""
+			summary = "설정된 기간 내 거래량 및 금액 반환",
+			description = "startDatd 와 endDate 받아 조건에 맞는 List<HouseDealsDto> 반환"
 	)
-
 	@GetMapping("/deal/during")
 	public ResponseEntity<List<HouseDealsDto>> getHouseDealsWithTimes(
 			@RequestParam
@@ -63,7 +62,7 @@ public class HouseController {
 
 
 	@Operation(
-			summary = "",
+			summary = "매물별 연도 및 월별 시세 변동 그래프",
 			description = ""
 	)
 	@GetMapping("/detail/status")

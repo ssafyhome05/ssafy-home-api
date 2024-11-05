@@ -22,8 +22,7 @@ import org.springframework.context.annotation.Configuration;
 
 /**
  * SWAGGER 이용 및 컨트롤러 이외의 API 명세를 위한 설정 파일
- *
- * 아 이부분 누가 더 깔끔하게 바꿔줬으면 좋겠다~
+ * 
  */
 @Configuration
 @OpenAPIDefinition(
@@ -40,7 +39,8 @@ import org.springframework.context.annotation.Configuration;
     scheme = "bearer"
 )
 public class SwaggerConfig {
-
+	
+	
   /**
    * 로그인을 Swagger Docs에 노출 시키기 위한 메서드
    *
@@ -50,14 +50,17 @@ public class SwaggerConfig {
    */
   @Bean
   public OpenAPI loginmOpenAPI() {
+	  
     OpenAPI openAPI = new OpenAPI();
     /**
-     * 태그를 통해서 각 컨트롤러마냥 탭을 나눌 수 있다
+     * 태그를 통해서 각 컨트롤러마다 탭을 나눌 수 있다
      * 태그 자체를 추가하는 과정
      */
     openAPI.addTagsItem(new Tag().name("Authentication").description("인증 및 인가"));
 
     PathItem loginPath = new PathItem();
+    
+    
     /**
      * Swagger에 들어갈 명령 덩어리 생성하는 과정
      */
