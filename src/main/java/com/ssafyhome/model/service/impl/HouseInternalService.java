@@ -22,6 +22,9 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Semaphore;
 
 @Service
 public class HouseInternalService {
@@ -34,13 +37,15 @@ public class HouseInternalService {
 	private final ConvertUtil convertUtil;
 	private final SGISClient sgisClient;
 	private final SGISUtil sgisUtil;
+	private final ExecutorService executorService;
 
 	public HouseInternalService(
 			GonggongClient gonggongClient,
 			HouseMapper houseMapper,
 			ConvertUtil convertUtil,
 			SGISClient sgisClient,
-			SGISUtil sgisUtil
+			SGISUtil sgisUtil,
+			ExecutorService executorService
 	) {
 
 		this.gonggongClient = gonggongClient;
@@ -48,10 +53,11 @@ public class HouseInternalService {
 		this.convertUtil = convertUtil;
 		this.sgisClient = sgisClient;
 		this.sgisUtil = sgisUtil;
+		this.executorService = executorService;
 	}
 
 	@Transactional
-	protected HouseInfoTask insertHouseData(int lawdCd, int dealYmd, SseEmitter sseEmitter) throws Exception {
+	protected HouseInfoTask insertHouseData(int lawdCd, int dealYmd, SseEmitter sseEmitter, Semaphore semaphore) throws Exception {
 
 		HouseInfoTask houseInfoTask = new HouseInfoTask();
 		LocalDateTime start = LocalDateTime.now();
@@ -67,6 +73,7 @@ public class HouseInternalService {
 				GonggongAptTradeResponse.CmmMsgHeader header = response.getCmmMsgHeader();
 				switch (header.getReturnReasonCode()) {
 					case "01" -> throw new GonggongApplicationErrorException("Gonggong application error");
+					case "04" -> throw new GonggongApplicationErrorException("Gonggong http error");
 					default -> throw new Exception();
 				}
 			}
@@ -76,57 +83,71 @@ public class HouseInternalService {
 				houseInfoTask.setTotalRows(totalRows);
 			}
 
+			CountDownLatch countDownLatch = new CountDownLatch(response.getBody().getItems().size());
+
 			for(GonggongAptTradeResponse.Item item : response.getBody().getItems()) {
 
-				HouseDealEntity houseDealEntity = convertUtil.convert(item, HouseDealEntity.class);
-				houseDealEntity.setDealSeq(lawdCd + "-" + dealYmd + "-" + seq++);
-				dealEntityList.add(houseDealEntity);
+				try{
+					HouseDealEntity houseDealEntity = convertUtil.convert(item, HouseDealEntity.class);
+					houseDealEntity.setDealSeq(lawdCd + "-" + dealYmd + "-" + seq++);
+					dealEntityList.add(houseDealEntity);
 
-				if (existAptSeq.contains(houseDealEntity.getAptSeq())) continue;
+					if (existAptSeq.contains(houseDealEntity.getAptSeq())) continue;
 
-				HouseInfoEntity houseInfoEntity = convertUtil.convert(item, HouseInfoEntity.class);
-				houseInfoEntity.setHouseSeq(item.getAptSeq());
+					HouseInfoEntity houseInfoEntity = convertUtil.convert(item, HouseInfoEntity.class);
+					houseInfoEntity.setHouseSeq(item.getAptSeq());
 
-				DongCodeEntity dongCodeEntity = houseMapper.getSidoGugun(item.getSggCd() + item.getUmdCd());
-				String dongName;
-				try {
-					dongName = dongCodeEntity.getSidoName() + " " + dongCodeEntity.getGugunName() + " " + houseInfoEntity.getUmdNm();
-				} catch (Exception e) {
-					continue;
-				}
-
-				if(!houseMapper.isExistHouseInfo(houseInfoEntity.getHouseSeq())) {
-					SgisGeoCode geoCode = sgisClient.getGeocode(sgisUtil.getAccessToken(), dongName + " " + item.getJibun());
-					if(geoCode.getResult() != null){
-						SgisGeoCode.Result.ResultData resultData =
-								sgisClient.getGeocode(sgisUtil.getAccessToken(), dongName + " " + item.getJibun())
-										.getResult().getResultdata().get(0);
-						houseInfoEntity.setLatitude(resultData.getY());
-						houseInfoEntity.setLongitude(resultData.getX());
+					DongCodeEntity dongCodeEntity = houseMapper.getSidoGugun(item.getSggCd() + item.getUmdCd());
+					String dongName;
+					try {
+						dongName = dongCodeEntity.getSidoName() + " " + dongCodeEntity.getGugunName() + " " + houseInfoEntity.getUmdNm();
+					} catch (Exception e) {
+						continue;
 					}
-					else {
-						try {
-							sseEmitter.send(
-									SseEmitter.event()
-											.name("Not found jibun")
-											.data(lawdCd + "-" + dealYmd + "-" + seq)
-							);
-						} catch (Exception e) {}
-					}
-				}
 
-				infoEntityList.add(houseInfoEntity);
-				existAptSeq.add(houseInfoEntity.getHouseSeq());
+					if(!houseMapper.isExistHouseInfo(houseInfoEntity.getHouseSeq())) {
+						int finalSeq = seq;
+						executorService.submit(() -> {
+							SgisGeoCode geoCode = sgisClient.getGeocode(sgisUtil.getAccessToken(), dongName + " " + item.getJibun());
+							if(geoCode.getResult() != null){
+								SgisGeoCode.Result.ResultData resultData =
+										sgisClient.getGeocode(sgisUtil.getAccessToken(), dongName + " " + item.getJibun())
+												.getResult().getResultdata().get(0);
+								houseInfoEntity.setLatitude(resultData.getY());
+								houseInfoEntity.setLongitude(resultData.getX());
+							}
+							else {
+								try {
+									sseEmitter.send(
+											SseEmitter.event()
+													.name("Not found jibun")
+													.data(lawdCd + "-" + dealYmd + "-" + finalSeq)
+									);
+								} catch (Exception e) {
+								}
+							}
+						});
+
+						infoEntityList.add(houseInfoEntity);
+						existAptSeq.add(houseInfoEntity.getHouseSeq());
+					}
+				} finally {
+					countDownLatch.countDown();
+				}
 			}
+
+			try {
+				countDownLatch.await();
+			} catch (InterruptedException e) {}
 
 		} while (repeat++ * 100 < totalRows);
 
+		semaphore.acquire();
 		try {
 			if (!infoEntityList.isEmpty()) houseMapper.insertHouseInfo(infoEntityList);
 			if (!dealEntityList.isEmpty()) houseMapper.insertHouseDeal(dealEntityList);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+		} catch (Exception e) {}
+		semaphore.release();
 
 		LocalDateTime end = LocalDateTime.now();
 		houseInfoTask.setDuration(Duration.between(start, end));

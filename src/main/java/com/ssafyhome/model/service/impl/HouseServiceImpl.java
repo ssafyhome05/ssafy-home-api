@@ -64,6 +64,7 @@ public class HouseServiceImpl implements HouseService {
 		sseEmitters.put(requestId, sseEmitter);
 
 		ConcurrentHashMap<Integer, Boolean> processingLawdMap = new ConcurrentHashMap<>();
+		Semaphore semaphore = new Semaphore(20);
 
 		executorService.submit(() -> {
 			try {
@@ -82,12 +83,12 @@ public class HouseServiceImpl implements HouseService {
 
 				AtomicInteger seq = new AtomicInteger(1);
 
-				List<Thread> threadList = new ArrayList<>();
 				CountDownLatch countDownLatch = new CountDownLatch(size);
 
+				ExecutorService executorService1 = Executors.newFixedThreadPool(20);
 				for (int lawdCd : lawdCdList) {
 
-					Thread vThread = Thread.startVirtualThread(() -> {
+					executorService1.submit(() -> {
 
 						Boolean existingValue = processingLawdMap.putIfAbsent(lawdCd, true);
 						if (existingValue != null) return;
@@ -100,7 +101,8 @@ public class HouseServiceImpl implements HouseService {
 									houseInfoTask = houseInternalService.insertHouseData(
 											lawdCd,
 											dealYmd,
-											sseEmitters.get(requestId)
+											sseEmitters.get(requestId),
+											semaphore
 									);
 									break;
 								} catch (GonggongApplicationErrorException e) {
@@ -109,19 +111,25 @@ public class HouseServiceImpl implements HouseService {
 									throw new Exception(e);
 								}
 							}
+							if (tryTimes == 0 && houseInfoTask == null) {
+								sseEmitter.send(SseEmitter.event()
+										.name(lawdCd+ "gonggong Error")
+										.data( "error (" + seq.getAndIncrement() + "/" + size + ")")
 
-							sseEmitter.send(SseEmitter.event()
-									.name(houseInfoTask.getTaskName())
-									.data(houseInfoTask.getTotalRows() + " rows completed!! commit (" + seq.getAndIncrement() + "/" + size + ") " + houseInfoTask.getDuration().toSeconds() + " seconds")
-							);
-
+								);
+							}
+							else {
+								sseEmitter.send(SseEmitter.event()
+										.name(houseInfoTask.getTaskName())
+										.data(houseInfoTask.getTotalRows() + " rows completed!! commit (" + seq.getAndIncrement() + "/" + size + ") " + houseInfoTask.getDuration().toSeconds() + " seconds")
+								);
+							}
 						} catch (Exception e) {
-							throw new CompletionException(e);
+							System.out.println(e.getMessage());
 						} finally {
 							countDownLatch.countDown();
 						}
 					});
-					threadList.add(vThread);
 				}
 
 				countDownLatch.await();
