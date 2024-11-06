@@ -11,6 +11,6 @@ public class HouseDealsDto {
   private String dealYear;
   private String dealMonth;
   private String dealDay;
-  private double exclusiveUserAr;
+  private double excluUseAr;
   private String dealAmount;
 }

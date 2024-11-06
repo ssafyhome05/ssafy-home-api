@@ -52,7 +52,7 @@
                 collection="list"
                 item="item"
                 separator=",">
-            (#{item.dealSeq},#{item.aptSeq},#{item.aptDong},#{item.floor},#{item.dealYear},#{item.dealMonth},#{item.dealDay},#{item.exclusiveUseAr},#{item.dealAmount})
+            (#{item.dealSeq},#{item.aptSeq},#{item.aptDong},#{item.floor},#{item.dealYear},#{item.dealMonth},#{item.dealDay},#{item.excluUseAr},#{item.dealAmount})
         </foreach>
     </insert>
     <select id="getSidoGugun" parameterType="string" resultType="com.ssafyhome.model.entity.mysql.DongCodeEntity">

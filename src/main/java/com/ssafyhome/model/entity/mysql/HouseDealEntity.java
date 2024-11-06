@@ -18,6 +18,6 @@ public class HouseDealEntity {
 	private int dealYear;
 	private int dealMonth;
 	private int dealDay;
-	private double exclusiveUseAr;
+	private double excluUseAr;
 	private String dealAmount;
 }
