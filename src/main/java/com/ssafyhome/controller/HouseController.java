@@ -123,14 +123,13 @@ public class HouseController {
 	)
 	@GetMapping("")
 	public ResponseEntity<List<HouseDto>> getHouseInfo(
-			@RequestParam
+			@RequestParam("dongCode") 
 			String dongCode,
-			@RequestParam(required = false)
+			@RequestParam(value = "startDate", required = false) 
 			String startDate,
-			@RequestParam(required = false)
+			@RequestParam(value = "endDate", required = false) 
 			String endDate,
-			@RequestParam(required = false)
-			String keyWord
+			@RequestParam(value = "keyWord", required = false) String keyWord
 	) {
 		Map<String, Object> params = new HashMap<>();
 		params.put("dongCode", dongCode);
