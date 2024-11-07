@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
-<mapper namespace="com.ssafyhome.model.dao.mapper.HouseMapper">
-    <select id="getHouseInfo" parameterType="map" resultType="com.ssafyhome.model.dto.house.HouseDto">
+<mapper namespace="com.ssafyhome.house.dao.HouseMapper">
+    <select id="getHouseInfo" parameterType="map" resultType="com.ssafyhome.house.dto.HouseDto">
         SELECT
             apt_seq,
             sgg_cd,
@@ -29,7 +29,7 @@
         </if>
     </select>
 
-    <select id="getHouseDeals" resultType="com.ssafyhome.model.dto.house.HouseDealsDto">
+    <select id="getHouseDeals" resultType="com.ssafyhome.house.dto.HouseDealsDto">
         SELECT *
         FROM house_deal
         WHERE apt_seq = #{houseSeq}
@@ -55,7 +55,7 @@
             (#{item.dealSeq},#{item.aptSeq},#{item.aptDong},#{item.floor},#{item.dealYear},#{item.dealMonth},#{item.dealDay},#{item.excluUseAr},#{item.dealAmount})
         </foreach>
     </insert>
-    <select id="getSidoGugun" parameterType="string" resultType="com.ssafyhome.model.entity.mysql.DongCodeEntity">
+    <select id="getSidoGugun" parameterType="string" resultType="com.ssafyhome.common.entity.DongCodeEntity">
         SELECT DISTINCT sido_name, gugun_name, bdong_code, bdong_name
         FROM dong_code
         WHERE bdong_code = #{dongCode}

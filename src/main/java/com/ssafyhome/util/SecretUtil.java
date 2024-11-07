@@ -1,7 +1,7 @@
 package com.ssafyhome.util;
 
-import com.ssafyhome.model.dao.repository.EmailSecretRepository;
-import com.ssafyhome.model.entity.redis.EmailSecretEntity;
+import com.ssafyhome.user.dao.EmailSecretRepository;
+import com.ssafyhome.user.entity.EmailSecretEntity;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 

@@ -1,21 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.ssafyhome.model.dao.mapper.UserMapper">
+<mapper namespace="com.ssafyhome.user.dao.UserMapper">
 
     <insert id="insertUser" useGeneratedKeys="true" keyProperty="userSeq"
-            parameterType="com.ssafyhome.model.entity.mysql.UserEntity">
+            parameterType="com.ssafyhome.user.entity.UserEntity">
         INSERT INTO user (user_id, user_pw, user_email, user_name, user_phone, user_zipcode, user_address, user_address2, social_type)
         VALUE (#{userId}, #{userPw}, #{userEmail}, #{userName}, #{userPhone}, #{userZipcode}, #{userAddress}, #{userAddress2}, 0)
     </insert>
 
     <insert id="insertOAuth2User" useGeneratedKeys="true" keyProperty="userSeq"
-            parameterType="com.ssafyhome.model.entity.mysql.UserEntity">
+            parameterType="com.ssafyhome.user.entity.UserEntity">
         INSERT INTO user (user_id, user_email, user_name, social_type, social_platform)
             VALUE (#{userId}, #{userEmail}, #{userName}, 1, #{socialPlatform})
     </insert>
 
     <update id="updateUser"
-            parameterType="com.ssafyhome.model.entity.mysql.UserEntity">
+            parameterType="com.ssafyhome.user.entity.UserEntity">
         UPDATE user
         SET user_name = #{userName}
         WHERE user_seq = #{userSeq}
@@ -34,7 +34,7 @@
 
     <select id="getUserBySeqAndEmail"
             parameterType="string"
-            resultType="com.ssafyhome.model.entity.mysql.UserEntity">
+            resultType="com.ssafyhome.user.entity.UserEntity">
         SELECT *
         FROM user
         WHERE user_seq = #{userSeq} AND user_email = #{userEmail}
@@ -42,14 +42,14 @@
 
     <select id="getUserById"
             parameterType="string"
-            resultType="com.ssafyhome.model.entity.mysql.UserEntity">
+            resultType="com.ssafyhome.user.entity.UserEntity">
         SELECT *
         FROM user
         WHERE user_id = #{userId}
     </select>
 
     <select id="getIdByNameAndEmail"
-            parameterType="com.ssafyhome.model.dto.user.FindUserDto"
+            parameterType="com.ssafyhome.user.dto.FindUserDto"
             resultType="java.lang.String">
         SELECT user.user_id
         FROM user
@@ -57,7 +57,7 @@
     </select>
 
     <select id="isUserExist"
-            parameterType="com.ssafyhome.model.dto.user.FindUserDto"
+            parameterType="com.ssafyhome.user.dto.FindUserDto"
             resultType="java.lang.Boolean">
         SELECT COUNT(*) > 0
         FROM user
@@ -72,13 +72,13 @@
     </select>
 
     <select id="getUserList"
-            resultType="com.ssafyhome.model.entity.mysql.UserEntity">
+            resultType="com.ssafyhome.user.entity.UserEntity">
         SELECT *
         FROM user;
     </select>
 
     <select id="getUserBySeq"
-            resultType="com.ssafyhome.model.entity.mysql.UserEntity">
+            resultType="com.ssafyhome.user.entity.UserEntity">
         SELECT *
         FROM user
         WHERE user_seq = #{userSeq}

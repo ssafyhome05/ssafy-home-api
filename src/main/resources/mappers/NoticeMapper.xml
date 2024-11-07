@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
-<mapper namespace="com.ssafyhome.model.dao.mapper.NoticeMapper">
+<mapper namespace="com.ssafyhome.notice.dao.NoticeMapper">
     <insert id="insert"
-            parameterType="com.ssafyhome.model.entity.mysql.NoticeEntity">
+            parameterType="com.ssafyhome.notice.entity.NoticeEntity">
         INSERT INTO notice (notice_title, notice_content)
         VALUES (#{noticeTitle}, #{noticeContent})
     </insert>
 
     <update id="update"
-            parameterType="com.ssafyhome.model.entity.mysql.NoticeEntity">
+            parameterType="com.ssafyhome.notice.entity.NoticeEntity">
         UPDATE notice
         SET
             notice_title = #{noticeTitle},
@@ -25,7 +25,7 @@
 
     <select id="selectBySeq"
             parameterType="int"
-            resultType="com.ssafyhome.model.entity.mysql.NoticeEntity">
+            resultType="com.ssafyhome.notice.entity.NoticeEntity">
         SELECT *
         FROM notice
         WHERE notice_seq = #{noticeSeq}
@@ -33,7 +33,7 @@
 
     <select id="selectByPage"
             parameterType="int"
-            resultType="com.ssafyhome.model.entity.mysql.NoticeEntity">
+            resultType="com.ssafyhome.notice.entity.NoticeEntity">
         SELECT *
         FROM notice
         LIMIT #{page}, 10

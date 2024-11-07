@@ -1,14 +1,10 @@
 package com.ssafyhome.util;
 
-import com.ssafyhome.model.dao.mapper.GeometryMapper;
-import com.ssafyhome.model.entity.mysql.GeometryEntity;
-import com.ssafyhome.util.calc.CalcUtil;
-import com.ssafyhome.util.calc.Circle;
-import com.ssafyhome.util.calc.Point;
-import org.locationtech.jts.geom.Coordinate;
+import com.ssafyhome.common.mapper.GeometryMapper;
+import com.ssafyhome.common.entity.GeometryEntity;
+import com.ssafyhome.util.object.Circle;
+import com.ssafyhome.util.object.Point;
 import org.locationtech.jts.geom.Geometry;
-import org.locationtech.jts.geom.Polygon;
-import org.locationtech.jts.geom.Polygonal;
 import org.locationtech.jts.io.ParseException;
 import org.locationtech.jts.io.WKBReader;
 import org.springframework.stereotype.Component;

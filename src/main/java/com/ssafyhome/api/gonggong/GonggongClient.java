@@ -1,7 +1,6 @@
 package com.ssafyhome.api.gonggong;
 
-import com.ssafyhome.api.common.FeignXmlDecoderConfig;
-import com.ssafyhome.model.dto.api.GonggongAptTradeResponse;
+import com.ssafyhome.api.gonggong.dto.GonggongAptTradeResponse;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;

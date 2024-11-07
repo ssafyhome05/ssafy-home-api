@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
-<mapper namespace="com.ssafyhome.model.dao.mapper.SpotMapper">
+<mapper namespace="com.ssafyhome.spot.dao.SpotMapper">
     <insert id="insertSpots"
             parameterType="java.util.List">
         INSERT IGNORE INTO spot
@@ -25,31 +25,31 @@
 
     </insert>
     <select id="getCategories"
-            resultType="com.ssafyhome.model.entity.mysql.CategoryEntity">
+            resultType="com.ssafyhome.spot.entity.CategoryEntity">
         SELECT *
         FROM category;
     </select>
 
     <select id="getSpotsByCategory"
-            resultType="com.ssafyhome.model.entity.mysql.SpotEntity">
+            resultType="com.ssafyhome.spot.entity.SpotEntity">
         SELECT *
         FROM spot
         WHERE concat(sgg_cd,umd_cd) = #{dongCode} AND spot_type = #{category}
     </select>
     <select id="getCustomSpotByUser"
-            resultType="com.ssafyhome.model.entity.mysql.CustomSpotEntity">
+            resultType="com.ssafyhome.bookmark.entity.CustomSpotEntity">
         SELECT *
         FROM custom_spot
         WHERE user_seq = #{userSeq}
     </select>
     <select id="getNearestSpotByStartPoint"
-            resultType="com.ssafyhome.model.entity.mysql.NearestSpotEntity">
+            resultType="com.ssafyhome.spot.entity.NearestSpotEntity">
         SELECT *
         FROM nearest_spot
         WHERE apt_seq = #{aptSeq}
     </select>
     <select id="getTMapPointByAptSeq"
-            resultType="com.ssafyhome.model.dto.api.TMapPoint">
+            resultType="com.ssafyhome.api.tmap.dto.TMapPoint">
         SELECT apt_nm as name, longitude as x, latitude as y
         FROM house_info
         WHERE apt_seq = #{apt_seq}

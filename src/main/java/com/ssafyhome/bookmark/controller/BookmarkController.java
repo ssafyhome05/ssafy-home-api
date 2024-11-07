@@ -1,0 +1,188 @@
+package com.ssafyhome.bookmark.controller;
+
+import com.ssafyhome.bookmark.dto.BookmarkStatusDto;
+import com.ssafyhome.house.dto.HouseDto;
+import com.ssafyhome.spot.dto.CustomSpotDto;
+import com.ssafyhome.spot.dto.LocationDto;
+import com.ssafyhome.bookmark.service.BookmarkService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+
+@Tag(
+		name = "Bookmark Controller",
+		description = "관심 지역, 관심 매물, 사용자 장소"
+)
+@RestController
+@RequestMapping("/bookmark")
+public class BookmarkController {
+
+	private static BookmarkService bookmarkService;
+
+	public BookmarkController(
+			BookmarkService bookmarkService
+	)
+	{
+		BookmarkController.bookmarkService = bookmarkService;
+	}
+
+	@Operation(
+			summary = "관심지역 등록",
+			description = "사용자가 보고 있는 String 객체의 dongcode 를 받아 북마크등록"
+	)
+	@PostMapping("/location")
+	@PreAuthorize("hasRole('ROLE_USER')")
+	public ResponseEntity<?> addLocation(
+			@RequestBody
+			String dongCode
+	) {
+
+		Map<String, Object> params = new HashMap<>();
+		params.put("dongCode", dongCode);
+		params.put("userSeq", SecurityContextHolder.getContext().getAuthentication().getName());
+
+		bookmarkService.addLocationBookmark(params);
+
+		return new ResponseEntity<>("add location bookmark success", HttpStatus.OK);
+	}
+
+	@Operation(
+			summary = "관심매물 등록",
+			description = "String 객체의 houseId 로 북마크등록"
+	)
+	@PostMapping("/house")
+	@PreAuthorize("hasRole('ROLE_USER')")
+	public ResponseEntity<?> addHouse(
+			@RequestBody
+			String houseId
+	) {
+
+		Map<String, Object> params = new HashMap<>();
+		params.put("userSeq", SecurityContextHolder.getContext().getAuthentication().getName());
+		params.put("aptSeq", houseId);
+
+		bookmarkService.addBookmark(params);
+
+		return new ResponseEntity<>("add bookmark success", HttpStatus.OK);
+	}
+
+	@Operation(
+			summary = "사용자 장소 등록",
+			description = "CustomSpotDto 객체를 받아 북마크등록"
+	)
+	@PostMapping("/custom")
+	@PreAuthorize("hasRole('ROLE_USER')")
+	public ResponseEntity<?> addCustomSpot(
+			@RequestBody
+			CustomSpotDto customSpotDto
+	) {
+
+		return null;
+	}
+
+	@Operation(
+			summary = "관심지역 목록 조회",
+			description = "북마크한 List<LocationDto> 반환"
+	)
+	@GetMapping("/location")
+	@PreAuthorize("hasRole('ROLE_USER')")
+	public ResponseEntity<List<LocationDto>> getLocations() {
+
+		return null;
+	}
+
+	@Operation(
+			summary = "관심 매물 목록 조회",
+			description = "북마크한 List<HouseDto> 반환"
+	)
+	@GetMapping("/house")
+	@PreAuthorize("hasRole('ROLE_USER')")
+	public ResponseEntity<List<HouseDto>> getHouses() {
+
+		return null;
+	}
+
+	@Operation(
+			summary = "사용자 장소 조회",
+			description = "북마크한 List<CustomSpotDto> 반환"
+	)
+	@GetMapping("/custom")
+	@PreAuthorize("hasRole('ROLE_USER')")
+	public ResponseEntity<List<CustomSpotDto>> getCustomSpots() {
+
+		return null;
+	}
+
+	@Operation(
+			summary = "모든 북마크 요약 조회",
+			description = "북마크한 매물, 지역, 사용자지역의 세부목록  조회"
+	)
+	@GetMapping("/status")
+	@PreAuthorize("hasRole('ROLE_USER')")
+	public ResponseEntity<List<BookmarkStatusDto>> getStatus() {
+
+		return null;
+	}
+
+	@Operation(
+			summary = "관심지역 삭제",
+			description = "String 객체의 dongcode 를 받아 사용자북마크에서 삭제"
+	)
+	@DeleteMapping("/location/{dongCode}")
+	@PreAuthorize("hasRole('ROLE_USER')")
+	public ResponseEntity<?> deleteLocation(
+			@PathVariable
+			String dongCode
+	) {
+		Map<String, Object> params = new HashMap<>();
+		params.put("dongCode", dongCode);
+		params.put("userSeq", SecurityContextHolder.getContext().getAuthentication().getName());
+
+		bookmarkService.deleteLocationBookmark(params);
+
+		return new ResponseEntity<>("delete location bookmark success", HttpStatus.OK);
+	}
+
+	@Operation(
+			summary = "관심매물 삭제",
+			description = "String 객체의 houseId 를 받아 사용자북마크에서 삭제"
+	)
+	@DeleteMapping("/house/{houseId}")
+	@PreAuthorize("hasRole('ROLE_USER')")
+	public ResponseEntity<?> deleteHouse(
+			@PathVariable
+			String houseId
+	) {
+
+		Map<String, Object> params = new HashMap<>();
+		params.put("userSeq", SecurityContextHolder.getContext().getAuthentication().getName());
+		params.put("aptSeq", houseId);
+
+		bookmarkService.deleteBookmark(params);
+
+		return new ResponseEntity<>("delete bookmark success", HttpStatus.OK);
+	}
+
+	@Operation(
+			summary = "사용자장소 삭제",
+			description = "String 객체의 customSeq 를 받아 사용자북마크에서 삭제"
+	)
+	@DeleteMapping("/custom/{customSeq}")
+	@PreAuthorize("hasRole('ROLE_USER')")
+	public ResponseEntity<?> deleteCustomSpot(
+			@PathVariable
+			String customSeq
+	) {
+
+		return null;
+	}
+}

@@ -1,6 +1,6 @@
 package com.ssafyhome;
 
-import com.ssafyhome.model.dao.mapper.GeometryMapper;
+import com.ssafyhome.common.mapper.GeometryMapper;
 import com.ssafyhome.util.GeometryUtil;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

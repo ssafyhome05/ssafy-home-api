@@ -1,6 +1,6 @@
 package com.ssafyhome.api.sgis;
 
-import com.ssafyhome.model.dto.api.SgisAccessToken;
+import com.ssafyhome.api.sgis.dto.SgisAccessToken;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 

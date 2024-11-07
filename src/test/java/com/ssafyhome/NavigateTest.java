@@ -1,7 +1,7 @@
 package com.ssafyhome;
 
-import com.ssafyhome.model.dto.api.TMapPoint;
-import com.ssafyhome.model.service.NavigateService;
+import com.ssafyhome.api.tmap.dto.TMapPoint;
+import com.ssafyhome.navigate.service.NavigateService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;

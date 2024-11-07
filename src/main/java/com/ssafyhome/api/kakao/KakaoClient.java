@@ -1,7 +1,7 @@
 package com.ssafyhome.api.kakao;
 
-import com.ssafyhome.api.common.FeignSnakeCaseConfig;
-import com.ssafyhome.model.dto.api.KakaoPlaceDto;
+import com.ssafyhome.api.sgis.FeignSnakeCaseConfig;
+import com.ssafyhome.api.kakao.dto.KakaoPlaceDto;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
