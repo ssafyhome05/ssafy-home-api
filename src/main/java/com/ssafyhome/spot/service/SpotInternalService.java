@@ -1,12 +1,12 @@
 package com.ssafyhome.spot.service;
 
-import com.ssafyhome.api.kakao.KakaoClient;
-import com.ssafyhome.api.sgis.SGISClient;
-import com.ssafyhome.api.sgis.SGISUtil;
+import com.ssafyhome.common.api.kakao.KakaoClient;
+import com.ssafyhome.common.api.sgis.SGISClient;
+import com.ssafyhome.common.api.sgis.SGISUtil;
 import com.ssafyhome.common.mapper.GeometryMapper;
 import com.ssafyhome.spot.dao.SpotMapper;
-import com.ssafyhome.api.kakao.dto.KakaoPlaceDto;
-import com.ssafyhome.api.sgis.dto.SgisGeoCode;
+import com.ssafyhome.common.api.kakao.dto.KakaoPlaceDto;
+import com.ssafyhome.common.api.sgis.dto.SgisGeoCode;
 import com.ssafyhome.spot.entity.CategoryEntity;
 import com.ssafyhome.common.entity.GeometryEntity;
 import com.ssafyhome.spot.entity.SpotEntity;

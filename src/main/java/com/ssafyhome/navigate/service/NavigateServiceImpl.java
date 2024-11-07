@@ -1,11 +1,11 @@
 package com.ssafyhome.navigate.service;
 
-import com.ssafyhome.api.tmap.TMapClient;
-import com.ssafyhome.api.tmap.dto.*;
+import com.ssafyhome.common.api.tmap.TMapClient;
+import com.ssafyhome.common.api.tmap.dto.*;
 import com.ssafyhome.spot.dao.SpotMapper;
 import com.ssafyhome.navigate.dto.NavigateDto;
 import com.ssafyhome.spot.dto.SpotSearchDto;
-import com.ssafyhome.util.ConvertUtil;
+import com.ssafyhome.common.util.ConvertUtil;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 

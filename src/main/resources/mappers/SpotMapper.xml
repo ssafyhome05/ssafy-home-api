@@ -49,7 +49,7 @@
         WHERE apt_seq = #{aptSeq}
     </select>
     <select id="getTMapPointByAptSeq"
-            resultType="com.ssafyhome.api.tmap.dto.TMapPoint">
+            resultType="com.ssafyhome.common.api.tmap.dto.TMapPoint">
         SELECT apt_nm as name, longitude as x, latitude as y
         FROM house_info
         WHERE apt_seq = #{apt_seq}

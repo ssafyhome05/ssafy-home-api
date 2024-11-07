@@ -1,13 +1,13 @@
 package com.ssafyhome;
 
-import com.ssafyhome.api.gonggong.GonggongClient;
-import com.ssafyhome.api.sgis.SGISClient;
-import com.ssafyhome.api.sgis.SGISUtil;
-import com.ssafyhome.api.gonggong.dto.GonggongAptTradeResponse;
-import com.ssafyhome.api.sgis.dto.SgisGeoCode;
+import com.ssafyhome.common.api.gonggong.GonggongClient;
+import com.ssafyhome.common.api.sgis.SGISClient;
+import com.ssafyhome.common.api.sgis.SGISUtil;
+import com.ssafyhome.common.api.gonggong.dto.GonggongAptTradeResponse;
+import com.ssafyhome.common.api.sgis.dto.SgisGeoCode;
 import com.ssafyhome.house.entity.HouseDealEntity;
 import com.ssafyhome.house.entity.HouseInfoEntity;
-import com.ssafyhome.util.ConvertUtil;
+import com.ssafyhome.common.util.ConvertUtil;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;

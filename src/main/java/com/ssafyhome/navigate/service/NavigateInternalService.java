@@ -1,9 +1,9 @@
 package com.ssafyhome.navigate.service;
 
-import com.ssafyhome.api.kakao.KakaoClient;
+import com.ssafyhome.common.api.kakao.KakaoClient;
 import com.ssafyhome.spot.dao.SpotMapper;
-import com.ssafyhome.api.kakao.dto.KakaoPlaceDto;
-import com.ssafyhome.api.tmap.dto.TMapPoint;
+import com.ssafyhome.common.api.kakao.dto.KakaoPlaceDto;
+import com.ssafyhome.common.api.tmap.dto.TMapPoint;
 import com.ssafyhome.spot.entity.CategoryEntity;
 import com.ssafyhome.spot.entity.NearestSpotEntity;
 import lombok.extern.slf4j.Slf4j;

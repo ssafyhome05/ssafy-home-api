@@ -3,7 +3,7 @@ package com.ssafyhome.auth.filter;
 import com.ssafyhome.user.dao.UserMapper;
 import com.ssafyhome.user.entity.UserEntity;
 import com.ssafyhome.auth.service.CustomUserDetailsService;
-import com.ssafyhome.util.JWTUtil;
+import com.ssafyhome.common.util.JWTUtil;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

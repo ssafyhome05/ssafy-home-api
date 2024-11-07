@@ -4,7 +4,7 @@ import com.ssafyhome.spot.dao.SpotMapper;
 import com.ssafyhome.spot.dto.SpotDto;
 import com.ssafyhome.spot.entity.CategoryEntity;
 import com.ssafyhome.spot.entity.SpotEntity;
-import com.ssafyhome.util.ConvertUtil;
+import com.ssafyhome.common.util.ConvertUtil;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;

@@ -1,6 +1,6 @@
 package com.ssafyhome.spot.dao;
 
-import com.ssafyhome.api.tmap.dto.TMapPoint;
+import com.ssafyhome.common.api.tmap.dto.TMapPoint;
 import com.ssafyhome.spot.entity.CategoryEntity;
 import com.ssafyhome.bookmark.entity.CustomSpotEntity;
 import com.ssafyhome.spot.entity.NearestSpotEntity;

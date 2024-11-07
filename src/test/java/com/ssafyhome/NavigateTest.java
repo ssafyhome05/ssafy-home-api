@@ -1,6 +1,6 @@
 package com.ssafyhome;
 
-import com.ssafyhome.api.tmap.dto.TMapPoint;
+import com.ssafyhome.common.api.tmap.dto.TMapPoint;
 import com.ssafyhome.navigate.service.NavigateService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

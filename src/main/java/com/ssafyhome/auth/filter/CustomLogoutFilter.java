@@ -2,7 +2,7 @@ package com.ssafyhome.auth.filter;
 
 import com.ssafyhome.auth.dao.RefreshTokenRepository;
 import com.ssafyhome.auth.service.JWTService;
-import com.ssafyhome.util.CookieUtil;
+import com.ssafyhome.common.util.CookieUtil;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.ServletRequest;

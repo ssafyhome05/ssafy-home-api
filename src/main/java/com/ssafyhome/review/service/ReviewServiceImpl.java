@@ -4,7 +4,7 @@ import com.ssafyhome.review.dao.ReviewMapper;
 import com.ssafyhome.review.dto.ReviewDto;
 import com.ssafyhome.review.dto.ReviewSearchDto;
 import com.ssafyhome.review.entity.ReviewEntity;
-import com.ssafyhome.util.ConvertUtil;
+import com.ssafyhome.common.util.ConvertUtil;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;

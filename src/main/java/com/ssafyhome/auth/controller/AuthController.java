@@ -2,7 +2,7 @@ package com.ssafyhome.auth.controller;
 
 import com.ssafyhome.auth.dto.JwtDto;
 import com.ssafyhome.auth.service.JWTService;
-import com.ssafyhome.util.CookieUtil;
+import com.ssafyhome.common.util.CookieUtil;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;

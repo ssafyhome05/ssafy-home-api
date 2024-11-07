@@ -3,7 +3,7 @@ package com.ssafyhome.notice.service;
 import com.ssafyhome.notice.dao.NoticeMapper;
 import com.ssafyhome.notice.dto.NoticeDto;
 import com.ssafyhome.notice.entity.NoticeEntity;
-import com.ssafyhome.util.ConvertUtil;
+import com.ssafyhome.common.util.ConvertUtil;
 import org.springframework.stereotype.Service;
 
 import java.time.format.DateTimeFormatter;

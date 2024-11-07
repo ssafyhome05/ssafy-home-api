@@ -1,6 +1,6 @@
 package com.ssafyhome.navigate.service;
 
-import com.ssafyhome.api.tmap.dto.TMapPoint;
+import com.ssafyhome.common.api.tmap.dto.TMapPoint;
 import com.ssafyhome.navigate.dto.NavigateDto;
 import com.ssafyhome.spot.dto.SpotSearchDto;
 
