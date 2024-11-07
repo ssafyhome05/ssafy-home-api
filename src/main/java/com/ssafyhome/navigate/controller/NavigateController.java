@@ -49,7 +49,7 @@ public class NavigateController {
 	)
 	@GetMapping("/{type}")
 	@PreAuthorize("hasRole('ROLE_USER')")
-	public ResponseEntity<List<NavigateDto>> getTimeWithCustomSpots(
+	public ResponseEntity<List<NavigateDto>> getTimeWithCustomSpotList(
 			@PathVariable
 			String type,
 
@@ -57,6 +57,6 @@ public class NavigateController {
 			String houseSeq
 	) {
 
-		return new ResponseEntity<>(navigateService.getNavigates(type, houseSeq), HttpStatus.OK);
+		return new ResponseEntity<>(navigateService.getNavigateList(type, houseSeq), HttpStatus.OK);
 	}
 }

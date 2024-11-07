@@ -32,12 +32,12 @@ public class NoticeController {
 	)
 	@PostMapping("")
 	@PreAuthorize("hasRole('ROLE_ADMIN')")
-	public ResponseEntity<?> registerNotice(
+	public ResponseEntity<?> addNotice(
 			@RequestBody
 			NoticeDto noticeDto
 	) {
 
-		noticeService.registerNotice(noticeDto);
+		noticeService.addNotice(noticeDto);
 		return new ResponseEntity<>("register notice success", HttpStatus.CREATED);
 	}
 

@@ -38,7 +38,7 @@ public class NavigateServiceImpl implements NavigateService {
     }
 
     @Override
-    public List<NavigateDto> getNavigates(String type, String aptSeq) {
+    public List<NavigateDto> getNavigateList(String type, String aptSeq) {
 
         TMapPoint start = spotMapper.getTMapPointByAptSeq(aptSeq);
         List<NavigateDto> navigates = new ArrayList<>();
