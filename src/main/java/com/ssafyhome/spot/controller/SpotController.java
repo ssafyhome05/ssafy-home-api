@@ -14,7 +14,7 @@ import java.util.Map;
 
 @Tag(
 		name = "Spot Controller",
-		description = "카테고리 별 장소 핸들링"
+		description = "카테고리 별 장소 핸들링 (spot의 경우 지역 내 존재하는 편의시설을 의미합니다.) "
 )
 @RestController
 @RequestMapping("/spot")
@@ -29,10 +29,10 @@ public class SpotController {
 
 	@Operation(
 			summary = "지도에 표시할 장소 정보",
-			description = "dongCode 와 일치하는 List<SpotDto> 반환"
+			description = "dongCode 내 편의시설들의 카테고리별 List<SpotDto> 을 key:value 형태로 반환"
 	)
 	@GetMapping("")
-	public ResponseEntity<Map<String,List<SpotDto>>> getSpots(
+	public ResponseEntity<Map<String,List<SpotDto>>> getSpotMap(
 			@RequestParam
 			String dongCode
 	) {
@@ -40,14 +40,5 @@ public class SpotController {
 		return new ResponseEntity<>(spotService.getSpotsByDongCode(dongCode), HttpStatus.OK);
 	}
 
-	@Operation(
-			summary = "Spot 등록",
-			description = "SpotDto 객체 등록"
-	)
-	@PostMapping("")
-	@PreAuthorize("hasRole('ROLE_ADMIN')")
-	public ResponseEntity<?> updateSpotInfo() {
 
-		return null;
-	}
 }
