@@ -1,24 +1,31 @@
 package com.ssafyhome.house.controller;
 
-import com.ssafyhome.common.mapper.GeometryMapper;
-import com.ssafyhome.house.dto.HouseDealsDto;
-import com.ssafyhome.house.dto.HouseDetailDto;
-import com.ssafyhome.house.dto.HouseDto;
-import com.ssafyhome.house.dto.HouseGraphDto;
-import com.ssafyhome.spot.dto.LocationStatusDto;
-import com.ssafyhome.house.service.HouseService;
-import com.ssafyhome.common.util.GeometryUtil;
-import com.ssafyhome.common.util.object.Point;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.tags.Tag;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
+
+import com.ssafyhome.common.mapper.GeometryMapper;
+import com.ssafyhome.common.util.GeometryUtil;
+import com.ssafyhome.common.util.object.Point;
+import com.ssafyhome.house.dto.HouseDealDto;
+import com.ssafyhome.house.dto.HouseDetailDto;
+import com.ssafyhome.house.dto.HouseDto;
+import com.ssafyhome.house.dto.HouseGraphDto;
+import com.ssafyhome.house.service.HouseService;
+import com.ssafyhome.spot.dto.LocationStatusDto;
+
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 
 @Tag(
@@ -45,7 +52,7 @@ public class HouseController {
 			description = "startDatd 와 endDate 받아 조건에 맞는 List<HouseDealsDto> 반환"
 	)
 	@GetMapping("/deal/during")
-	public ResponseEntity<List<HouseDealsDto>> getHouseDealsWithTimes(
+	public ResponseEntity<List<HouseDealDto>> getHouseDealsWithTimes(
 			@RequestParam
 			String houseSeq,
 
@@ -62,7 +69,7 @@ public class HouseController {
 
 	@Operation(
 			summary = "매물별 연도 및 월별 시세 변동 그래프",
-			description = "202208, 202209 등 월 별 거래 평균 데이터 <HouseGraphDto> 반환"
+			description = "202208, 202209 등 특정 매물의 지금까지 월 별 거래 데이터 추이 <HouseGraphDto> 반환"
 	)
 	@GetMapping("/detail/status")
 	public ResponseEntity<HouseGraphDto> getGraphInfo(
@@ -74,11 +81,11 @@ public class HouseController {
 	}
 
 	@Operation(
-			summary = "",
-			description = ""
+			summary = "매물별 모든 거래 내역 반환",
+			description = "특정 매물의 거래금액 <HouseDealsDto>(page, limit)"
 	)
 	@GetMapping("/deal")
-	public ResponseEntity<List<HouseDealsDto>> getHouseDeals(
+	public ResponseEntity<List<HouseDealDto>> getHouseDeals(
 			@RequestParam
 			String houseSeq,
 			@RequestParam
@@ -87,7 +94,7 @@ public class HouseController {
 			int limit
 	) {
 
-		return new ResponseEntity<>(houseService.getHouseDeals(houseSeq, page, limit), HttpStatus.OK);
+		return new ResponseEntity<>(houseService.getHouseDealList(houseSeq, page, limit), HttpStatus.OK);
 	}
 
 	@Operation(

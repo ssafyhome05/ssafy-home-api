@@ -1,21 +1,27 @@
 package com.ssafyhome.house.service;
 
-import com.ssafyhome.house.dao.HouseMapper;
-import com.ssafyhome.house.dto.HouseDealsDto;
-import com.ssafyhome.house.dto.HouseDto;
-import com.ssafyhome.common.exception.GonggongApplicationErrorException;
-import com.ssafyhome.house.dto.HouseInfoTask;
-import org.springframework.stereotype.Service;
-import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
-
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.*;
-import java.util.concurrent.*;
-
 import java.util.List;
+import java.util.Map;
+import java.util.NoSuchElementException;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Semaphore;
 import java.util.concurrent.atomic.AtomicInteger;
+
+import org.springframework.stereotype.Service;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
+
+import com.ssafyhome.common.exception.GonggongApplicationErrorException;
+import com.ssafyhome.house.dao.HouseMapper;
+import com.ssafyhome.house.dto.HouseDealDto;
+import com.ssafyhome.house.dto.HouseDto;
+import com.ssafyhome.house.dto.HouseInfoTask;
 
 @Service
 public class HouseServiceImpl implements HouseService {
@@ -52,12 +58,12 @@ public class HouseServiceImpl implements HouseService {
 	}
 
 	@Override
-	public List<HouseDealsDto> getHouseDeals(String houseSeq, int page, int limit) {
+	public List<HouseDealDto> getHouseDealList(String houseSeq, int page, int limit) {
 
 		int offset = page * limit;
-		List<HouseDealsDto> houseDealsList = houseMapper.getHouseDeals(houseSeq, limit, offset);
+		List<HouseDealDto> houseDealList = houseMapper.getHouseDealList(houseSeq, limit, offset);
 
-		return houseDealsList;
+		return houseDealList;
 	}
 
 	@Override
