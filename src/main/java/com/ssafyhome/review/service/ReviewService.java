@@ -7,8 +7,8 @@ import java.util.List;
 
 public interface ReviewService {
 
-	void registerReview(ReviewDto reviewDto);
-	List<ReviewDto> getReviews(ReviewSearchDto reviewSearchDto);
+	void addReview(ReviewDto reviewDto);
+	List<ReviewDto> getReviewList(ReviewSearchDto reviewSearchDto);
 	void updateReview(String aptSeq, ReviewDto reviewDto);
 	void deleteReview(String aptSeq);
 }
