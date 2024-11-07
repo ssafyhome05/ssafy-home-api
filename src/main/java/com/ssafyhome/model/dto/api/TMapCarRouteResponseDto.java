@@ -5,7 +5,7 @@ import lombok.EqualsAndHashCode;
 
 import java.util.List;
 
-@EqualsAndHashCode(callSuper = true)
+@EqualsAndHashCode(callSuper = true) // intellij 에서만 작동
 @Data
 public class TMapCarRouteResponseDto extends TMapResponse<TMapCarRouteResponseDto.Feature>{
 

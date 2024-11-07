@@ -3,7 +3,7 @@ package com.ssafyhome.model.dto.api;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-@EqualsAndHashCode(callSuper = true)
+@EqualsAndHashCode(callSuper = true) // intellij 에서만 작동
 @Data
 public class TMapWalkRouteResponseDto extends TMapResponse<TMapWalkRouteResponseDto.Feature> {
 

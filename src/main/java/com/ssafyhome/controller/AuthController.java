@@ -29,6 +29,10 @@ public class AuthController {
     this.jwtService = jwtService;
     this.cookieUtil = new CookieUtil();
   }
+  
+  
+  
+  
   @Operation(
       summary = "refresh token을 재발급함",
       description = "Authorization에 access token, Cookie에 refresh token을 삽입하여 반환"
@@ -37,7 +41,7 @@ public class AuthController {
   public ResponseEntity<?> reissue(
       @Parameter(
           name = "refresh token",
-          description = "access token을 재발급학기 위한 jwt토큰"
+          description = "access token을 재발급하기 위한 jwt토큰"
       )
       @CookieValue(value = "refreshToken", defaultValue = "no_refresh_token")
       String refreshToken
