@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
-<mapper namespace="com.ssafyhome.model.dao.mapper.ReviewMapper">
+<mapper namespace="com.ssafyhome.review.dao.ReviewMapper">
     <insert id="insertReview"
-            parameterType="com.ssafyhome.model.entity.mysql.ReviewEntity">
+            parameterType="com.ssafyhome.review.entity.ReviewEntity">
         INSERT INTO house_review (apt_seq, user_seq, review_title, review_rate, review_content)
         VALUES (#{aptSeq}, #{userSeq}, #{reviewTitle}, #{reviewRate}, #{reviewContent})
     </insert>
 
     <update id="updateReview"
-            parameterType="com.ssafyhome.model.entity.mysql.ReviewEntity">
+            parameterType="com.ssafyhome.review.entity.ReviewEntity">
         UPDATE house_review
         SET
             review_title = #{reviewTitle},
@@ -27,8 +27,8 @@
     </delete>
 
     <select id="getReviewBySearchDto"
-            parameterType="com.ssafyhome.model.dto.review.ReviewSearchDto"
-            resultType="com.ssafyhome.model.entity.mysql.ReviewEntity">
+            parameterType="com.ssafyhome.review.dto.ReviewSearchDto"
+            resultType="com.ssafyhome.review.entity.ReviewEntity">
         SELECT *
         FROM house_review
         LIMIT

@@ -1,7 +1,7 @@
 package com.ssafyhome;
 
-import com.ssafyhome.model.service.SpotService;
-import com.ssafyhome.model.service.impl.SpotInternalService;
+import com.ssafyhome.spot.service.SpotService;
+import com.ssafyhome.spot.service.SpotInternalService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;

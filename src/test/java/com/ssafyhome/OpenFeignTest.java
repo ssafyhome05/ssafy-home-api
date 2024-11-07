@@ -1,13 +1,16 @@
 package com.ssafyhome;
 
-import com.ssafyhome.api.gonggong.GonggongClient;
-import com.ssafyhome.api.kakao.KakaoClient;
-import com.ssafyhome.api.sgis.SGISClient;
-import com.ssafyhome.api.sgis.SGISUtil;
-import com.ssafyhome.api.tmap.TMapClient;
-import com.ssafyhome.model.dao.mapper.GeometryMapper;
-import com.ssafyhome.model.dto.api.*;
-import com.ssafyhome.model.entity.mysql.GeometryEntity;
+import com.ssafyhome.common.api.gonggong.GonggongClient;
+import com.ssafyhome.common.api.gonggong.dto.GonggongAptTradeResponse;
+import com.ssafyhome.common.api.kakao.KakaoClient;
+import com.ssafyhome.common.api.kakao.dto.KakaoPlaceDto;
+import com.ssafyhome.common.api.sgis.SGISClient;
+import com.ssafyhome.common.api.sgis.SGISUtil;
+import com.ssafyhome.common.api.sgis.dto.SgisGeoCode;
+import com.ssafyhome.common.api.tmap.TMapClient;
+import com.ssafyhome.common.api.tmap.dto.*;
+import com.ssafyhome.common.mapper.GeometryMapper;
+import com.ssafyhome.common.entity.GeometryEntity;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
