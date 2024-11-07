@@ -62,7 +62,7 @@ public class HouseController {
 
 	@Operation(
 			summary = "매물별 연도 및 월별 시세 변동 그래프",
-			description = ""
+			description = "202208, 202209 등 월 별 거래 평균 데이터 <HouseGraphDto> 반환"
 	)
 	@GetMapping("/detail/status")
 	public ResponseEntity<HouseGraphDto> getGraphInfo(
