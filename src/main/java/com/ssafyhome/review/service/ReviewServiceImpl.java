@@ -28,7 +28,7 @@ public class ReviewServiceImpl implements ReviewService {
 	}
 
 	@Override
-	public void registerReview(ReviewDto reviewDto) {
+	public void addReview(ReviewDto reviewDto) {
 
 		ReviewEntity reviewEntity = convertUtil.convert(reviewDto, ReviewEntity.class);
 		reviewEntity.setUserSeq(getUserSeq());
@@ -36,7 +36,7 @@ public class ReviewServiceImpl implements ReviewService {
 	}
 
 	@Override
-	public List<ReviewDto> getReviews(ReviewSearchDto reviewSearchDto) {
+	public List<ReviewDto> getReviewList(ReviewSearchDto reviewSearchDto) {
 
 		List<ReviewEntity> reviewEntityList = reviewMapper.getReviewBySearchDto(reviewSearchDto);
 		return convertUtil.convert(reviewEntityList, ReviewDto.class);

@@ -20,18 +20,14 @@ import java.util.Map;
 
 @Tag(
 		name = "Bookmark Controller",
-		description = "관심 지역, 관심 매물, 사용자 장소"
+		description = "관심 지역(location), 관심 매물(house), 사용자 장소(custom spot)"
 )
 @RestController
 @RequestMapping("/bookmark")
 public class BookmarkController {
-
 	private static BookmarkService bookmarkService;
 
-	public BookmarkController(
-			BookmarkService bookmarkService
-	)
-	{
+	public BookmarkController(BookmarkService bookmarkService) {
 		BookmarkController.bookmarkService = bookmarkService;
 	}
 
@@ -95,7 +91,7 @@ public class BookmarkController {
 	)
 	@GetMapping("/location")
 	@PreAuthorize("hasRole('ROLE_USER')")
-	public ResponseEntity<List<LocationDto>> getLocations() {
+	public ResponseEntity<List<LocationDto>> getLocationList() {
 
 		return null;
 	}

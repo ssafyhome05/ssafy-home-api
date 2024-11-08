@@ -31,6 +31,6 @@ public class NavigateTest {
     @Test
     public void navigateTest2() {
 
-        System.out.println(navigateService.getNavigates("spot", "11110-101"));
+        System.out.println(navigateService.getNavigateList("spot", "11110-101"));
     }
 }

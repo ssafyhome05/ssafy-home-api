@@ -25,7 +25,7 @@ public class NoticeServiceImpl implements NoticeService {
   }
 
   @Override
-  public void registerNotice(NoticeDto noticeDto) {
+  public void addNotice(NoticeDto noticeDto) {
 
     NoticeEntity noticeEntity = convertUtil.convert(noticeDto, NoticeEntity.class);
     noticeMapper.insert(noticeEntity);

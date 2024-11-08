@@ -33,12 +33,12 @@ public class ReviewController {
 	)
 	@PostMapping("")
 	@PreAuthorize("hasRole('ROLE_USER')")
-	public ResponseEntity<?> registerReview(
+	public ResponseEntity<?> addReview(
 			@RequestBody
 			ReviewDto reviewDto
 	) {
 
-		reviewService.registerReview(reviewDto);
+		reviewService.addReview(reviewDto);
 		return new ResponseEntity<>("review register success", HttpStatus.CREATED);
 	}
 
@@ -48,12 +48,12 @@ public class ReviewController {
 	)
 	@GetMapping("/list")
 	@PreAuthorize("hasRole('ROLE_ADMIN')")
-	public ResponseEntity<List<ReviewDto>> getReview(
+	public ResponseEntity<List<ReviewDto>> getReviewList(
 			@RequestBody
 			ReviewSearchDto reviewSearchDto
 	) {
 
-		List<ReviewDto> reviewDtoList = reviewService.getReviews(reviewSearchDto);
+		List<ReviewDto> reviewDtoList = reviewService.getReviewList(reviewSearchDto);
 		return new ResponseEntity<>(reviewDtoList, HttpStatus.OK);
 	}
 

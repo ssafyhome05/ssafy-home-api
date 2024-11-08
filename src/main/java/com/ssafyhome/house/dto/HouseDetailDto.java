@@ -19,7 +19,7 @@ public class HouseDetailDto {
   private String AvgDealAmount;
   private double reviewRate;
   private boolean isBookmark;
-  private List<HouseDealsDto> deals;
+  private List<HouseDealDto> deals;
   private List<ReviewDto> reviews;
   private Map<Object, NavigateDto> navigates;
   private HouseGraphDto graph;
