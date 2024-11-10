@@ -29,7 +29,7 @@
         </if>
     </select>
 
-    <select id="getHouseDeals" resultType="com.ssafyhome.house.dto.HouseDealsDto">
+    <select id="getHouseDeals" resultType="com.ssafyhome.house.dto.HouseDealDto">
         SELECT *
         FROM house_deal
         WHERE apt_seq = #{houseSeq}
