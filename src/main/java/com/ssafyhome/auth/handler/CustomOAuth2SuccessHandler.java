@@ -50,6 +50,8 @@ public class CustomOAuth2SuccessHandler implements AuthenticationSuccessHandler 
 		JwtDto jwtDto = jwtService.setTokens(userSeq, userEmail);
 		response.setHeader("Authorization", "Bearer " + jwtDto.getAccessToken());
 		response.addCookie(jwtDto.getRefreshToken());
+
+		response.sendRedirect(frontEndUrl);
 	}
 
 	private void onAuthenticationAdminSuccess(HttpServletRequest request, HttpServletResponse response, AdminOAuth2User adminOAuth2User) {
