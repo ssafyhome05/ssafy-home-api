@@ -66,7 +66,7 @@ public class BookmarkController {
 		params.put("userSeq", SecurityContextHolder.getContext().getAuthentication().getName());
 		params.put("aptSeq", houseId);
 
-		bookmarkService.addBookmark(params);
+		bookmarkService.addHouseBookmark(params);
 
 		return new ResponseEntity<>("add bookmark success", HttpStatus.OK);
 	}
@@ -81,8 +81,13 @@ public class BookmarkController {
 			@RequestBody
 			CustomSpotDto customSpotDto
 	) {
+		Map<String, Object> params = new HashMap<>();
+		params.put("userSeq", SecurityContextHolder.getContext().getAuthentication().getName());
+		params.put("customSpot", customSpotDto);
 
-		return null;
+		bookmarkService.addCustomSpotBookmark(params);
+
+		return new ResponseEntity<>("add bookmark success", HttpStatus.OK);
 	}
 
 	@Operation(
@@ -92,8 +97,13 @@ public class BookmarkController {
 	@GetMapping("/location")
 	@PreAuthorize("hasRole('ROLE_USER')")
 	public ResponseEntity<List<LocationDto>> getLocationList() {
+		Map<String, Object> params = new HashMap<>();
+		params.put("userSeq", SecurityContextHolder.getContext().getAuthentication().getName());
 
-		return null;
+		List<LocationDto> locationList = bookmarkService.getLocationList();
+		
+		return new ResponseEntity<>(locationList, HttpStatus.OK);
+		
 	}
 
 	@Operation(
@@ -102,9 +112,14 @@ public class BookmarkController {
 	)
 	@GetMapping("/house")
 	@PreAuthorize("hasRole('ROLE_USER')")
-	public ResponseEntity<List<HouseDto>> getHouses() {
+	public ResponseEntity<List<HouseDto>> getHouseList() {
+		Map<String, Object> params = new HashMap<>();
+		
+		params.put("userSeq", SecurityContextHolder.getContext().getAuthentication().getName());
 
-		return null;
+		List<HouseDto> houseList = bookmarkService.getHouseList();
+		
+		return new ResponseEntity<>(houseList, HttpStatus.OK);
 	}
 
 	@Operation(
@@ -113,9 +128,11 @@ public class BookmarkController {
 	)
 	@GetMapping("/custom")
 	@PreAuthorize("hasRole('ROLE_USER')")
-	public ResponseEntity<List<CustomSpotDto>> getCustomSpots() {
-
-		return null;
+	public ResponseEntity<List<CustomSpotDto>> getCustomSpotList() {
+		Map<String, Object> params = new HashMap<>();
+		params.put("userSeq", SecurityContextHolder.getContext().getAuthentication().getName());
+		List<CustomSpotDto> customSpotList = bookmarkService.getCustomSpotList();
+		return new ResponseEntity<>(customSpotList, HttpStatus.OK);
 	}
 
 	@Operation(
@@ -163,7 +180,7 @@ public class BookmarkController {
 		params.put("userSeq", SecurityContextHolder.getContext().getAuthentication().getName());
 		params.put("aptSeq", houseId);
 
-		bookmarkService.deleteBookmark(params);
+		bookmarkService.deleteHouseBookmark(params);
 
 		return new ResponseEntity<>("delete bookmark success", HttpStatus.OK);
 	}
@@ -179,6 +196,13 @@ public class BookmarkController {
 			String customSeq
 	) {
 
-		return null;
+		Map<String, Object> params = new HashMap<>();
+		params.put("userSeq", SecurityContextHolder.getContext().getAuthentication().getName());
+		params.put("customSeq", customSeq);
+
+		bookmarkService.deleteCustomSpotBookmark(params);
+
+		return new ResponseEntity<>("delete CustomSpot bookmark success", HttpStatus.OK);
+
 	}
 }
