@@ -183,7 +183,7 @@ public class UserServiceImpl implements UserService {
 
   private boolean checkPassword(UserDto userDto) {
 
-    return userDto.getUserPassword().equals(userDto.getUserPasswordConfirm());
+    return userDto.getUserPw().equals(userDto.getUserPasswordConfirm());
   }
 
   private boolean checkPassword(PasswordDto passwordDto) {
