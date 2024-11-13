@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class HouseInfoEntity {
 
-	private String houseSeq;
+	private String aptSeq;
 	private String sggCd;
 	private String umdCd;
 	private String umdNm;

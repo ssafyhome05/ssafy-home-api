@@ -32,17 +32,17 @@
     <select id="getHouseDeals" resultType="com.ssafyhome.house.dto.HouseDealDto">
         SELECT *
         FROM house_deal
-        WHERE apt_seq = #{houseSeq}
+        WHERE apt_seq = #{aptSeq}
             LIMIT #{limit} OFFSET #{offset};
     </select>
     <insert id="insertHouseInfo" parameterType="java.util.List">
-        INSERT INTO house_info
+        INSERT IGNORE INTO house_info
         VALUES
         <foreach
                 collection="list"
                 item="item"
                 separator=",">
-            (#{item.houseSeq},#{item.sggCd},#{item.umdCd},#{item.umdNm},#{item.jibun},#{item.roadNmSggCd},#{item.roadNm},#{item.roadNmBonbun},#{item.roadNmBubun},#{item.aptNm},#{item.buildYear},#{item.latitude},#{item.longitude})
+            (#{item.aptSeq},#{item.sggCd},#{item.umdCd},#{item.umdNm},#{item.jibun},#{item.roadNmSggCd},#{item.roadNm},#{item.roadNmBonbun},#{item.roadNmBubun},#{item.aptNm},#{item.buildYear},#{item.latitude},#{item.longitude})
         </foreach>
     </insert>
     <insert id="insertHouseDeal" parameterType="java.util.List">
@@ -58,17 +58,12 @@
     <select id="getSidoGugun" parameterType="string" resultType="com.ssafyhome.common.entity.DongCodeEntity">
         SELECT DISTINCT sido_name, gugun_name, bdong_code, bdong_name
         FROM dong_code
-        WHERE bdong_code = #{dongCode}
+        WHERE substr(bdong_code, 1, 5) = substr(#{dongCode}, 1, 5)
     </select>
     <select id="getLawdCdList" resultType="Integer">
         SELECT DISTINCT SUBSTR(bdong_code, 1, 5)
         FROM dong_code
         WHERE bdong_code BETWEEN #{startCd} AND #{endCd}
-    </select>
-    <select id="isExistHouseInfo" resultType="Boolean">
-        SELECT COUNT(*) > 0
-        FROM house_info
-        WHERE apt_seq = #{houseSeq}
     </select>
     <select id="getExistAptSeq" resultType="String">
         SELECT apt_seq

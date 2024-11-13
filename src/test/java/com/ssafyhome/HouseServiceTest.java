@@ -47,7 +47,7 @@ public class HouseServiceTest {
 		for(GonggongAptTradeResponse.Item item : response.getBody().getItems()) {
 
 			HouseInfoEntity houseInfoEntity = convertUtil.convert(item, HouseInfoEntity.class);
-			houseInfoEntity.setHouseSeq(item.getAptSeq());
+			houseInfoEntity.setAptSeq(item.getAptSeq());
 
 			SgisGeoCode.Result.ResultData geoCode =
 					sgisClient.getGeocode(sgisUtil.getAccessToken(), item.getRoadNm() + " " + item.getRoadNmBonbun())

@@ -112,8 +112,7 @@ public class HouseServiceImpl implements HouseService {
 									houseInfoTask = houseInternalService.insertHouseData(
 											lawdCd,
 											dealYmd,
-											sseEmitters.get(requestId),
-											semaphore
+											sseEmitters.get(requestId)
 									);
 									break;
 								} catch (GonggongApplicationErrorException e) {

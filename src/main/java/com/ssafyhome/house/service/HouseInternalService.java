@@ -12,6 +12,7 @@ import com.ssafyhome.common.entity.DongCodeEntity;
 import com.ssafyhome.house.entity.HouseDealEntity;
 import com.ssafyhome.house.entity.HouseInfoEntity;
 import com.ssafyhome.common.util.ConvertUtil;
+import org.mybatis.spring.SqlSessionTemplate;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,10 +22,11 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
+import java.util.Objects;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Semaphore;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @Service
 public class HouseInternalService {
@@ -57,14 +59,16 @@ public class HouseInternalService {
 	}
 
 	@Transactional
-	protected HouseInfoTask insertHouseData(int lawdCd, int dealYmd, SseEmitter sseEmitter, Semaphore semaphore) throws Exception {
+	protected HouseInfoTask insertHouseData(int lawdCd, int dealYmd, SseEmitter sseEmitter) throws Exception {
 
 		HouseInfoTask houseInfoTask = new HouseInfoTask();
 		LocalDateTime start = LocalDateTime.now();
-		int totalRows = 0 , repeat = 1, seq = 1;
-		List<HouseInfoEntity> infoEntityList = new ArrayList<>();
+		int totalRows = 0;
+		int repeat = 1;
+		AtomicInteger seq = new AtomicInteger(1);
 		List<HouseDealEntity> dealEntityList = new ArrayList<>();
-		Set<String> existAptSeq = houseMapper.getExistAptSeq(String.valueOf(lawdCd));
+		ConcurrentHashMap<String, HouseInfoEntity> infoEntityMap = new ConcurrentHashMap<>();
+		houseMapper.getExistAptSeq(String.valueOf(lawdCd)).forEach((aptSeq) -> infoEntityMap.put(aptSeq, new HouseInfoEntity()));
 
 		do {
 			GonggongAptTradeResponse response =
@@ -85,55 +89,53 @@ public class HouseInternalService {
 
 			CountDownLatch countDownLatch = new CountDownLatch(response.getBody().getItems().size());
 
+			List<DongCodeEntity> dongCodeEntities = houseMapper.getSidoGugun(String.valueOf(lawdCd));
 			for(GonggongAptTradeResponse.Item item : response.getBody().getItems()) {
 
-				try{
-					HouseDealEntity houseDealEntity = convertUtil.convert(item, HouseDealEntity.class);
-					houseDealEntity.setDealSeq(lawdCd + "-" + dealYmd + "-" + seq++);
-					dealEntityList.add(houseDealEntity);
+				executorService.submit(() -> {
+					try{
+						HouseDealEntity houseDealEntity = convertUtil.convert(item, HouseDealEntity.class);
+						houseDealEntity.setDealSeq(lawdCd + "-" + dealYmd + "-" + seq.getAndIncrement());
+						dealEntityList.add(houseDealEntity);
 
-					if (existAptSeq.contains(houseDealEntity.getAptSeq())) continue;
+						if(infoEntityMap.containsKey(item.getAptSeq())) return;
 
-					HouseInfoEntity houseInfoEntity = convertUtil.convert(item, HouseInfoEntity.class);
-					houseInfoEntity.setHouseSeq(item.getAptSeq());
+						HouseInfoEntity houseInfoEntity = convertUtil.convert(item, HouseInfoEntity.class);
+						houseInfoEntity.setAptSeq(item.getAptSeq());
 
-					DongCodeEntity dongCodeEntity = houseMapper.getSidoGugun(item.getSggCd() + item.getUmdCd());
-					String dongName;
-					try {
-						dongName = dongCodeEntity.getSidoName() + " " + dongCodeEntity.getGugunName() + " " + houseInfoEntity.getUmdNm();
+						DongCodeEntity dongCodeEntity = dongCodeEntities.stream().filter(entity -> entity.getBdongCode().equals(item.getSggCd() + item.getUmdCd())).findFirst().get();
+						String dongName;
+						try {
+							dongName = dongCodeEntity.getSidoName() + " " + dongCodeEntity.getGugunName() + " " + houseInfoEntity.getUmdNm();
+						} catch (Exception e) {
+								throw new RuntimeException(e);
+						}
+						SgisGeoCode geoCode = sgisClient.getGeocode(sgisUtil.getAccessToken(), dongName + " " + item.getJibun());
+						if(geoCode.getResult() != null){
+							SgisGeoCode.Result.ResultData resultData =
+									sgisClient.getGeocode(sgisUtil.getAccessToken(), dongName + " " + item.getJibun())
+											.getResult().getResultdata().get(0);
+							houseInfoEntity.setLatitude(resultData.getY());
+							houseInfoEntity.setLongitude(resultData.getX());
+						}
+						else {
+							try {
+								sseEmitter.send(
+										SseEmitter.event()
+												.name("Not found jibun")
+												.data(lawdCd + "-" + dealYmd + "-" + seq)
+								);
+							} catch (Exception e) {
+							}
+						}
+						infoEntityMap.putIfAbsent(houseInfoEntity.getAptSeq(), houseInfoEntity);
 					} catch (Exception e) {
-						continue;
+						e.printStackTrace();
 					}
-
-					if(!houseMapper.isExistHouseInfo(houseInfoEntity.getHouseSeq())) {
-						int finalSeq = seq;
-						executorService.submit(() -> {
-							SgisGeoCode geoCode = sgisClient.getGeocode(sgisUtil.getAccessToken(), dongName + " " + item.getJibun());
-							if(geoCode.getResult() != null){
-								SgisGeoCode.Result.ResultData resultData =
-										sgisClient.getGeocode(sgisUtil.getAccessToken(), dongName + " " + item.getJibun())
-												.getResult().getResultdata().get(0);
-								houseInfoEntity.setLatitude(resultData.getY());
-								houseInfoEntity.setLongitude(resultData.getX());
-							}
-							else {
-								try {
-									sseEmitter.send(
-											SseEmitter.event()
-													.name("Not found jibun")
-													.data(lawdCd + "-" + dealYmd + "-" + finalSeq)
-									);
-								} catch (Exception e) {
-								}
-							}
-						});
-
-						infoEntityList.add(houseInfoEntity);
-						existAptSeq.add(houseInfoEntity.getHouseSeq());
+					finally {
+						countDownLatch.countDown();
 					}
-				} finally {
-					countDownLatch.countDown();
-				}
+				});
 			}
 
 			try {
@@ -142,12 +144,13 @@ public class HouseInternalService {
 
 		} while (repeat++ * 100 < totalRows);
 
-		semaphore.acquire();
 		try {
+			List<HouseInfoEntity> infoEntityList = infoEntityMap.values().stream().filter(entity -> entity.getAptSeq() != null).toList();
 			if (!infoEntityList.isEmpty()) houseMapper.insertHouseInfo(infoEntityList);
 			if (!dealEntityList.isEmpty()) houseMapper.insertHouseDeal(dealEntityList);
-		} catch (Exception e) {}
-		semaphore.release();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 
 		LocalDateTime end = LocalDateTime.now();
 		houseInfoTask.setDuration(Duration.between(start, end));
