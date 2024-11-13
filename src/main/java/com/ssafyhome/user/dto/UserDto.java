@@ -13,7 +13,7 @@ public class UserDto {
 
   private long userSeq;
   private String userId;
-  private String userPassword;
+  private String userPw;
   private String userPasswordConfirm;
   private String userName;
   private String userEmail;

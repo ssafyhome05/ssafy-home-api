@@ -72,12 +72,14 @@ public class HouseController {
 			description = "202208, 202209 등 특정 매물의 지금까지 월 별 거래 데이터 추이 <HouseGraphDto> 반환"
 	)
 	@GetMapping("/detail/status")
-	public ResponseEntity<HouseGraphDto> getGraphInfo(
+	public ResponseEntity<List<HouseGraphDto>> getGraphInfo(
 			@RequestParam
-			String houseSeq
+			String houseSeq,
+			@RequestParam
+			int year
 	) {
 
-		return null;
+		return new ResponseEntity<>(houseService.getHouseGraph(houseSeq, year), HttpStatus.OK);
 	}
 
 	@Operation(

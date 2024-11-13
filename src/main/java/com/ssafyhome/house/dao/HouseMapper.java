@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.ssafyhome.house.dto.HouseGraphDto;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -20,6 +21,7 @@ public interface HouseMapper {
     List<HouseDealDto> getHouseDealList(@Param("houseSeq") String houseSeq,
                                       @Param("limit") int limit,
                                       @Param("offset") int offset);
+	List<HouseGraphDto> getHouseGraph(@Param("houseSeq") String houseSeq, @Param("year") int year);
 	void insertHouseInfo(List<HouseInfoEntity> infoEntityList);
 	void insertHouseDeal(List<HouseDealEntity> dealEntityList);
 	List<DongCodeEntity> getSidoGugun(String sggCd);

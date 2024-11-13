@@ -29,7 +29,7 @@
         </if>
     </select>
 
-    <select id="getHouseDeals" resultType="com.ssafyhome.house.dto.HouseDealDto">
+    <select id="getHouseDealList" resultType="com.ssafyhome.house.dto.HouseDealDto">
         SELECT *
         FROM house_deal
         WHERE apt_seq = #{aptSeq}
@@ -69,5 +69,34 @@
         SELECT apt_seq
         FROM house_info
         WHERE sgg_cd = #{sggCode}
+    </select>
+
+    <select id="getHouseGraph" resultType="com.ssafyhome.house.dto.HouseGraphDto">
+        SELECT
+            months.month AS 'month',
+                COALESCE(house_deal_data.cnt, 0) AS 'dealCnt',
+                COALESCE(house_deal_data.dealAvg, 0) AS 'avgDealAmount',
+                COALESCE(house_deal_data.areaDealAvg, 0) AS 'avgAreaPrice'
+        FROM
+            (SELECT 1 AS month UNION SELECT 2 UNION SELECT 3 UNION SELECT 4 UNION SELECT 5 UNION SELECT 6
+             UNION SELECT 7 UNION SELECT 8 UNION SELECT 9 UNION SELECT 10 UNION SELECT 11 UNION SELECT 12) AS months
+                LEFT JOIN
+            (SELECT
+                 deal_month AS month,
+        COUNT(*) AS cnt,
+        ROUND(AVG(CAST(REPLACE(deal_amount, ',', '') AS DOUBLE)), 1) AS dealAvg,
+        ROUND(AVG(CAST(REPLACE(deal_amount, ',', '') AS DOUBLE)) / AVG(exclu_use_ar), 1) AS areaDealAvg
+             FROM
+                 house_deal
+             WHERE
+                 apt_seq = #{houseSeq}
+               AND deal_year = #{year}
+             GROUP BY
+                 deal_month
+            ) AS house_deal_data
+            ON
+                months.month = house_deal_data.month
+        ORDER BY
+            months.month
     </select>
 </mapper>

@@ -1,6 +1,11 @@
 package com.ssafyhome.house.dto;
 
-public class HouseGraphDto {
-	
+import lombok.Data;
 
+@Data
+public class HouseGraphDto {
+    private int month;
+    private int dealCnt;
+    private double avgDealAmount;
+    private double avgAreaPrice;
 }

@@ -3,10 +3,7 @@ package com.ssafyhome.house.service;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.List;
-import java.util.Map;
-import java.util.NoSuchElementException;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
@@ -14,6 +11,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import com.ssafyhome.house.dto.HouseGraphDto;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
@@ -64,6 +62,14 @@ public class HouseServiceImpl implements HouseService {
 		List<HouseDealDto> houseDealList = houseMapper.getHouseDealList(houseSeq, limit, offset);
 
 		return houseDealList;
+	}
+
+	@Override
+	public List<HouseGraphDto> getHouseGraph(String houseSeq, int year){
+
+		List<HouseGraphDto> houseGraphDtoList = houseMapper.getHouseGraph(houseSeq, year);
+
+		return houseGraphDtoList;
 	}
 
 	@Override
