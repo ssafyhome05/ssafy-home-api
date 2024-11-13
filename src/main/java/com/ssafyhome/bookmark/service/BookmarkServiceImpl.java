@@ -1,8 +1,13 @@
 package com.ssafyhome.bookmark.service;
 
 import com.ssafyhome.bookmark.dao.BookmarkMapper;
+import com.ssafyhome.house.dto.HouseDto;
+import com.ssafyhome.spot.dto.CustomSpotDto;
+import com.ssafyhome.spot.dto.LocationDto;
+
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Map;
 
 @Service
@@ -17,13 +22,13 @@ public class BookmarkServiceImpl implements BookmarkService {
     }
 
     @Override
-    public void addBookmark(Map<String, Object> params) {
-        bookmarkMapper.addBookmark(params);
+    public void addHouseBookmark(Map<String, Object> params) {
+        bookmarkMapper.addHouseBookmark(params);
     }
 
     @Override
-    public void deleteBookmark(Map<String, Object> params) {
-        bookmarkMapper.deleteBookmark(params);
+    public void deleteHouseBookmark(Map<String, Object> params) {
+        bookmarkMapper.deleteHouseBookmark(params);
     }
 
     @Override
@@ -35,5 +40,35 @@ public class BookmarkServiceImpl implements BookmarkService {
     public void deleteLocationBookmark(Map<String, Object> params) {
         bookmarkMapper.deleteLocationBookmark(params);
     }
+
+	@Override
+	public void addCustomSpotBookmark(Map<String, Object> params) {
+		bookmarkMapper.addCustomSpotBookmark(params);
+		
+	}
+
+	@Override
+	public List<HouseDto> getHouseList() {
+		// TODO Auto-generated method stub
+		return bookmarkMapper.getHouseList();
+	}
+
+	@Override
+	public List<LocationDto> getLocationList() {
+		// TODO Auto-generated method stub
+		return bookmarkMapper.getLocationList();
+	}
+
+	@Override
+	public List<CustomSpotDto> getCustomSpotList() {
+		// TODO Auto-generated method stub
+		return bookmarkMapper.getCustomSpotList();
+	}
+
+	@Override
+	public void deleteCustomSpotBookmark(Map<String, Object> params) {
+		bookmarkMapper.deleteCustomSpotBookmark(params);
+		
+	}
 
 }

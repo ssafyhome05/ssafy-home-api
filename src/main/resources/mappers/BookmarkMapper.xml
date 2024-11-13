@@ -2,12 +2,12 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.ssafyhome.bookmark.dao.BookmarkMapper">
 
-    <insert id="addBookmark" parameterType="map">
+    <insert id="addHouseBookmark" parameterType="map">
         INSERT INTO favorite_house
         VALUES(#{userSeq}, #{aptSeq})
     </insert>
     
-    <delete id="deleteBookmark" parameterType="map">
+    <delete id="deleteHouseBookmark" parameterType="map">
         DELETE
         FROM favorite_house
         WHERE apt_seq = #{aptSeq}
