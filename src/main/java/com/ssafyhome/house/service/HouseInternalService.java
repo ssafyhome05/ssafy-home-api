@@ -156,4 +156,12 @@ public class HouseInternalService {
 		houseInfoTask.setDuration(Duration.between(start, end));
 		return houseInfoTask;
 	}
+	
+	
+	
+	
+	
+	
+	
+	
 }

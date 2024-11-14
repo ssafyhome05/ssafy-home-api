@@ -72,6 +72,15 @@ public class HouseServiceImpl implements HouseService {
 		return houseGraphDtoList;
 	}
 
+	
+	@Override
+	public String startPopulationTask() {
+		
+		// 모든 행정동에 대한 population 데이터 DB 의 population table 에 저장 하는 메서드
+		return "success";
+	}
+	
+	
 	@Override
 	public String startHouseInfoTask(int dealYmd, int startCd, int endCd) {
 
@@ -191,6 +200,8 @@ public class HouseServiceImpl implements HouseService {
 
 		return DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 	}
+
+
 
 }
 
