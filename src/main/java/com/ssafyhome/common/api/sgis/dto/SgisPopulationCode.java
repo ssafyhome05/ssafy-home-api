@@ -21,14 +21,18 @@ public class SgisPopulationCode {
 	@JsonProperty("trId")
 	private String trId;
 	
+	// 프로젝트에서는 3개의 지표 시각화
+	// 1. 총인구
+	// 2. 인구밀도 (소수점 두자리)
+	// 3. 노령화지수, 백명당 노인 x명
 	
 	public static class Result{
 		
 
 	    private String admCd;               // 행정구역코드
 	    private String admNm;               // 행정구역명 (집계구에서는 나오지 않음)
-	    private String totPpltn;            // 총인구
-	    private double avgAge;              // 평균나이 (소수점 한자리)
+	    private String totPpltn;            // 총인구							  
+	    private double avgAge;              // 평균나이 (소수점 한자리)			
 	    private double ppltnDnsty;          // 인구밀도 (소수점 두자리)
 	    private String agedChildIdx;        // 노령화지수 (일백명당 명)
 	    private String oldageSuprtPer;      // 노년부양비 (일백명당 명)

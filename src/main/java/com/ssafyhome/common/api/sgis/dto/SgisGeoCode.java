@@ -31,10 +31,10 @@ public class SgisGeoCode {
 
 			private String riNm;
 			private String roadNmSubNo;
-			private String sggCd;
+			private String sggCd;			// (법정동) 시군구 코드
 			private String admCd;			// 행정동 코드
 			private String roadNmMainNo;
-			private String legCd;			// 법정동 코드
+			private String legCd;			// (읍면동) 법정동 코드
 			private String roadNm;
 			private String bdMatches;
 			private String bdSubNm;
