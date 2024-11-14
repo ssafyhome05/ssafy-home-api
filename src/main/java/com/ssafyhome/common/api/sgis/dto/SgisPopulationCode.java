@@ -22,9 +22,9 @@ public class SgisPopulationCode {
 	private String trId;
 	
 	// 프로젝트에서는 3개의 지표 시각화
-	// 1. 총인구
-	// 2. 인구밀도 (소수점 두자리)
-	// 3. 노령화지수, 백명당 노인 x명
+	// 1. 총인구 totPpltn
+	// 2. 인구밀도 (소수점 두자리) ppltnDnsty
+	// 3. 노령화지수, 백명당 노인 x명 agedChildIdx
 	
 	public static class Result{
 		

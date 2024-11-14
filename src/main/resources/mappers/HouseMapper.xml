@@ -55,6 +55,19 @@
             (#{item.dealSeq},#{item.aptSeq},#{item.aptDong},#{item.floor},#{item.dealYear},#{item.dealMonth},#{item.dealDay},#{item.excluUseAr},#{item.dealAmount})
         </foreach>
     </insert>
+    
+    <insert id="insertPopulation" parameterType="java.util.List">
+        INSERT IGNORE INTO population
+        VALUES
+        <foreach
+                collection="list"
+                item="item"
+                separator=",">
+            (#{item.admCd},#{item.totPpltn},#{item.ppltnDnsty},#{item.agedChildIdx},#{item.corpCnt},#{item.totHouse})
+        </foreach>
+    </insert>
+    
+    
     <select id="getSidoGugun" parameterType="string" resultType="com.ssafyhome.common.entity.DongCodeEntity">
         SELECT DISTINCT sido_name, gugun_name, bdong_code, bdong_name
         FROM dong_code
