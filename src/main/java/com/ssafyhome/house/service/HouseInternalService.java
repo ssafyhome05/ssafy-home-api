@@ -72,19 +72,22 @@ public class HouseInternalService {
 			
 			SgisPopulationCode population = sgisClient.getPopulation(sgisUtil.getAccessToken(), 
 																		year, 
-																		pop.getAdmCd(), 
-																		"0");
+																		pop.getAdmCd().substring(0, 2), 
+																		"1");
 			if(population.getErrMsg().equals("Success")) {
 				
 				PopulationEntity newPop = new PopulationEntity();
-				newPop.setAdmCd(population.getResult().get(0).getAdmCd());
-				newPop.setAgedChildIdx(population.getResult().get(0).getAgedChildIdx());
-				newPop.setCorpCnt(population.getResult().get(0).getCorpCnt());
-				newPop.setPpltnDnsty(population.getResult().get(0).getPpltnDnsty());
-				newPop.setTotHouse(population.getResult().get(0).getTotHouse());
-				newPop.setTotPpltn(population.getResult().get(0).getTotPpltn());
 				
-				houseMapper.insertPopulation(newPop);
+				for (int i = 0; i < population.getResult().size(); i++) {
+					newPop.setAdmCd(population.getResult().get(i).getAdmCd());
+					newPop.setAgedChildIdx(population.getResult().get(i).getAgedChildIdx());
+					newPop.setCorpCnt(population.getResult().get(i).getCorpCnt());
+					newPop.setPpltnDnsty(population.getResult().get(i).getPpltnDnsty());
+					newPop.setTotHouse(population.getResult().get(i).getTotHouse());
+					newPop.setTotPpltn(population.getResult().get(i).getTotPpltn());
+					
+					houseMapper.insertPopulation(newPop);
+				}
 			}
 		}
 		
