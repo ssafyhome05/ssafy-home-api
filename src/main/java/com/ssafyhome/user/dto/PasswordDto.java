@@ -10,3 +10,4 @@ public class PasswordDto {
   private String newPassword;
   private String newPasswordConfirm;
 }
+
