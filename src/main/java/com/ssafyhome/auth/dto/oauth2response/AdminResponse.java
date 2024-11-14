@@ -18,18 +18,18 @@ public class AdminResponse implements OAuth2Response {
 
   @Override
   public String getProviderId() {
-    return attributes.get("sub").toString();
+    return "admin";
   }
 
   @Override
   public String getEmail() {
-    return attributes.get("email").toString();
+    return "null";
   }
 
   @Override
   public String getName() {
-    return attributes.get("name").toString();
+    return ((Map<String, String>)attributes.get("response")).get("username");
   }
 
-  public String getRole() { return attributes.get("role").toString(); }
+  public String getRole() { return ((Map<String, String>)attributes.get("response")).get("role"); }
 }
