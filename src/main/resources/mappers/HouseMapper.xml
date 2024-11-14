@@ -55,11 +55,34 @@
             (#{item.dealSeq},#{item.aptSeq},#{item.aptDong},#{item.floor},#{item.dealYear},#{item.dealMonth},#{item.dealDay},#{item.excluUseAr},#{item.dealAmount})
         </foreach>
     </insert>
+    
+    <!-- 있으면 update, 없으면 insert -->
+    <insert id="insertPopulation" parameterType="com.ssafyhome.house.entity.PopulationEntity">
+    
+      INSERT INTO population (adm_cd, tot_ppltn, ppltn_dnsty, aged_child_idx, corp_cnt, tot_house)
+      VALUES (#{admCd}, #{totPpltn}, #{ppltnDnsty}, #{agedChildIdx}, #{corpCnt}, #{totHouse})
+      ON DUPLICATE KEY UPDATE
+          tot_ppltn = #{totPpltn},
+          ppltn_dnsty = #{ppltnDnsty},
+          aged_child_idx = #{agedChildIdx},
+          corp_cnt = #{corpCnt},
+          tot_house = #{totHouse}
+  
+	</insert> 
+    
     <select id="getSidoGugun" parameterType="string" resultType="com.ssafyhome.common.entity.DongCodeEntity">
         SELECT DISTINCT sido_name, gugun_name, bdong_code, bdong_name
         FROM dong_code
         WHERE substr(bdong_code, 1, 5) = substr(#{dongCode}, 1, 5)
     </select>
+    
+    
+    <select id="getPopulationList" resultType="com.ssafyhome.house.entity.PopulationEntity">
+        SELECT adm_cd
+        FROM population
+    </select>
+    
+    
     <select id="getLawdCdList" resultType="Integer">
         SELECT DISTINCT SUBSTR(bdong_code, 1, 5)
         FROM dong_code

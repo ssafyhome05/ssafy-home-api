@@ -4,15 +4,16 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import com.ssafyhome.house.dto.HouseGraphDto;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
 import com.ssafyhome.common.entity.DongCodeEntity;
 import com.ssafyhome.house.dto.HouseDealDto;
 import com.ssafyhome.house.dto.HouseDto;
+import com.ssafyhome.house.dto.HouseGraphDto;
 import com.ssafyhome.house.entity.HouseDealEntity;
 import com.ssafyhome.house.entity.HouseInfoEntity;
+import com.ssafyhome.house.entity.PopulationEntity;
 
 @Mapper
 public interface HouseMapper {
@@ -27,4 +28,7 @@ public interface HouseMapper {
 	List<DongCodeEntity> getSidoGugun(String sggCd);
 	List<Integer> getLawdCdList(@Param("startCd") String startCd, @Param("endCd") String endCd);
 	Set<String> getExistAptSeq(String sggCode);
+	
+	void insertPopulation(PopulationEntity populationEntity);
+	List<PopulationEntity> getPopulationList();
 }

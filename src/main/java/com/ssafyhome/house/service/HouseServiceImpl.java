@@ -13,6 +13,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import com.ssafyhome.house.dto.HouseGraphDto;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import com.ssafyhome.common.exception.GonggongApplicationErrorException;
@@ -20,6 +21,7 @@ import com.ssafyhome.house.dao.HouseMapper;
 import com.ssafyhome.house.dto.HouseDealDto;
 import com.ssafyhome.house.dto.HouseDto;
 import com.ssafyhome.house.dto.HouseInfoTask;
+import com.ssafyhome.house.entity.PopulationEntity;
 
 @Service
 public class HouseServiceImpl implements HouseService {
@@ -72,6 +74,25 @@ public class HouseServiceImpl implements HouseService {
 		return houseGraphDtoList;
 	}
 
+	/**
+	 *  모든 행정동 297개에 대한 population 데이터 DB 의 population table 에 저장 하는 메서드
+	 *  SGISClient 사용
+	 */
+	@Override
+	
+	public String startPopulationTask(String year) {
+		
+		
+		List<PopulationEntity> popList = houseMapper.getPopulationList();
+		
+		houseInternalService.getPopulation(popList,  year);
+		
+		
+		
+		return "success";
+	}
+	
+	
 	@Override
 	public String startHouseInfoTask(int dealYmd, int startCd, int endCd) {
 
@@ -191,6 +212,8 @@ public class HouseServiceImpl implements HouseService {
 
 		return DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 	}
+
+
 
 }
 

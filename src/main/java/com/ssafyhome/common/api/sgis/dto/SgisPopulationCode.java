@@ -1,7 +1,10 @@
 package com.ssafyhome.common.api.sgis.dto;
 
+
+import java.util.List;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.ssafyhome.common.api.sgis.dto.SgisGeoCode.Result;
+
 
 import lombok.Data;
 
@@ -10,8 +13,9 @@ public class SgisPopulationCode {
 
 	
 	private String id;
-	private Result result;
-	
+
+	private List<Result> result;
+
 	@JsonProperty("errMsg")
 	private String errMsg;
 	
@@ -21,14 +25,20 @@ public class SgisPopulationCode {
 	@JsonProperty("trId")
 	private String trId;
 	
+
+	// 프로젝트에서는 3개의 지표 시각화
+	// 1. 총인구 totPpltn
+	// 2. 인구밀도 (소수점 두자리) ppltnDnsty
+	// 3. 노령화지수, 백명당 노인 x명 agedChildIdx
 	
+	@Data
 	public static class Result{
 		
 
 	    private String admCd;               // 행정구역코드
 	    private String admNm;               // 행정구역명 (집계구에서는 나오지 않음)
-	    private String totPpltn;            // 총인구
-	    private double avgAge;              // 평균나이 (소수점 한자리)
+	    private String totPpltn;            // 총인구							  
+	    private double avgAge;              // 평균나이 (소수점 한자리)			
 	    private double ppltnDnsty;          // 인구밀도 (소수점 두자리)
 	    private String agedChildIdx;        // 노령화지수 (일백명당 명)
 	    private String oldageSuprtPer;      // 노년부양비 (일백명당 명)
@@ -46,8 +56,7 @@ public class SgisPopulationCode {
 	    private String haesuogaPpltn;       // 해수면 어가 인구
 	    private String employeeCnt;         // 종업원수 (전체 사업체)
 	    private String corpCnt;             // 사업체수 (전체 사업체)
-	
-		
+
 	}
 	
 }

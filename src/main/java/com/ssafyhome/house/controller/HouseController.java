@@ -212,4 +212,20 @@ public class HouseController {
 
 		return houseService.getSseEmitter(requestId);
 	}
+	
+	
+	@Operation(
+			summary = "행정동별 인구통계 데이터 업데이트",
+			description = "행정동 시군구별 총인구수, 인구밀도, 노령화지수, 사업체 수, 총 주택수 정보 업데이트"
+	)
+	@GetMapping("/admin/register")
+//	@PreAuthorize("hasRole('ROLE_ADMIN')")
+	public ResponseEntity<?> updatePopulationInfo() {
+
+		String result = houseService.startPopulationTask("2022");
+		if (!result.equals("success")) {
+			//excpeion 구현 필요
+		}
+		return new ResponseEntity<>("success", HttpStatus.CREATED);
+	}
 }
