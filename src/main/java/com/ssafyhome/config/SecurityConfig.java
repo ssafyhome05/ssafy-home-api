@@ -13,6 +13,7 @@ import com.ssafyhome.auth.service.CustomUserDetailsService;
 import com.ssafyhome.common.util.CookieUtil;
 import com.ssafyhome.common.util.ErrorUtil;
 import com.ssafyhome.common.util.JWTUtil;
+import com.ssafyhome.auth.repository.CustomAuthorizationRequestRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Value;
@@ -171,7 +172,8 @@ public class SecurityConfig {
   public SecurityFilterChain securityFilterChain(
       HttpSecurity http,
       CustomOAuth2UserService customOAuth2UserService,
-      CustomOAuth2SuccessHandler customOAuth2SuccessHandler
+      CustomOAuth2SuccessHandler customOAuth2SuccessHandler,
+      CustomAuthorizationRequestRepository customAuthorizationRequestRepository
   ) throws Exception {
 
     /**
@@ -234,6 +236,9 @@ public class SecurityConfig {
         .userInfoEndpoint(userInfoEndpointConfig -> userInfoEndpointConfig
             .userService(customOAuth2UserService))
         .successHandler(customOAuth2SuccessHandler)
+        .authorizationEndpoint(endpoint -> endpoint
+            .authorizationRequestRepository(customAuthorizationRequestRepository)
+            .baseUri("/oauth2/authorization"))
     );
 
     /**
