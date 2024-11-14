@@ -30,4 +30,5 @@ public interface HouseMapper {
 	Set<String> getExistAptSeq(String sggCode);
 	
 	void insertPopulation(List<PopulationEntity> populationEntityList);
+	List<PopulationEntity> getPopulationList();
 }

@@ -73,6 +73,14 @@
         FROM dong_code
         WHERE substr(bdong_code, 1, 5) = substr(#{dongCode}, 1, 5)
     </select>
+    
+    
+    <select id="getPopulationList" resultType="com.ssafyhome.house.entity.PopulationEntity">
+        SELECT adm_cd
+        FROM population
+    </select>
+    
+    
     <select id="getLawdCdList" resultType="Integer">
         SELECT DISTINCT SUBSTR(bdong_code, 1, 5)
         FROM dong_code
