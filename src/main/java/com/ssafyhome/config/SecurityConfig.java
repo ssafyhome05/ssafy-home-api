@@ -35,6 +35,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.security.web.authentication.logout.LogoutFilter;
 import org.springframework.web.cors.CorsConfiguration;
 
+import java.util.Arrays;
 import java.util.Collections;
 
 /**
@@ -150,7 +151,7 @@ public class SecurityConfig {
   private CorsConfiguration corsConfiguration(HttpServletRequest request) {
 
     CorsConfiguration corsConfiguration = new CorsConfiguration();
-    corsConfiguration.setAllowedOrigins(Collections.singletonList(frontEndUrl));
+    corsConfiguration.setAllowedOrigins(Arrays.asList(frontEndUrl, "http://localhost:9000", "http://localhost:9001"));
     corsConfiguration.setAllowedMethods(Collections.singletonList("*"));
     corsConfiguration.setAllowCredentials(true); // 쿠키 등의 자격증명 전송을 허용
     corsConfiguration.setAllowedHeaders(Collections.singletonList("*"));
