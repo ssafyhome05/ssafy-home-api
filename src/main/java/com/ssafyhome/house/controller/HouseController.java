@@ -222,7 +222,7 @@ public class HouseController {
 //	@PreAuthorize("hasRole('ROLE_ADMIN')")
 	public ResponseEntity<?> updatePopulationInfo() {
 
-		String result = houseService.startPopulationTask();
+		String result = houseService.startPopulationTask("2022");
 		if (!result.equals("success")) {
 			//excpeion 구현 필요
 		}

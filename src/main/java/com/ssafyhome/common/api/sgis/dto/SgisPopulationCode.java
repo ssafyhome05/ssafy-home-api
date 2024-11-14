@@ -1,7 +1,8 @@
 package com.ssafyhome.common.api.sgis.dto;
 
+import java.util.List;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.ssafyhome.common.api.sgis.dto.SgisGeoCode.Result;
 
 import lombok.Data;
 
@@ -10,7 +11,7 @@ public class SgisPopulationCode {
 
 	
 	private String id;
-	private Result result;
+	private List<Result> result;
 	
 	@JsonProperty("errMsg")
 	private String errMsg;
@@ -26,6 +27,7 @@ public class SgisPopulationCode {
 	// 2. 인구밀도 (소수점 두자리) ppltnDnsty
 	// 3. 노령화지수, 백명당 노인 x명 agedChildIdx
 	
+	@Data
 	public static class Result{
 		
 
@@ -51,7 +53,6 @@ public class SgisPopulationCode {
 	    private String employeeCnt;         // 종업원수 (전체 사업체)
 	    private String corpCnt;             // 사업체수 (전체 사업체)
 	
-		
 	}
 	
 }

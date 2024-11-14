@@ -29,6 +29,6 @@ public interface HouseMapper {
 	List<Integer> getLawdCdList(@Param("startCd") String startCd, @Param("endCd") String endCd);
 	Set<String> getExistAptSeq(String sggCode);
 	
-	void insertPopulation(List<PopulationEntity> populationEntityList);
+	void insertPopulation(PopulationEntity populationEntity);
 	List<PopulationEntity> getPopulationList();
 }

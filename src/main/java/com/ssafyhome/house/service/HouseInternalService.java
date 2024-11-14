@@ -1,32 +1,33 @@
 package com.ssafyhome.house.service;
 
-import com.ssafyhome.common.api.gonggong.GonggongClient;
-import com.ssafyhome.common.api.sgis.SGISClient;
-import com.ssafyhome.common.api.sgis.SGISUtil;
-import com.ssafyhome.common.exception.GonggongApplicationErrorException;
-import com.ssafyhome.house.dao.HouseMapper;
-import com.ssafyhome.common.api.gonggong.dto.GonggongAptTradeResponse;
-import com.ssafyhome.common.api.sgis.dto.SgisGeoCode;
-import com.ssafyhome.house.dto.HouseInfoTask;
-import com.ssafyhome.common.entity.DongCodeEntity;
-import com.ssafyhome.house.entity.HouseDealEntity;
-import com.ssafyhome.house.entity.HouseInfoEntity;
-import com.ssafyhome.common.util.ConvertUtil;
-import org.mybatis.spring.SqlSessionTemplate;
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.atomic.AtomicInteger;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
-import java.time.Duration;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.atomic.AtomicInteger;
+import com.ssafyhome.common.api.gonggong.GonggongClient;
+import com.ssafyhome.common.api.gonggong.dto.GonggongAptTradeResponse;
+import com.ssafyhome.common.api.sgis.SGISClient;
+import com.ssafyhome.common.api.sgis.SGISUtil;
+import com.ssafyhome.common.api.sgis.dto.SgisGeoCode;
+import com.ssafyhome.common.api.sgis.dto.SgisPopulationCode;
+import com.ssafyhome.common.entity.DongCodeEntity;
+import com.ssafyhome.common.exception.GonggongApplicationErrorException;
+import com.ssafyhome.common.util.ConvertUtil;
+import com.ssafyhome.house.dao.HouseMapper;
+import com.ssafyhome.house.dto.HouseInfoTask;
+import com.ssafyhome.house.entity.HouseDealEntity;
+import com.ssafyhome.house.entity.HouseInfoEntity;
+import com.ssafyhome.house.entity.PopulationEntity;
 
 @Service
 public class HouseInternalService {
@@ -57,6 +58,38 @@ public class HouseInternalService {
 		this.sgisUtil = sgisUtil;
 		this.executorService = executorService;
 	}
+	
+	/**
+	 * db 에서 행정동코드를 하나씩 받아와, year 년도 데이터로 갱신
+	 * @param pop, year
+	 * @return 갱신된 PopulatonEntity
+	 */
+	@Transactional
+	protected void getPopulation(List<PopulationEntity> popList, String year) {
+		
+		for (PopulationEntity pop : popList) {
+			
+			
+			SgisPopulationCode population = sgisClient.getPopulation(sgisUtil.getAccessToken(), 
+																		year, 
+																		pop.getAdmCd(), 
+																		"0");
+			if(population.getErrMsg().equals("Success")) {
+				
+				PopulationEntity newPop = new PopulationEntity();
+				newPop.setAdmCd(population.getResult().get(0).getAdmCd());
+				newPop.setAgedChildIdx(population.getResult().get(0).getAgedChildIdx());
+				newPop.setCorpCnt(population.getResult().get(0).getCorpCnt());
+				newPop.setPpltnDnsty(population.getResult().get(0).getPpltnDnsty());
+				newPop.setTotHouse(population.getResult().get(0).getTotHouse());
+				newPop.setTotPpltn(population.getResult().get(0).getTotPpltn());
+				
+				houseMapper.insertPopulation(newPop);
+			}
+		}
+		
+	}
+	
 
 	@Transactional
 	protected HouseInfoTask insertHouseData(int lawdCd, int dealYmd, SseEmitter sseEmitter) throws Exception {
