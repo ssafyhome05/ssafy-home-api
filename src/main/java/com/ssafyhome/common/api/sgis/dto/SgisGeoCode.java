@@ -32,9 +32,9 @@ public class SgisGeoCode {
 			private String riNm;
 			private String roadNmSubNo;
 			private String sggCd;
-			private String admCd;
+			private String admCd;			// 행정동 코드
 			private String roadNmMainNo;
-			private String legCd;
+			private String legCd;			// 법정동 코드
 			private String roadNm;
 			private String bdMatches;
 			private String bdSubNm;
