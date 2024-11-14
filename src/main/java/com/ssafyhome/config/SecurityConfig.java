@@ -13,6 +13,7 @@ import com.ssafyhome.auth.service.CustomUserDetailsService;
 import com.ssafyhome.common.util.CookieUtil;
 import com.ssafyhome.common.util.ErrorUtil;
 import com.ssafyhome.common.util.JWTUtil;
+import com.ssafyhome.auth.repository.CustomAuthorizationRequestRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Value;
@@ -35,6 +36,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.security.web.authentication.logout.LogoutFilter;
 import org.springframework.web.cors.CorsConfiguration;
 
+import java.util.Arrays;
 import java.util.Collections;
 
 /**
@@ -150,7 +152,7 @@ public class SecurityConfig {
   private CorsConfiguration corsConfiguration(HttpServletRequest request) {
 
     CorsConfiguration corsConfiguration = new CorsConfiguration();
-    corsConfiguration.setAllowedOrigins(Collections.singletonList(frontEndUrl));
+    corsConfiguration.setAllowedOrigins(Arrays.asList(frontEndUrl, "http://localhost:9000", "http://localhost:9001"));
     corsConfiguration.setAllowedMethods(Collections.singletonList("*"));
     corsConfiguration.setAllowCredentials(true); // 쿠키 등의 자격증명 전송을 허용
     corsConfiguration.setAllowedHeaders(Collections.singletonList("*"));
@@ -170,7 +172,8 @@ public class SecurityConfig {
   public SecurityFilterChain securityFilterChain(
       HttpSecurity http,
       CustomOAuth2UserService customOAuth2UserService,
-      CustomOAuth2SuccessHandler customOAuth2SuccessHandler
+      CustomOAuth2SuccessHandler customOAuth2SuccessHandler,
+      CustomAuthorizationRequestRepository customAuthorizationRequestRepository
   ) throws Exception {
 
     /**
@@ -233,6 +236,9 @@ public class SecurityConfig {
         .userInfoEndpoint(userInfoEndpointConfig -> userInfoEndpointConfig
             .userService(customOAuth2UserService))
         .successHandler(customOAuth2SuccessHandler)
+        .authorizationEndpoint(endpoint -> endpoint
+            .authorizationRequestRepository(customAuthorizationRequestRepository)
+            .baseUri("/oauth2/authorization"))
     );
 
     /**
