@@ -50,6 +50,7 @@ public interface SGISClient {
 			@RequestParam("adm_cd")
 			String admCd,
 			// 행정동코드를 받아서 반환
+
 			
 			@RequestParam("low_search")
 			String lowSearch

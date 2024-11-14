@@ -1,8 +1,10 @@
 package com.ssafyhome.common.api.sgis.dto;
 
-import java.util.List;
 
+import java.util.List;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.ssafyhome.common.api.sgis.dto.SgisGeoCode.Result;
+
 
 import lombok.Data;
 
@@ -11,8 +13,9 @@ public class SgisPopulationCode {
 
 	
 	private String id;
+
 	private List<Result> result;
-	
+
 	@JsonProperty("errMsg")
 	private String errMsg;
 	
@@ -22,6 +25,7 @@ public class SgisPopulationCode {
 	@JsonProperty("trId")
 	private String trId;
 	
+
 	// 프로젝트에서는 3개의 지표 시각화
 	// 1. 총인구 totPpltn
 	// 2. 인구밀도 (소수점 두자리) ppltnDnsty
@@ -52,7 +56,7 @@ public class SgisPopulationCode {
 	    private String haesuogaPpltn;       // 해수면 어가 인구
 	    private String employeeCnt;         // 종업원수 (전체 사업체)
 	    private String corpCnt;             // 사업체수 (전체 사업체)
-	
+
 	}
 	
 }
