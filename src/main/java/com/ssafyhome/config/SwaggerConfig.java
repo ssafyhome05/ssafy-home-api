@@ -27,8 +27,19 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 @OpenAPIDefinition(
     info = @Info(
-        title = "ZIPCHACK",
-        description = "ssafy home 아파트 매매 정보 시스템"
+        title = "Zip-chack",
+        description = "# Zip-chack serviec APIs \n\n"
+        		+ "## 마음에 드는 집에 착! 집착 서비스 api sample 입니다. \n\n"
+        		+ "### 제공 API : \n\n"
+        		+ "1. 로그인 및 인증 관련 서비스 \n\n"
+        		+ "2. __Bookmark__ 즐겨찾기 서비스 \n\n"
+        		+ "3. __House__ 거래확인 및 요약그래프 서비스 \n\n"
+        		+ "4. __Navigate__ 매물과 bookmark 거리 확인 서비스 \n\n"
+        		+ "5. __Notice__ 공지사항 서비스 \n\n"
+        		+ "6. __Review__ 매물 평가 서비스 \n\n"
+        		+ "7. __Spot__ 특정 법정동 내 편의시설 확안 서비스 \n\n"
+        		+ "8. __User__ 관리 서비스"
+        		
     ),
     security = @SecurityRequirement(name = "bearerAuth")
 )
