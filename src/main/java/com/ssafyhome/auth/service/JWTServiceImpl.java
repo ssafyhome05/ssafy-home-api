@@ -55,12 +55,17 @@ public class JWTServiceImpl implements JWTService {
     }
 
     if (!jwtUtil.getKey(refreshToken, "category").equals("refresh") ||
-        !refreshTokenRepository.existsById(refreshToken) ||
-        jwtUtil.isExpired(refreshToken)
+        !refreshTokenRepository.existsById(refreshToken)
     ) {
       return "invalid refresh token";
     }
-    
+
+    try {
+      jwtUtil.isExpired(refreshToken);
+    } catch (Exception e) {
+      return "invalid refresh token";
+    }
+
     return null;
   }
 
