@@ -3,6 +3,7 @@ package com.ssafyhome.common.util;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.security.SignatureException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -27,7 +28,7 @@ public class JWTUtil {
     );
   }
 
-  public Claims parseToken(String token) {
+  public Claims parseToken(String token) throws SignatureException {
 
     return Jwts.parser()
         .verifyWith(secretKey)
@@ -37,18 +38,17 @@ public class JWTUtil {
   }
 
   public String getKey(String token, String key) {
-
-    return parseToken(token).get(key, String.class);
+    try {
+      return parseToken(token).get(key, String.class);
+    } catch (SignatureException e) {
+      return null;
+    }
   }
 
-  public Boolean isExpired(String token) {
+  public Boolean isExpired(String token) throws ExpiredJwtException, SignatureException {
 
-    try {
       Date expiration = parseToken(token).getExpiration();
       return expiration.before(new Date());
-    } catch (ExpiredJwtException e) {
-      return true;
-    }
   }
 
   public String createJWT(String category, String userSeq, String userEmail, Long expiration) {

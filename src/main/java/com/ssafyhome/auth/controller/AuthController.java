@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -50,14 +51,14 @@ public class AuthController {
           name = "refresh token",
           description = "JWT Refresh Token"
       )
-      @CookieValue(value = "refreshToken", defaultValue = "no_refresh_token")
+      @CookieValue(value = "refresh", defaultValue = "no_refresh_token")
       String refreshToken
   ) {
 
     JwtDto jwtDto = jwtService.reissueRefreshToken(refreshToken);
-    ResponseEntity<?> responseEntity = new ResponseEntity<>("reissue jwt tokens", HttpStatus.CREATED);
-    responseEntity.getHeaders().add("Authorization", "Bearer " + jwtDto.getAccessToken());
-    responseEntity.getHeaders().add("Cookie", cookieUtil.convertToString(jwtDto.getRefreshToken()));
-    return responseEntity;
+    HttpHeaders headers = new HttpHeaders();
+    headers.add("Authorization", "Bearer " + jwtDto.getAccessToken());
+    headers.add(HttpHeaders.SET_COOKIE, cookieUtil.convertToString(jwtDto.getRefreshToken()));
+    return new ResponseEntity<>("reissue jwt tokens", headers, HttpStatus.CREATED);
   }
 }
