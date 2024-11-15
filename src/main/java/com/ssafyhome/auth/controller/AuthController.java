@@ -5,6 +5,8 @@ import com.ssafyhome.auth.service.JWTService;
 import com.ssafyhome.common.util.CookieUtil;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -34,14 +36,19 @@ public class AuthController {
   
   
   @Operation(
-      summary = "refresh token을 재발급함",
-      description = "Authorization에 access token, Cookie에 refresh token을 삽입하여 반환"
+      summary = "Refresh Token 재발급",
+      description = "### 사용자의 refreshToken 을 활용해 accessToken을 재발급합니다. \n\n"
+      		+ "1. 사용자 Header에  Authorization에 갱신된 access token 추가 \n\n"
+      		+ "2. Cookie에 갱신된 refresh token 추가"
   )
+  @ApiResponses({
+	  @ApiResponse(responseCode = "201", description="accessToken 재발급 완료")
+  })
   @PostMapping("/reissue")
   public ResponseEntity<?> reissue(
       @Parameter(
           name = "refresh token",
-          description = "access token을 재발급하기 위한 jwt토큰"
+          description = "JWT Refresh Token"
       )
       @CookieValue(value = "refreshToken", defaultValue = "no_refresh_token")
       String refreshToken

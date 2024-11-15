@@ -76,17 +76,19 @@ public class SwaggerConfig {
      * Swagger에 들어갈 명령 덩어리 생성하는 과정
      */
     Operation loginOperation = new Operation()
-        .addTagsItem("Authentication")
-        .summary("로그인을 통한 jwt token 발급")
-        .description("Authorization에 access token, Cookie에 refresh token을 삽입하여 반환")
+        .addTagsItem("Authentication Controller")
+        .summary("로그인 성공 시 JWT 발급")
+        .description("### 로그인에 성공하면 사용자에게 JWT를 발급합니다. \n\n"
+        		+ "1. Authorization > access token 추가 \n\n "
+        		+ "2. Cookie        > refresh token 추가 ")
         .requestBody(new RequestBody()
             .content(new Content()
                 .addMediaType("application/x-www-form-urlencoded",
                     new MediaType()
                         .schema(new Schema<>()
                             .type("object")
-                            .addProperties("username", new Schema<>().type("string"))
-                            .addProperties("password", new Schema<>().type("string"))
+                            .addProperties("id", new Schema<>().type("string").description("사용자의 아이디"))
+                            .addProperties("password", new Schema<>().type("string").description("사용자의 비밀번호"))
                         )
                 )
             )
