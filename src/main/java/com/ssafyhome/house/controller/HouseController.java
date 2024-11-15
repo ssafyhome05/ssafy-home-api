@@ -25,6 +25,7 @@ import com.ssafyhome.house.service.HouseService;
 import com.ssafyhome.spot.dto.LocationStatusDto;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 
@@ -53,7 +54,7 @@ public class HouseController {
 	)
 	@GetMapping("/deal/during")
 	public ResponseEntity<List<HouseDealDto>> getHouseDealsWithTimes(
-			@RequestParam
+			@RequestParam()
 			String houseSeq,
 
 			@RequestParam
@@ -73,9 +74,15 @@ public class HouseController {
 	)
 	@GetMapping("/detail/status")
 	public ResponseEntity<List<HouseGraphDto>> getGraphInfo(
-			@RequestParam
+			@Parameter(
+			          name = "houseSeq"
+			      )
+			@RequestParam("houseSeq")
 			String houseSeq,
-			@RequestParam
+			@Parameter(
+			          name = "year"
+			      )
+			@RequestParam("year")
 			int year
 	) {
 
@@ -88,11 +95,11 @@ public class HouseController {
 	)
 	@GetMapping("/deal")
 	public ResponseEntity<List<HouseDealDto>> getHouseDeals(
-			@RequestParam
+			@RequestParam("houseSeq")
 			String houseSeq,
-			@RequestParam
+			@RequestParam("page")
 			int page,
-			@RequestParam
+			@RequestParam("limit")
 			int limit
 	) {
 
@@ -105,7 +112,10 @@ public class HouseController {
 	)
 	@GetMapping("/detail")
 	public ResponseEntity<HouseDetailDto> getHouseInfoDetail(
-			@RequestParam
+			@Parameter(
+			          name = "dongCode"
+			      )
+			@RequestParam("dongcode")
 			String dongCode
 	) {
 
@@ -118,7 +128,10 @@ public class HouseController {
 	)
 	@GetMapping("/status")
 	public ResponseEntity<LocationStatusDto> getHouseStatus(
-			@RequestParam
+			@Parameter(
+			          name = "dongCode"
+			      )
+			@RequestParam("dongcode")
 			String dongCode
 	) {
 
@@ -171,7 +184,10 @@ public class HouseController {
 	)
 	@GetMapping("/polygon")
 	public List<Point> getDongPolygon(
-			@RequestParam
+			@RequestParam("dongCode")
+			@Parameter(
+			          name = "dongCode"
+			      )
 			String dongCode
 	){
 		List<Point> dongPolygonList = geometryUtil.getPoints(geometryMapper.selectByDongCode(dongCode));
@@ -206,7 +222,10 @@ public class HouseController {
 	@GetMapping("/task/{requestId}/status")
 //	@PreAuthorize("hasRole('ROLE_ADMIN')")
 	public SseEmitter subscribeHouseInfoProcess(
-			@PathVariable
+			@Parameter(
+			          name = "requestId"
+			      )
+			@PathVariable("requestId")
 			String requestId
 	) {
 

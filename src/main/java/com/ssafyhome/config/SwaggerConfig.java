@@ -67,7 +67,7 @@ public class SwaggerConfig {
      * 태그를 통해서 각 컨트롤러마다 탭을 나눌 수 있다
      * 태그 자체를 추가하는 과정
      */
-    openAPI.addTagsItem(new Tag().name("Authentication").description("인증 및 인가"));
+    openAPI.addTagsItem(new Tag().name("Authentication Controller").description("인증 및 인가"));
 
     PathItem loginPath = new PathItem();
     
