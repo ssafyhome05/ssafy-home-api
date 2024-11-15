@@ -3,6 +3,10 @@ package com.ssafyhome.user.controller;
 import com.ssafyhome.user.dto.*;
 import com.ssafyhome.user.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -28,8 +32,15 @@ public class UserController {
 
 	@Operation(
 			summary = "회원가입",
-			description = "UserDto를 받아 회원 등록"
+			description = "UserDto를 받아 회원을 등록합니다."
 	)
+	@ApiResponses({
+		@ApiResponse(responseCode = "201", description="회원가입 완료"),
+		@ApiResponse(responseCode = "400", description="비밀번호 비일치"),
+		@ApiResponse(responseCode = "500", description="형식에 맞지 않는 데이터 \n\n"
+				+ "1. 형식에 맞지 않는 전화번호"
+				+ "2. 중복 아이디")
+	  })
 	@PostMapping("")
 	public ResponseEntity<?> addUser(
 			@RequestBody
@@ -65,16 +76,24 @@ public class UserController {
 
 	@Operation(
 			summary = "이메일 전송",
-			description = "String 객체의 email 받아 이메일 전송"
+			description = "String 객체의 email 받아 인증번호를 전송합니다."
 	)
+	  @ApiResponses({
+		  @ApiResponse(responseCode = "200", description="이메일 전송 완료")
+	  })
+
 	@PostMapping("/send/mail")
 	public ResponseEntity<?> sendEmail(
 			@RequestBody
+			@Schema(
+			        description = "이메일 주소",
+			        example = "x22z@naver.com"  // 예시 값 설정
+			    )
 			String email
 	) {
 
 		userService.sendEmail(email);
-		return new ResponseEntity<>("send Email success", HttpStatus.CREATED);
+		return new ResponseEntity<>("send Email success", HttpStatus.OK);
 	}
 
 	@Operation(
@@ -107,14 +126,26 @@ public class UserController {
 
 	@Operation(
 			summary = "이메일 확인",
-			description = "String 객체의 key 와 email 받아 이메일 확인"
+			description = "String 객체의 key 와 email 받아 이메일을 확인합니다."
 	)
+	  @ApiResponses({
+		  @ApiResponse(responseCode = "500", description="유효하지 않은 이메일인 경우, Optional error")
+	  })
+
 	@GetMapping("/check/mail")
 	public ResponseEntity<?> checkEmailSecret(
-			@RequestParam
+			@Parameter(
+			          name = "email",
+			          description = "secret key 를 전송한 mail"
+			      )
+			@RequestParam(value="email")
 			String email,
 
-			@RequestParam
+			@Parameter(
+			          name = "key",
+			          description = "메일에 전송된 secret key"
+			      )
+			@RequestParam(value="key")
 			String key
 	) {
 
@@ -123,11 +154,16 @@ public class UserController {
 
 	@Operation(
 			summary = "아이디 중복확인",
-			description = "String 객체의 userId 받아 중복확인"
+			description = "String 객체의 userId 받아 기존에 있는 id인지 확인합니다."
 	)
 	@GetMapping("/check/duplicate")
 	public ResponseEntity<?> checkIdDuplicate(
 			@RequestParam
+			@Parameter(
+			          name = "id",
+			          description = "user id"
+			      )
+
 			String userId
 	) {
 
