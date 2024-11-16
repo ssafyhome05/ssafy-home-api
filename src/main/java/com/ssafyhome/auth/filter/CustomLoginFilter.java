@@ -61,17 +61,12 @@ public class CustomLoginFilter extends UsernamePasswordAuthenticationFilter {
 		headers.add(HttpHeaders.AUTHORIZATION, "Bearer " + jwtDto.getAccessToken());
 		headers.add(HttpHeaders.SET_COOKIE, jwtDto.getAccessToken());
 
-		ResponseMessage.builder()
-				.responseCode(AuthResponseCode.LOGIN_SUCCESS)
-				.headers(headers)
-				.build().setResponse(response);
+		ResponseMessage.setHeadersResponse(response, AuthResponseCode.LOGIN_SUCCESS, headers);
 	}
 
 	@Override
 	protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response, AuthenticationException failed) throws IOException, ServletException {
 
-		ResponseMessage.builder()
-				.responseCode(AuthResponseCode.FAIL_TO_LOGIN)
-				.build().setResponse(response);
+		ResponseMessage.setBasicResponse(response, AuthResponseCode.FAIL_TO_LOGIN);
 	}
 }

@@ -62,9 +62,6 @@ public class AuthController {
     headers.add(HttpHeaders.AUTHORIZATION, "Bearer " + jwtDto.getAccessToken());
     headers.add(HttpHeaders.SET_COOKIE, cookieUtil.convertToString(jwtDto.getRefreshToken()));
 
-    return ResponseMessage.builder()
-        .responseCode(AuthResponseCode.TOKEN_REISSUED)
-        .headers(headers)
-        .build().responseEntity();
+    return ResponseMessage.responseHeadersEntity(AuthResponseCode.TOKEN_REISSUED, headers);
   }
 }

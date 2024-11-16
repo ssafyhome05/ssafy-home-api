@@ -28,23 +28,13 @@ public class PreAuthorizeExceptionHandler {
 	@Bean
 	public AccessDeniedHandler customAccessDeniedHandler() {
 
-		return (request, response, exception) -> {
-			ResponseMessage.builder()
-					.responseCode(AuthResponseCode.METHOD_FORBIDDEN)
-					.data(getErrorDetails(request, exception))
-					.build().setResponse(response);
-		};
+		return (request, response, exception) -> ResponseMessage.setDataResponse(response, AuthResponseCode.METHOD_FORBIDDEN, getErrorDetails(request, exception));
 	}
 
 	@Bean
 	public AuthenticationEntryPoint customAuthenticationEntryPoint() {
 
-		return (request, response, exception) -> {
-			ResponseMessage.builder()
-					.responseCode(AuthResponseCode.METHOD_UNAUTHORIZED)
-					.data(getErrorDetails(request, exception))
-					.build().setResponse(response);
-		};
+		return (request, response, exception) -> ResponseMessage.setDataResponse(response, AuthResponseCode.METHOD_UNAUTHORIZED, getErrorDetails(request, exception));
 	}
 
 	public Map<String, Object> getErrorDetails(HttpServletRequest request, Exception exception) {

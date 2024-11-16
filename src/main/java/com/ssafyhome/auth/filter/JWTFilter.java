@@ -48,9 +48,7 @@ public class JWTFilter extends OncePerRequestFilter {
 
 		if (!authorizationHeader.startsWith("Bearer ")) {
 
-			ResponseMessage.builder()
-					.responseCode(AuthResponseCode.INVALID_JWT_TOKEN)
-					.build().setResponse(response);
+			ResponseMessage.setBasicResponse(response,AuthResponseCode.INVALID_JWT_TOKEN);
 			return;
 		}
 
@@ -59,15 +57,12 @@ public class JWTFilter extends OncePerRequestFilter {
 		try {
 			jwtUtil.isExpired(accessToken);
 		} catch (ExpiredJwtException e) {
-			ResponseMessage.builder()
-					.responseCode(AuthResponseCode.ACCESS_TOKEN_EXPIRED)
-					.build().setResponse(response);
 
+			ResponseMessage.setBasicResponse(response, AuthResponseCode.ACCESS_TOKEN_EXPIRED);
 			return;
 		} catch (SignatureException e) {
-			ResponseMessage.builder()
-					.responseCode(AuthResponseCode.INVALID_JWT_TOKEN)
-					.build().setResponse(response);
+
+			ResponseMessage.setBasicResponse(response, AuthResponseCode.INVALID_JWT_TOKEN);
 			return;
 		}
 
@@ -80,9 +75,7 @@ public class JWTFilter extends OncePerRequestFilter {
 
 		if (!category.equals("access") || userEntity == null) {
 
-			ResponseMessage.builder()
-					.responseCode(AuthResponseCode.INVALID_JWT_TOKEN)
-					.build().setResponse(response);
+			ResponseMessage.setBasicResponse(response, AuthResponseCode.INVALID_JWT_TOKEN);
 			return;
 		}
 

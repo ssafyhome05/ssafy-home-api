@@ -57,9 +57,6 @@ public class CustomLogoutFilter extends GenericFilterBean {
 		HttpHeaders headers = new HttpHeaders();
 		headers.add(HttpHeaders.SET_COOKIE, cookieUtil.convertToString(cookieUtil.deleteCookie("refresh")));
 
-		ResponseMessage.builder()
-				.responseCode(AuthResponseCode.LOGOUT_SUCCESS)
-				.headers(headers)
-				.build().setResponse(response);
+		ResponseMessage.setHeadersResponse(response, AuthResponseCode.LOGOUT_SUCCESS, headers);
 	}
 }
