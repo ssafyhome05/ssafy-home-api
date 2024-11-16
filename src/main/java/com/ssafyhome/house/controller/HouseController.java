@@ -134,39 +134,12 @@ public class HouseController {
 			description = ""
 	)
 	@GetMapping("")
-	public ResponseEntity<List<HouseDto>> getHouseInfo(
-			@RequestParam("dongCode") 
-			String dongCode,
-			@RequestParam(value = "startDate", required = false) 
-			String startDate,
-			@RequestParam(value = "endDate", required = false) 
-			String endDate,
-			@RequestParam(value = "keyWord", required = false) String keyWord
+	public ResponseEntity<ResponseMessage.CustomMessage> getHouseInfo(
+			@RequestParam
+			HouseSearchWithTimeDto searchDto
 	) {
-		Map<String, Object> params = new HashMap<>();
-		params.put("dongCode", dongCode);
 
-		if (startDate != null && !startDate.isEmpty()) {
-			String[] start = startDate.split("-");
-			params.put("startYear", start[0]);
-			params.put("startMonth", start[1]);
-		}else{
-			params.put("startYear", "");
-			params.put("startMonth", "");
-		}
-
-		if (endDate != null && !endDate.isEmpty()) {
-			String[] end = endDate.split("-");
-			params.put("endYear", end[0]);
-			params.put("endMonth", end[1]);
-		} else{
-			params.put("endYear", "");
-			params.put("endMonth", "");
-		}
-		params.put("keyWord", keyWord);
-
-		return new ResponseEntity<>(houseService.getHouseInfo(params), HttpStatus.OK);
-//		return new ResponseEntity<>(houseService.getHouseInfo(dongCode), HttpStatus.OK);
+		return ResponseMessage.responseDataEntity(HouseResoponseCode.OK, houseService.getHouseInfo(searchDto));
 	}
 
 	@Operation(
