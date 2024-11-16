@@ -1,5 +1,6 @@
 package com.ssafyhome.auth.service;
 
+import com.ssafyhome.common.exception.ExpiredRefreshException;
 import com.ssafyhome.common.exception.InvalidJwtException;
 import com.ssafyhome.auth.dao.RefreshTokenRepository;
 import com.ssafyhome.auth.dto.JwtDto;
@@ -31,10 +32,7 @@ public class JWTServiceImpl implements JWTService {
   @Override
   public JwtDto reissueRefreshToken(String refreshToken) {
 
-    String RefreshTokenError = checkRefreshTokenError(refreshToken);
-    if (RefreshTokenError != null) {
-      throw new InvalidJwtException(RefreshTokenError);
-    }
+    checkRefreshTokenError(refreshToken);
 
     String userSeq = jwtUtil.getKey(refreshToken, "userSeq");
     String userEmail = jwtUtil.getKey(refreshToken, "userEmail");
@@ -48,25 +46,23 @@ public class JWTServiceImpl implements JWTService {
   }
 
   @Override
-  public String checkRefreshTokenError(String refreshToken) {
+  public void checkRefreshTokenError(String refreshToken) {
 
     if (refreshToken == null || refreshToken.equals("no_refresh_token")) {
-      return "refresh token not found";
+      throw new InvalidJwtException(refreshToken);
     }
 
     if (!jwtUtil.getKey(refreshToken, "category").equals("refresh") ||
         !refreshTokenRepository.existsById(refreshToken)
     ) {
-      return "invalid refresh token";
+      throw new InvalidJwtException(refreshToken);
     }
 
     try {
       jwtUtil.isExpired(refreshToken);
     } catch (Exception e) {
-      return "invalid refresh token";
+      throw new ExpiredRefreshException();
     }
-
-    return null;
   }
 
   @Override

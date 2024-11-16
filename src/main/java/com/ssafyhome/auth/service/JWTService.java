@@ -9,7 +9,7 @@ public interface JWTService {
 
   void saveRefreshTokenToRedis(String refreshToken, String userSeq);
 
-  String checkRefreshTokenError(String refreshToken);
+  void checkRefreshTokenError(String refreshToken);
 
   JwtDto setTokens(String userSeq, String userEmail);
 

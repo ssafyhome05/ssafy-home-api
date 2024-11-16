@@ -1,6 +1,8 @@
 package com.ssafyhome.user.controller;
 
+import com.ssafyhome.common.response.ResponseMessage;
 import com.ssafyhome.user.dto.*;
+import com.ssafyhome.user.response.UserResponseCode;
 import com.ssafyhome.user.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -124,8 +126,8 @@ public class UserController {
 			description = "userSeq 에 해당하는 UserDto 를 반환합니다."
 	)
 	@GetMapping("")
-	//@PreAuthorize("hasRole('ROLE_ADMIN') or  #userSeq == authentication.name")
-	public ResponseEntity<UserDto> getUserInfo(
+	@PreAuthorize("hasRole('ROLE_ADMIN') or  #userSeq == authentication.name")
+	public ResponseEntity<ResponseMessage.CustomMessage> getUserInfo(
 			@Parameter(
 			          name = "userSeq"
 			      )
@@ -133,7 +135,10 @@ public class UserController {
 			String userSeq
 	) {
 
-		return new ResponseEntity<>(userService.getUserInfo(userSeq), HttpStatus.OK);
+		return ResponseMessage.builder()
+				.responseCode(UserResponseCode.OK)
+				.data(userService.getUserInfo(userSeq))
+				.build().responseEntity();
 	}
 
 	@GetMapping("/info")

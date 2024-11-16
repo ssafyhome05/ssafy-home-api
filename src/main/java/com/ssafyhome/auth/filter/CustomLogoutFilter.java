@@ -1,7 +1,9 @@
 package com.ssafyhome.auth.filter;
 
 import com.ssafyhome.auth.dao.RefreshTokenRepository;
+import com.ssafyhome.auth.response.AuthResponseCode;
 import com.ssafyhome.auth.service.JWTService;
+import com.ssafyhome.common.response.ResponseMessage;
 import com.ssafyhome.common.util.CookieUtil;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -9,7 +11,7 @@ import jakarta.servlet.ServletRequest;
 import jakarta.servlet.ServletResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpHeaders;
 import org.springframework.web.filter.GenericFilterBean;
 
 import java.io.IOException;
@@ -47,13 +49,17 @@ public class CustomLogoutFilter extends GenericFilterBean {
 		}
 
 		String refreshToken = jwtService.getRefreshToken(request);
-		if (jwtService.checkRefreshTokenError(refreshToken) != null) {
-			response.setStatus(HttpStatus.BAD_REQUEST.value());
-			return;
-		}
+		try {
+			jwtService.checkRefreshTokenError(refreshToken);
+			refreshTokenRepository.deleteById(refreshToken);
+		} catch (Exception e) {}
 
-		refreshTokenRepository.deleteById(refreshToken);
-		response.addCookie(cookieUtil.deleteCookie("refresh"));
-		response.setStatus(HttpStatus.OK.value());
+		HttpHeaders headers = new HttpHeaders();
+		headers.add(HttpHeaders.SET_COOKIE, cookieUtil.convertToString(cookieUtil.deleteCookie("refresh")));
+
+		ResponseMessage.builder()
+				.responseCode(AuthResponseCode.LOGOUT_SUCCESS)
+				.headers(headers)
+				.build().setResponse(response);
 	}
 }
