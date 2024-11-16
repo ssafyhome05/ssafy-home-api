@@ -13,7 +13,7 @@ public interface UserService {
   UserDto getUserInfo(String userSeq);
   List<UserDto> getUserList(UserSearchDto userSearchDto);
   String checkEmailSecret(EmailSecretDto emailSecretDto);
-  boolean checkIdDuplicate(String id);
+  void checkIdDuplicate(String id);
   void changePassword(String userSeq, PasswordDto passwordDto);
   void updateUser(long userSeq, UserDto userDto);
   void deleteUser(long userSeq);

@@ -5,6 +5,7 @@ import com.ssafyhome.auth.exception.ExpiredRefreshException;
 import com.ssafyhome.auth.exception.InvalidJwtException;
 import com.ssafyhome.auth.response.AuthResponseCode;
 import com.ssafyhome.common.response.ResponseMessage;
+import com.ssafyhome.user.exception.*;
 import com.ssafyhome.user.response.UserResponseCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mail.MailSendException;
@@ -52,5 +53,10 @@ public class GlobalExceptionHandler {
   @ExceptionHandler(ExpiredRefreshException.class)
   public ResponseEntity<ResponseMessage.CustomMessage> handleExpiredJwtException(ExpiredRefreshException e) {
     return ResponseMessage.responseBasicEntity(AuthResponseCode.REFRESH_TOKEN_EXPIRED);
+  }
+
+  @ExceptionHandler(UserNotFoundException.class)
+  public ResponseEntity<ResponseMessage.CustomMessage> handleUserNotFoundException(UserNotFoundException e) {
+    return ResponseMessage.responseBasicEntity(UserResponseCode.USER_NOT_FOUND);
   }
 }
