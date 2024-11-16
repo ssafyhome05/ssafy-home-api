@@ -1,6 +1,7 @@
 package com.ssafyhome.auth.filter;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ssafyhome.auth.response.AuthResponseCode;
+import com.ssafyhome.common.response.ResponseMessage;
 import com.ssafyhome.user.dao.UserMapper;
 import com.ssafyhome.user.entity.UserEntity;
 import com.ssafyhome.auth.service.CustomUserDetailsService;
@@ -17,8 +18,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 
 public class JWTFilter extends OncePerRequestFilter {
 
@@ -49,7 +48,7 @@ public class JWTFilter extends OncePerRequestFilter {
 
 		if (!authorizationHeader.startsWith("Bearer ")) {
 
-			response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+			ResponseMessage.setBasicResponse(response,AuthResponseCode.INVALID_JWT_TOKEN);
 			return;
 		}
 
@@ -58,17 +57,12 @@ public class JWTFilter extends OncePerRequestFilter {
 		try {
 			jwtUtil.isExpired(accessToken);
 		} catch (ExpiredJwtException e) {
-			response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-			Map<String, Object> errorDetails = new HashMap<>();
-			errorDetails.put("message", "Token has expired");
-			errorDetails.put("status", HttpServletResponse.SC_UNAUTHORIZED);
 
-			ObjectMapper mapper = new ObjectMapper();
-			mapper.writeValue(response.getWriter(), errorDetails);
-
+			ResponseMessage.setBasicResponse(response, AuthResponseCode.ACCESS_TOKEN_EXPIRED);
 			return;
 		} catch (SignatureException e) {
-			response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+
+			ResponseMessage.setBasicResponse(response, AuthResponseCode.INVALID_JWT_TOKEN);
 			return;
 		}
 
@@ -81,7 +75,7 @@ public class JWTFilter extends OncePerRequestFilter {
 
 		if (!category.equals("access") || userEntity == null) {
 
-			response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+			ResponseMessage.setBasicResponse(response, AuthResponseCode.INVALID_JWT_TOKEN);
 			return;
 		}
 

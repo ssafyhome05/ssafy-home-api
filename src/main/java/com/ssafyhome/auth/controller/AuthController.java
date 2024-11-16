@@ -1,7 +1,9 @@
 package com.ssafyhome.auth.controller;
 
 import com.ssafyhome.auth.dto.JwtDto;
+import com.ssafyhome.auth.response.AuthResponseCode;
 import com.ssafyhome.auth.service.JWTService;
+import com.ssafyhome.common.response.ResponseMessage;
 import com.ssafyhome.common.util.CookieUtil;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -9,7 +11,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -56,9 +57,11 @@ public class AuthController {
   ) {
 
     JwtDto jwtDto = jwtService.reissueRefreshToken(refreshToken);
+
     HttpHeaders headers = new HttpHeaders();
-    headers.add("Authorization", "Bearer " + jwtDto.getAccessToken());
+    headers.add(HttpHeaders.AUTHORIZATION, "Bearer " + jwtDto.getAccessToken());
     headers.add(HttpHeaders.SET_COOKIE, cookieUtil.convertToString(jwtDto.getRefreshToken()));
-    return new ResponseEntity<>("reissue jwt tokens", headers, HttpStatus.CREATED);
+
+    return ResponseMessage.responseHeadersEntity(AuthResponseCode.TOKEN_REISSUED, headers);
   }
 }

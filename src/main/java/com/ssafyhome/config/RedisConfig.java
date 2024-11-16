@@ -57,7 +57,7 @@ public class RedisConfig {
    * Redisson을 이용해서 분산락을 걸고 Task가 성공됨을 저장하는 Repository를 따로 안만들고 Templete을 활용하기 위
    * */
   @Bean
-  public RedisTemplate<String, Object> redisTemplat함() {
+  public RedisTemplate<String, Object> redisTemplate() {
 
     RedisTemplate<String, Object> template = new RedisTemplate<>();
     template.setConnectionFactory(redisConnectionFactory());
