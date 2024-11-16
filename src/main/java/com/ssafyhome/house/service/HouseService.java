@@ -18,7 +18,7 @@ public interface HouseService {
     List<HouseGraphDto> getHouseGraph(String houseSeq, int year);
 
     String startHouseInfoTask(int dealYmd, int startCd, int endCd);
-    String startPopulationTask(String year);
+    void startPopulationTask(String year);
 
     SseEmitter getSseEmitter(String requestId);
 }

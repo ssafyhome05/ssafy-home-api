@@ -204,12 +204,9 @@ public class HouseController {
 	)
 	@GetMapping("/admin/register")
 //	@PreAuthorize("hasRole('ROLE_ADMIN')")
-	public ResponseEntity<?> updatePopulationInfo() {
+	public ResponseEntity<ResponseMessage.CustomMessage> updatePopulationInfo() {
 
-		String result = houseService.startPopulationTask("2022");
-		if (!result.equals("success")) {
-			//excpeion 구현 필요
-		}
-		return new ResponseEntity<>("success", HttpStatus.CREATED);
+		houseService.startPopulationTask("2022");
+		return ResponseMessage.responseBasicEntity(HouseResoponseCode.POPULATION_UPDATED);
 	}
 }

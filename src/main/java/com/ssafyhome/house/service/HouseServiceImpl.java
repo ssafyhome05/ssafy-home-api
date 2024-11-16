@@ -11,16 +11,13 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import com.ssafyhome.house.dto.HouseGraphDto;
+import com.ssafyhome.house.dto.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import com.ssafyhome.common.exception.GonggongApplicationErrorException;
 import com.ssafyhome.house.dao.HouseMapper;
-import com.ssafyhome.house.dto.HouseDealDto;
-import com.ssafyhome.house.dto.HouseDto;
-import com.ssafyhome.house.dto.HouseInfoTask;
 import com.ssafyhome.house.entity.PopulationEntity;
 
 @Service
@@ -50,9 +47,9 @@ public class HouseServiceImpl implements HouseService {
 	}
 
 	@Override
-	public List<HouseDto> getHouseInfo(Map<String, Object> params) {
+	public List<HouseDto> getHouseInfo(HouseSearchWithTimeDto searchDto) {
 
-		List<HouseDto> houseInfoList = houseMapper.getHouseInfo(params);
+		List<HouseDto> houseInfoList = houseMapper.getHouseInfo(searchDto);
 
 		return houseInfoList;
 	}
@@ -79,17 +76,10 @@ public class HouseServiceImpl implements HouseService {
 	 *  SGISClient 사용
 	 */
 	@Override
-	
-	public String startPopulationTask(String year) {
-		
-		
+	public void startPopulationTask(String year) {
+
 		List<PopulationEntity> popList = houseMapper.getPopulationList();
-		
-		houseInternalService.getPopulation(popList,  year);
-		
-		
-		
-		return "success";
+		houseInternalService.getPopulation(popList, year);
 	}
 	
 	
