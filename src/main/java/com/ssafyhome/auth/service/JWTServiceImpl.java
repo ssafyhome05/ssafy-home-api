@@ -1,7 +1,7 @@
 package com.ssafyhome.auth.service;
 
-import com.ssafyhome.common.exception.ExpiredRefreshException;
-import com.ssafyhome.common.exception.InvalidJwtException;
+import com.ssafyhome.auth.exception.ExpiredRefreshException;
+import com.ssafyhome.auth.exception.InvalidJwtException;
 import com.ssafyhome.auth.dao.RefreshTokenRepository;
 import com.ssafyhome.auth.dto.JwtDto;
 import com.ssafyhome.auth.entity.RefreshTokenEntity;

@@ -1,7 +1,9 @@
 package com.ssafyhome.common.handler;
 
+import com.ssafyhome.auth.exception.AccessTokenExpiredException;
+import com.ssafyhome.auth.exception.ExpiredRefreshException;
+import com.ssafyhome.auth.exception.InvalidJwtException;
 import com.ssafyhome.auth.response.AuthResponseCode;
-import com.ssafyhome.common.exception.*;
 import com.ssafyhome.common.response.ResponseMessage;
 import com.ssafyhome.user.response.UserResponseCode;
 import org.springframework.http.ResponseEntity;
