@@ -1,21 +1,19 @@
 package com.ssafyhome.config;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ssafyhome.auth.handler.CustomOAuth2SuccessHandler;
 import com.ssafyhome.auth.filter.CustomLoginFilter;
 import com.ssafyhome.auth.filter.CustomLogoutFilter;
 import com.ssafyhome.auth.filter.JWTFilter;
+import com.ssafyhome.auth.handler.PreAuthorizeExceptionHandler;
 import com.ssafyhome.user.dao.UserMapper;
 import com.ssafyhome.auth.dao.RefreshTokenRepository;
 import com.ssafyhome.auth.service.JWTService;
 import com.ssafyhome.auth.service.CustomOAuth2UserService;
 import com.ssafyhome.auth.service.CustomUserDetailsService;
 import com.ssafyhome.common.util.CookieUtil;
-import com.ssafyhome.common.util.ErrorUtil;
 import com.ssafyhome.common.util.JWTUtil;
 import com.ssafyhome.auth.repository.CustomAuthorizationRequestRepository;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -29,9 +27,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.logout.LogoutFilter;
 import org.springframework.web.cors.CorsConfiguration;
@@ -55,32 +51,32 @@ public class SecurityConfig {
 
   private final AuthenticationConfiguration authenticationConfiguration;
   private final RefreshTokenRepository refreshTokenRepository;
+  private final PreAuthorizeExceptionHandler preAuthorizeExceptionHandler;
   private final UserMapper userMapper;
   private final JWTService jwtService;
   private final JWTUtil jwtUtil;
   private final CookieUtil cookieUtil;
-  private final ErrorUtil errorUtil;
   private final CustomUserDetailsService userDetailsService;
 
   
   public SecurityConfig(
       AuthenticationConfiguration authenticationConfiguration,
       RefreshTokenRepository refreshTokenRepository,
+      PreAuthorizeExceptionHandler preAuthorizeExceptionHandler,
       UserMapper userMapper,
       JWTService jwtService,
       JWTUtil jwtUtil,
       CookieUtil cookieUtil,
-      ErrorUtil errorUtil,
       CustomUserDetailsService userDetailsService
   ) {
 
     this.authenticationConfiguration = authenticationConfiguration;
     this.refreshTokenRepository = refreshTokenRepository;
+    this.preAuthorizeExceptionHandler = preAuthorizeExceptionHandler;
     this.userMapper = userMapper;
     this.jwtService = jwtService;
     this.jwtUtil = jwtUtil;
     this.cookieUtil = cookieUtil;
-    this.errorUtil = errorUtil;
     this.userDetailsService = userDetailsService;
   }
 
@@ -110,41 +106,6 @@ public class SecurityConfig {
     String hierarchy = "ROLE_ADMIN > ROLE_MANAGER > ROLE_USER";
     return RoleHierarchyImpl.fromHierarchy(hierarchy);
   }
-
-  /**
-   * @PreAuthorize의 경우 Filter단에서 권한을 처리하므로 ControllerAdvice를 통한 Handling에 어려움이 있음
-   * 그래서 따로 인증 및 권한 오류를 핸들링 하기 위해 빈으로 등록
-   * - customAccessDeniedHandler - 403 Forbidden
-   * - customAuthenticationEntryPoint - 401 Unauthorized
-   */
-  @Bean
-  public AccessDeniedHandler customAccessDeniedHandler() {
-
-    return (request, response, accessDeniedException) -> {
-      response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-      response.setContentType("application/json;charset=UTF-8");
-
-      ObjectMapper mapper = new ObjectMapper();
-      String jsonResponse = mapper.writeValueAsString(errorUtil.getErrorDetails(request, accessDeniedException));
-      response.getWriter().write(jsonResponse);
-    };
-  }
-
-  
-  
-  @Bean
-  public AuthenticationEntryPoint customAuthenticationEntryPoint() {
-
-    return (request, response, authException) -> {
-      response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-      response.setContentType("application/json;charset=UTF-8");
-
-      ObjectMapper mapper = new ObjectMapper();
-      String jsonResponse = mapper.writeValueAsString(errorUtil.getErrorDetails(request, authException));
-      response.getWriter().write(jsonResponse);
-    };
-  }
-
   
   /**
    * Spring Security에서의 Cors권한 설정
@@ -188,8 +149,8 @@ public class SecurityConfig {
      * 메서드 접근 불가시 종류에 따라서 custom bean에 따라 로직 수행
      */
     http.exceptionHandling((exceptionHandling) -> exceptionHandling
-        .accessDeniedHandler(customAccessDeniedHandler())
-        .authenticationEntryPoint(customAuthenticationEntryPoint())
+        .accessDeniedHandler(preAuthorizeExceptionHandler.customAccessDeniedHandler())
+        .authenticationEntryPoint(preAuthorizeExceptionHandler.customAuthenticationEntryPoint())
     );
 
     /**
