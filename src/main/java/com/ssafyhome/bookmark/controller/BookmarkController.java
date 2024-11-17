@@ -25,10 +25,11 @@ import java.util.Map;
 @RestController
 @RequestMapping("/bookmark")
 public class BookmarkController {
+
 	private static BookmarkService bookmarkService;
 
 	public BookmarkController(BookmarkService bookmarkService) {
-		BookmarkController.bookmarkService = bookmarkService;
+		this.bookmarkService = bookmarkService;
 	}
 
 	@Operation(
@@ -58,7 +59,7 @@ public class BookmarkController {
 	@PostMapping("/house")
 	@PreAuthorize("hasRole('ROLE_USER')")
 	public ResponseEntity<?> addHouse(
-			@RequestBody
+			@RequestParam(value = "houseId")
 			String houseId
 	) {
 
