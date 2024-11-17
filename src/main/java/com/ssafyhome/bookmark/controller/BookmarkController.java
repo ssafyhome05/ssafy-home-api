@@ -45,7 +45,7 @@ public class BookmarkController {
 		Map<String, Object> params = new HashMap<>();
 		params.put("dongCode", dongCode);
 		params.put("userSeq", SecurityContextHolder.getContext().getAuthentication().getName());
-
+		//System.out.println(dongCode);
 		bookmarkService.addLocationBookmark(params);
 
 		return new ResponseEntity<>("add location bookmark success", HttpStatus.OK);
