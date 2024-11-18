@@ -1,32 +1,23 @@
 package com.ssafyhome.house.controller;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
-
 import com.ssafyhome.common.mapper.GeometryMapper;
+import com.ssafyhome.common.response.ResponseMessage;
 import com.ssafyhome.common.util.GeometryUtil;
 import com.ssafyhome.common.util.object.Point;
-import com.ssafyhome.house.dto.HouseDealDto;
-import com.ssafyhome.house.dto.HouseDetailDto;
-import com.ssafyhome.house.dto.HouseDto;
-import com.ssafyhome.house.dto.HouseGraphDto;
+import com.ssafyhome.house.dto.HouseSearchWithTimeDto;
+import com.ssafyhome.house.response.HouseResoponseCode;
 import com.ssafyhome.house.service.HouseService;
-import com.ssafyhome.spot.dto.LocationStatusDto;
-
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 
 @Tag(
@@ -53,7 +44,7 @@ public class HouseController {
 			description = "startDatd 와 endDate 받아 조건에 맞는 List<HouseDealsDto> 반환"
 	)
 	@GetMapping("/deal/during")
-	public ResponseEntity<List<HouseDealDto>> getHouseDealsWithTimes(
+	public ResponseEntity<ResponseMessage.CustomMessage> getHouseDealsWithTimes(
 			@RequestParam("houseSeq")
 			String houseSeq,
 
@@ -73,7 +64,7 @@ public class HouseController {
 			description = "202208, 202209 등 특정 매물의 지금까지 월 별 거래 데이터 추이 <HouseGraphDto> 반환"
 	)
 	@GetMapping("/detail/status")
-	public ResponseEntity<List<HouseGraphDto>> getGraphInfo(
+	public ResponseEntity<ResponseMessage.CustomMessage> getGraphInfo(
 			@Parameter(
 			          name = "houseSeq"
 			      )
@@ -86,7 +77,7 @@ public class HouseController {
 			int year
 	) {
 
-		return new ResponseEntity<>(houseService.getHouseGraph(houseSeq, year), HttpStatus.OK);
+		return ResponseMessage.responseDataEntity(HouseResoponseCode.OK, houseService.getHouseGraph(houseSeq, year));
 	}
 
 	@Operation(
@@ -94,7 +85,7 @@ public class HouseController {
 			description = "특정 매물의 거래금액 <HouseDealsDto>(page, limit)"
 	)
 	@GetMapping("/deal")
-	public ResponseEntity<List<HouseDealDto>> getHouseDeals(
+	public ResponseEntity<ResponseMessage.CustomMessage> getHouseDeals(
 			@RequestParam("houseSeq")
 			String houseSeq,
 			@RequestParam("page")
@@ -103,7 +94,7 @@ public class HouseController {
 			int limit
 	) {
 
-		return new ResponseEntity<>(houseService.getHouseDealList(houseSeq, page, limit), HttpStatus.OK);
+		return ResponseMessage.responseDataEntity(HouseResoponseCode.OK, houseService.getHouseDealList(houseSeq, page, limit));
 	}
 
 	@Operation(
@@ -111,7 +102,7 @@ public class HouseController {
 			description = ""
 	)
 	@GetMapping("/detail")
-	public ResponseEntity<HouseDetailDto> getHouseInfoDetail(
+	public ResponseEntity<ResponseMessage.CustomMessage> getHouseInfoDetail(
 			@Parameter(
 			          name = "dongCode"
 			      )
@@ -128,7 +119,7 @@ public class HouseController {
 			description = ""
 	)
 	@GetMapping("/status")
-	public ResponseEntity<LocationStatusDto> getHouseStatus(
+	public ResponseEntity<ResponseMessage.CustomMessage> getHouseStatus(
 			@Parameter(
 			          name = "dongCode"
 			      )
@@ -144,47 +135,12 @@ public class HouseController {
 			description = ""
 	)
 	@GetMapping("")
-	public ResponseEntity<List<HouseDto>> getHouseInfo(
-			@RequestParam("dongCode") 
-			String dongCode,
-			@RequestParam(value = "startDate", required = false) 
-			String startDate,
-			@RequestParam(value = "endDate", required = false) 
-			String endDate,
-			@RequestParam(value = "keyWord", required = false) String keyWord,
-			@RequestParam(value = "userSeq", required = false) String userSeq
+	public ResponseEntity<ResponseMessage.CustomMessage> getHouseInfo(
+			@RequestParam
+			HouseSearchWithTimeDto searchDto
 	) {
-		Map<String, Object> params = new HashMap<>();
 
-		params.put("dongCode", dongCode);
-
-		if (startDate != null && !startDate.isEmpty()) {
-			String[] start = startDate.split("-");
-			params.put("startYear", start[0]);
-			params.put("startMonth", start[1]);
-		}else{
-			params.put("startYear", "");
-			params.put("startMonth" , "");
-		}
-
-		if (endDate != null && !endDate.isEmpty()) {
-			String[] end = endDate.split("-");
-			params.put("endYear", end[0]);
-			params.put("endMonth", end[1]);
-		} else{
-			params.put("endYear", "");
-			params.put("endMonth", "");
-		}
-
-		params.put("keyWord", keyWord);
-
-		if(userSeq != null && !userSeq.isEmpty()){
-			params.put("userSeq", userSeq);
-		}else{
-			params.put("userSeq", "");
-		}
-
-		return new ResponseEntity<>(houseService.getHouseInfo(params), HttpStatus.OK);
+		return ResponseMessage.responseDataEntity(HouseResoponseCode.OK, houseService.getHouseInfo(searchDto));
 	}
 
 	@Operation(
@@ -192,7 +148,7 @@ public class HouseController {
 			description = ""
 	)
 	@GetMapping("/polygon")
-	public List<Point> getDongPolygon(
+	public ResponseEntity<ResponseMessage.CustomMessage> getDongPolygon(
 			@RequestParam("dongCode")
 			@Parameter(
 			          name = "dongCode"
@@ -200,7 +156,7 @@ public class HouseController {
 			String dongCode
 	){
 		List<Point> dongPolygonList = geometryUtil.getPoints(geometryMapper.selectByDongCode(dongCode));
-		return dongPolygonList;
+		return ResponseMessage.responseDataEntity(HouseResoponseCode.OK, dongPolygonList);
 	}
 
 	@Operation(
@@ -209,7 +165,7 @@ public class HouseController {
 	)
 	@PostMapping("/admin/register")
 //	@PreAuthorize("hasRole('ROLE_ADMIN')")
-	public ResponseEntity<?> updateHouseInfo(
+	public ResponseEntity<ResponseMessage.CustomMessage> updateHouseInfo(
 			@RequestParam(required = false, defaultValue = "11110")
 			int startCd,
 
@@ -221,7 +177,8 @@ public class HouseController {
 	) {
 
 		String requestId = houseService.startHouseInfoTask(dealYmd, startCd, endCd);
-		return new ResponseEntity<>(requestId, HttpStatus.CREATED);
+		String taskURI = "http://localhost:8080/api/house/task/" + requestId + "/status";
+		return ResponseMessage.responseDataEntity(HouseResoponseCode.TASK_STATUS_CREATED, taskURI);
 	}
 
 	@Operation(
@@ -248,12 +205,25 @@ public class HouseController {
 	)
 	@GetMapping("/admin/register")
 //	@PreAuthorize("hasRole('ROLE_ADMIN')")
-	public ResponseEntity<?> updatePopulationInfo() {
+	public ResponseEntity<ResponseMessage.CustomMessage> updatePopulationInfo() {
 
-		String result = houseService.startPopulationTask("2022");
-		if (!result.equals("success")) {
-			//excpeion 구현 필요
-		}
-		return new ResponseEntity<>("success", HttpStatus.CREATED);
+		houseService.startPopulationTask("2022");
+		return ResponseMessage.responseBasicEntity(HouseResoponseCode.POPULATION_UPDATED);
+	}
+
+	@PostMapping("/search")
+	public ResponseEntity<ResponseMessage.CustomMessage> inputSearchKeyword(
+			@RequestBody
+			String dongCode
+	) {
+
+		houseService.saveSearchKeyword(dongCode);
+		return ResponseMessage.responseBasicEntity(HouseResoponseCode.KEYWORD_SUCCESS_SAVED);
+	}
+
+	@GetMapping("/top-ten")
+	public ResponseEntity<ResponseMessage.CustomMessage> getTopTen() {
+
+		return ResponseMessage.responseDataEntity(HouseResoponseCode.OK, houseService.getTopTen());
 	}
 }

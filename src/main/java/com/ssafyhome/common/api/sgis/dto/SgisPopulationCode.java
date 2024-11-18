@@ -3,8 +3,6 @@ package com.ssafyhome.common.api.sgis.dto;
 
 import java.util.List;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.ssafyhome.common.api.sgis.dto.SgisGeoCode.Result;
-
 
 import lombok.Data;
 

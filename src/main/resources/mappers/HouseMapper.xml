@@ -1,21 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.ssafyhome.house.dao.HouseMapper">
-    <select id="getHouseInfo" parameterType="map" resultType="com.ssafyhome.house.dto.HouseDto">
+    <select id="getHouseInfo" parameterType="com.ssafyhome.house.dto.HouseSearchWithTimeDto" resultType="com.ssafyhome.house.dto.HouseDto">
         SELECT
-            apt_seq,
-            sgg_cd,
-            umd_cd,
-            umd_nm,
-            jibun,
-            road_nm_sgg_cd,
-            road_nm,
-            road_nm_bonbun,
-            road_nm_bubun,
-            apt_nm,
-            build_year,
-            latitude,
-            longitude,
+            *,
             (SELECT COUNT(*)
                 FROM house_deal
                 WHERE house_deal.apt_seq = house_info.apt_seq) AS deal_cnt,
@@ -74,8 +62,24 @@
           corp_cnt = #{corpCnt},
           tot_house = #{totHouse}
   
-	</insert> 
-    
+	</insert>
+    <insert id="insertPopulation2" parameterType="com.ssafyhome.house.entity.PopulationEntity">
+        INSERT INTO population
+        VALUES
+        <foreach
+                collection="list"
+                item="item"
+                separator=",">
+            (#{item.admCd},#{item.totPPltn},#{item.ppltnDnsty},#{item.agedChildIdx},#{item.corpCnt},#{item.totHouse})
+        </foreach>
+        ON DUPLICATE KEY UPDATE
+        tot_ppltn = #{totPpltn},
+        ppltn_dnsty = #{ppltnDnsty},
+        aged_child_idx = #{agedChildIdx},
+        corp_cnt = #{corpCnt},
+        tot_house = #{totHouse}
+    </insert>
+
     <select id="getSidoGugun" parameterType="string" resultType="com.ssafyhome.common.entity.DongCodeEntity">
         SELECT DISTINCT sido_name, gugun_name, bdong_code, bdong_name
         FROM dong_code
@@ -127,5 +131,11 @@
                 months.month = house_deal_data.month
         ORDER BY
             months.month
+    </select>
+
+    <select id="getDongNameByCode" resultType="java.lang.String">
+        SELECT DISTINCT CONCAT(sido_name, ' ', gugun_name, ' ', bdong_name)
+        FROM dong_code
+        WHERE bdong_code = #{dongCode}
     </select>
 </mapper>
