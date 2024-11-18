@@ -46,32 +46,13 @@ public class HouseController {
 		this.geometryMapper = geometryMapper;
 	}
 
-	@Operation(
-			summary = "설정된 기간 내 거래량 및 금액 반환",
-			description = "startDatd 와 endDate 받아 조건에 맞는 List<HouseDealsDto> 반환"
-	)
-	@GetMapping("/deal/during")
-	public ResponseEntity<ResponseMessage.CustomMessage> getHouseDealsWithTimes(
-			@RequestParam("houseSeq")
-			String houseSeq,
-
-			@RequestParam("startDate")
-			String startDate,
-
-			@RequestParam("endDate")
-			String endDate
-	) {
-
-		return null;
-	}
-
 
 	@Operation(
 			summary = "특정 연도의 특정 매물의 월별 시세 변동 그래프",
 			description = "특정 매물의 지금까지 월 별 거래 데이터 추이를 반환합니다."
 	)
 	@GetMapping("/status")
-	public ResponseEntity<List<HouseGraphDto>> getGraphInfo(
+	public ResponseEntity<ResponseMessage.CustomMessage> getGraphInfo(
 			@Parameter(
 			          name = "houseSeq"
 			      )
@@ -105,16 +86,7 @@ public class HouseController {
 		return ResponseMessage.responseDataEntity(HouseResoponseCode.OK, houseService.getHouseDealList(houseSeq, page, limit));
 	}
 
-	@Operation(
-			summary = "",
-			description = ""
-	)
-	@GetMapping("/detail")
-	public ResponseEntity<ResponseMessage.CustomMessage> getHouseInfoDetail(
-			@Parameter(
-			          name = "dongCode"
-			      )
-
+	
 
 
 	@Operation(
@@ -138,7 +110,6 @@ public class HouseController {
 			description = "사용자가 입력한 dongcode(필수) 와 세부사항(연도, 매물이름) 을 기준으로 매물 존재내역을 반환합니다."
 	)
 	@GetMapping("")
-
 	public ResponseEntity<ResponseMessage.CustomMessage> getHouseInfo(
 			@RequestParam
 			HouseSearchWithTimeDto searchDto
@@ -146,6 +117,8 @@ public class HouseController {
 		return ResponseMessage.responseDataEntity(HouseResoponseCode.OK, houseService.getHouseInfo(searchDto));
 	}
 
+	
+	
 	@Operation(
 			summary = "지도 상 법정동 경계선 반환",
 			description = "검색한 법정동의 경계면 좌표 리스트를 반환합니다."
