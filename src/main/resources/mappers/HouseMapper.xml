@@ -128,4 +128,12 @@
         ORDER BY
             months.month
     </select>
+    
+    
+    <select id="getPopulation" resultType="com.ssafyhome.house.entity.PopulationEntity">
+        SELECT *
+        FROM population
+        WHERE dong_code = #{dongCode}
+    </select>
+
 </mapper>

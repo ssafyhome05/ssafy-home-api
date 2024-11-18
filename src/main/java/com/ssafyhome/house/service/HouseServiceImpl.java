@@ -213,6 +213,12 @@ public class HouseServiceImpl implements HouseService {
 		return DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 	}
 
+	@Override
+	public PopulationEntity getPopulation(String dongCode) {
+		
+		return houseMapper.getPopulation(dongCode);
+	}
+
 
 
 }

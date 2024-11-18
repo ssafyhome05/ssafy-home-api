@@ -4,6 +4,9 @@ import java.util.List;
 import java.util.Map;
 
 import com.ssafyhome.house.dto.HouseGraphDto;
+import com.ssafyhome.house.entity.PopulationEntity;
+
+import org.apache.ibatis.annotations.Param;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import com.ssafyhome.house.dto.HouseDealDto;
@@ -20,4 +23,8 @@ public interface HouseService {
     String startPopulationTask(String year);
 
     SseEmitter getSseEmitter(String requestId);
+    
+	PopulationEntity getPopulation(@Param("dongCode")String dongCode);
+
+    
 }

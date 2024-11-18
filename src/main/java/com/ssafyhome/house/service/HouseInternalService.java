@@ -82,7 +82,7 @@ public class HouseInternalService {
 					newPop.setAdmCd(population.getResult().get(i).getAdmCd());
 					newPop.setAgedChildIdx(population.getResult().get(i).getAgedChildIdx());
 					newPop.setCorpCnt(population.getResult().get(i).getCorpCnt());
-					newPop.setPpltnDnsty(population.getResult().get(i).getPpltnDnsty());
+					newPop.setPpltnDnsty(String.valueOf(population.getResult().get(i).getPpltnDnsty()));
 					newPop.setTotHouse(population.getResult().get(i).getTotHouse());
 					newPop.setTotPpltn(population.getResult().get(i).getTotPpltn());
 					

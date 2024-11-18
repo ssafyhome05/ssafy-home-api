@@ -21,6 +21,7 @@ import com.ssafyhome.house.dto.HouseDealDto;
 import com.ssafyhome.house.dto.HouseDetailDto;
 import com.ssafyhome.house.dto.HouseDto;
 import com.ssafyhome.house.dto.HouseGraphDto;
+import com.ssafyhome.house.entity.PopulationEntity;
 import com.ssafyhome.house.service.HouseService;
 import com.ssafyhome.spot.dto.LocationStatusDto;
 
@@ -124,19 +125,18 @@ public class HouseController {
 	}
 
 	@Operation(
-			summary = "",
-			description = ""
+			summary = "동코드별 인구통계 반환",
+			description = "지역별 총인구, 가구총계, 노령화지수, 평균연령을 반환합니다."
 	)
 	@GetMapping("/status")
-	public ResponseEntity<LocationStatusDto> getHouseStatus(
+	public ResponseEntity<PopulationEntity> getPopulation(
 			@Parameter(
 			          name = "dongCode"
 			      )
 			@RequestParam("dongCode")
 			String dongCode
 	) {
-
-		return null;
+		return new ResponseEntity<>(houseService.getPopulation(dongCode), HttpStatus.OK);
 	}
 
 	@Operation(
