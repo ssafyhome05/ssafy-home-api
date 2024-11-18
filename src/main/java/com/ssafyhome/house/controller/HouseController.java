@@ -45,13 +45,13 @@ public class HouseController {
 	)
 	@GetMapping("/deal/during")
 	public ResponseEntity<ResponseMessage.CustomMessage> getHouseDealsWithTimes(
-			@RequestParam()
+			@RequestParam("houseSeq")
 			String houseSeq,
 
-			@RequestParam
+			@RequestParam("startDate")
 			String startDate,
 
-			@RequestParam
+			@RequestParam("endDate")
 			String endDate
 	) {
 
@@ -106,7 +106,8 @@ public class HouseController {
 			@Parameter(
 			          name = "dongCode"
 			      )
-			@RequestParam("dongcode")
+
+			@RequestParam("dongCode")
 			String dongCode
 	) {
 
@@ -122,7 +123,7 @@ public class HouseController {
 			@Parameter(
 			          name = "dongCode"
 			      )
-			@RequestParam("dongcode")
+			@RequestParam("dongCode")
 			String dongCode
 	) {
 

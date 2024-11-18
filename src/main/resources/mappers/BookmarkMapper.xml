@@ -10,7 +10,7 @@
     <delete id="deleteHouseBookmark" parameterType="map">
         DELETE
         FROM favorite_house
-        WHERE apt_seq = #{aptSeq}
+        WHERE user_seq = #{userSeq} AND apt_seq = #{aptSeq}
     </delete>
 
     <insert id="addLocationBookmark" parameterType="map">

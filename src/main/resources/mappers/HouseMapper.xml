@@ -9,7 +9,13 @@
                 WHERE house_deal.apt_seq = house_info.apt_seq) AS deal_cnt,
             (SELECT FORMAT(ROUND(AVG(CAST(REPLACE(deal_amount, ',', '') AS DOUBLE)), 1), 0)
                 FROM house_deal
-                WHERE house_deal.apt_seq = house_info.apt_seq) AS avg_deal_amount
+                WHERE house_deal.apt_seq = house_info.apt_seq) AS avg_deal_amount,
+             <if test="userSeq != null">
+                (SELECT CASE WHEN COUNT(*) > 0 THEN TRUE ELSE FALSE END
+                FROM favorite_house
+                WHERE favorite_house.user_seq = #{userSeq}
+                AND favorite_house.apt_seq = house_info.apt_seq) AS bookmark
+            </if>
         FROM house_info
         WHERE CONCAT(sgg_cd, umd_cd) = #{dongCode}
         <if test="keyWord != null and keyWord != ''">
