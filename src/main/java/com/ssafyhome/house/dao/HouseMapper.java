@@ -31,4 +31,5 @@ public interface HouseMapper {
 	
 	void insertPopulation(PopulationEntity populationEntity);
 	List<PopulationEntity> getPopulationList();
+	
 }
