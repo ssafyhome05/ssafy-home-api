@@ -1,16 +1,14 @@
 package com.ssafyhome.navigate.controller;
 
-import com.ssafyhome.navigate.dto.NavigateDto;
-import com.ssafyhome.spot.dto.SpotSearchDto;
+import com.ssafyhome.common.response.ResponseMessage;
+import com.ssafyhome.navigate.response.NavigateResponseCode;
 import com.ssafyhome.navigate.service.NavigateService;
+import com.ssafyhome.spot.dto.SpotSearchDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @Tag(
 		name = "Navigate Controller",
@@ -32,7 +30,7 @@ public class NavigateController {
 			description = "houseSeq 의 장소와 spotSearchDto 장소 간 NavigateDto 반환"
 	)
 	@GetMapping("/search")
-	public ResponseEntity<NavigateDto> getTimeWithSearchSpot(
+	public ResponseEntity<ResponseMessage.CustomMessage> getTimeWithSearchSpot(
 			@RequestParam
 			String houseSeq,
 
@@ -40,7 +38,10 @@ public class NavigateController {
 			SpotSearchDto spotSearchDto
 	) {
 
-		return new ResponseEntity<>(navigateService.getNavigate("search", houseSeq, navigateService.getEndPoint(spotSearchDto)), HttpStatus.OK);
+		return ResponseMessage.responseDataEntity(
+				NavigateResponseCode.OK,
+				navigateService.getNavigate("search", houseSeq, navigateService.getEndPoint(spotSearchDto))
+		);
 	}
 
 	@Operation(
@@ -49,7 +50,7 @@ public class NavigateController {
 	)
 	@GetMapping("/{type}")
 	@PreAuthorize("hasRole('ROLE_USER')")
-	public ResponseEntity<List<NavigateDto>> getTimeWithCustomSpotList(
+	public ResponseEntity<ResponseMessage.CustomMessage> getTimeWithCustomSpotList(
 			@PathVariable
 			String type,
 
@@ -57,6 +58,9 @@ public class NavigateController {
 			String houseSeq
 	) {
 
-		return new ResponseEntity<>(navigateService.getNavigateList(type, houseSeq), HttpStatus.OK);
+		return ResponseMessage.responseDataEntity(
+				NavigateResponseCode.OK,
+				navigateService.getNavigateList(type, houseSeq)
+		);
 	}
 }
