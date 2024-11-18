@@ -132,7 +132,12 @@
         ORDER BY
             months.month
     </select>
-
+    <select id="getPopulation" resultType="com.ssafyhome.house.entity.PopulationEntity">
+        SELECT *
+        FROM population
+        WHERE dong_code = LEFT(#{dongCode}, 5)
+    </select>
+  
     <select id="getDongNameByCode" resultType="java.lang.String">
         SELECT DISTINCT CONCAT(sido_name, ' ', gugun_name, ' ', bdong_name)
         FROM dong_code

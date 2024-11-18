@@ -217,8 +217,11 @@ public class HouseServiceImpl implements HouseService {
 	}
 
 	@Override
-	public void saveSearchKeyword(String dongCode) {
+	public PopulationEntity getPopulation(String dongCode) {
+		return houseMapper.getPopulation(dongCode);
+	}
 
+	public void saveSearchKeyword(String dongCode) {
 		searchKeywordRepository.save(new SearchKeywordEntity(dongCode, LocalDateTime.now()));
 	}
 
