@@ -185,7 +185,7 @@ public class HouseController {
 //	@PreAuthorize("hasRole('ROLE_ADMIN')")
 	public ResponseEntity<ResponseMessage.CustomMessage> updatePopulationInfo() {
 
-		houseService.startPopulationTask("2022");
+		houseService.startPopulationTask("2022"); 
 		return ResponseMessage.responseBasicEntity(HouseResoponseCode.POPULATION_UPDATED);
 	}
 
