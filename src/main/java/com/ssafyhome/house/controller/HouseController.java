@@ -49,31 +49,12 @@ public class HouseController {
 		this.geometryMapper = geometryMapper;
 	}
 
-	@Operation(
-			summary = "설정된 기간 내 거래량 및 금액 반환",
-			description = "startDatd 와 endDate 받아 조건에 맞는 List<HouseDealsDto> 반환"
-	)
-	@GetMapping("/deal/during")
-	public ResponseEntity<List<HouseDealDto>> getHouseDealsWithTimes(
-			@RequestParam("houseSeq")
-			String houseSeq,
-
-			@RequestParam("startDate")
-			String startDate,
-
-			@RequestParam("endDate")
-			String endDate
-	) {
-
-		return null;
-	}
-
 
 	@Operation(
-			summary = "매물별 연도 및 월별 시세 변동 그래프",
-			description = "202208, 202209 등 특정 매물의 지금까지 월 별 거래 데이터 추이 <HouseGraphDto> 반환"
+			summary = "특정 연도의 특정 매물의 월별 시세 변동 그래프",
+			description = "특정 매물의 지금까지 월 별 거래 데이터 추이를 반환합니다."
 	)
-	@GetMapping("/detail/status")
+	@GetMapping("/status")
 	public ResponseEntity<List<HouseGraphDto>> getGraphInfo(
 			@Parameter(
 			          name = "houseSeq"
@@ -92,7 +73,7 @@ public class HouseController {
 
 	@Operation(
 			summary = "매물별 모든 거래 내역 반환",
-			description = "특정 매물의 거래금액 <HouseDealsDto>(page, limit)"
+			description = "특정 매물의 거래금액을 반환합니다."
 	)
 	@GetMapping("/deal")
 	public ResponseEntity<List<HouseDealDto>> getHouseDeals(
@@ -107,22 +88,9 @@ public class HouseController {
 		return new ResponseEntity<>(houseService.getHouseDealList(houseSeq, page, limit), HttpStatus.OK);
 	}
 
-	@Operation(
-			summary = "",
-			description = ""
-	)
-	@GetMapping("/detail")
-	public ResponseEntity<HouseDetailDto> getHouseInfoDetail(
-			@Parameter(
-			          name = "dongCode"
-			      )
 
-			@RequestParam("dongCode")
-			String dongCode
-	) {
 
-		return null;
-	}
+
 
 	@Operation(
 			summary = "동코드별 인구통계 반환",
@@ -140,11 +108,12 @@ public class HouseController {
 	}
 
 	@Operation(
-			summary = "",
-			description = ""
+			summary = "특정 지역의 매물 존재정보 반환",
+			description = "사용자가 입력한 dongcode(필수) 와 세부사항(연도, 매물이름) 을 기준으로 매물 존재내역을 반환합니다."
 	)
 	@GetMapping("")
 	public ResponseEntity<List<HouseDto>> getHouseInfo(
+			@Parameter(example = "1111010100")
 			@RequestParam("dongCode") 
 			String dongCode,
 			@RequestParam(value = "startDate", required = false) 
@@ -188,14 +157,15 @@ public class HouseController {
 	}
 
 	@Operation(
-			summary = "",
-			description = ""
+			summary = "지도 상 법정동 경계선 반환",
+			description = "검색한 법정동의 경계면 좌표 리스트를 반환합니다."
 	)
 	@GetMapping("/polygon")
 	public List<Point> getDongPolygon(
 			@RequestParam("dongCode")
 			@Parameter(
-			          name = "dongCode"
+			          name = "dongCode",
+			          example = "1111010100"
 			      )
 			String dongCode
 	){
@@ -204,19 +174,19 @@ public class HouseController {
 	}
 
 	@Operation(
-			summary = "",
-			description = ""
+			summary = "새로운 매물 데이터 업데이트 (관리자) ",
+			description = "신규 매물 거래 내역을 업데이트 합니다. (관리자) "
 	)
 	@PostMapping("/admin/register")
 //	@PreAuthorize("hasRole('ROLE_ADMIN')")
 	public ResponseEntity<?> updateHouseInfo(
-			@RequestParam(required = false, defaultValue = "11110")
+			@RequestParam(name="startCd", required = false, defaultValue = "11110")
 			int startCd,
 
-			@RequestParam(required = false, defaultValue = "60000")
+			@RequestParam(name="endCd", required = false, defaultValue = "60000")
 			int endCd,
 
-			@RequestParam
+			@RequestParam(name="dealYmd")
 			int dealYmd
 	) {
 
@@ -225,8 +195,8 @@ public class HouseController {
 	}
 
 	@Operation(
-			summary = "",
-			description = ""
+			summary = "새로운 매물 데이터 업데이트 진척도 확인 (관리자)",
+			description = "신규 매물 거래 내역의 업데이트 진척도를 반환합니다. (관리자전용)"
 	)
 	@GetMapping("/task/{requestId}/status")
 //	@PreAuthorize("hasRole('ROLE_ADMIN')")
@@ -244,7 +214,7 @@ public class HouseController {
 	
 	@Operation(
 			summary = "행정동별 인구통계 데이터 업데이트",
-			description = "행정동 시군구별 총인구수, 인구밀도, 노령화지수, 사업체 수, 총 주택수 정보 업데이트"
+			description = "행정동 시군구별 총인구수, 인구밀도, 노령화지수, 사업체 수, 총 주택수 정보를 테이블에 업데이트합니다."
 	)
 	@GetMapping("/admin/register")
 //	@PreAuthorize("hasRole('ROLE_ADMIN')")
