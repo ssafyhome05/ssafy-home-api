@@ -1,6 +1,11 @@
 package com.ssafyhome.config;
 
 
+import java.util.List;
+
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.enums.SecuritySchemeType;
 import io.swagger.v3.oas.annotations.info.Info;
@@ -16,9 +21,8 @@ import io.swagger.v3.oas.models.media.Schema;
 import io.swagger.v3.oas.models.parameters.RequestBody;
 import io.swagger.v3.oas.models.responses.ApiResponse;
 import io.swagger.v3.oas.models.responses.ApiResponses;
+import io.swagger.v3.oas.models.servers.Server;
 import io.swagger.v3.oas.models.tags.Tag;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 
 /**
  * SWAGGER 이용 및 컨트롤러 이외의 API 명세를 위한 설정 파일
@@ -62,6 +66,9 @@ public class SwaggerConfig {
   @Bean
   public OpenAPI loginmOpenAPI() {
 	  
+	    
+    
+	  
     OpenAPI openAPI = new OpenAPI();
     /**
      * 태그를 통해서 각 컨트롤러마다 탭을 나눌 수 있다
@@ -71,7 +78,7 @@ public class SwaggerConfig {
 
     PathItem loginPath = new PathItem();
     
-    
+
     /**
      * Swagger에 들어갈 명령 덩어리 생성하는 과정
      */
@@ -87,12 +94,13 @@ public class SwaggerConfig {
                     new MediaType()
                         .schema(new Schema<>()
                             .type("object")
-                            .addProperties("id", new Schema<>().type("string").description("사용자의 아이디"))
+                            .addProperties("username", new Schema<>().type("string").description("사용자의 아이디"))
                             .addProperties("password", new Schema<>().type("string").description("사용자의 비밀번호"))
                         )
                 )
             )
         )
+        
         .responses(new ApiResponses()
             .addApiResponse("200", new ApiResponse()
                 .description("로그인 성공")
@@ -121,6 +129,7 @@ public class SwaggerConfig {
      */
     loginPath.setPost(loginOperation);
     openAPI.path("/auth/login", loginPath);
+    
 
     return openAPI;
   }
