@@ -133,7 +133,7 @@
     <select id="getPopulation" resultType="com.ssafyhome.house.entity.PopulationEntity">
         SELECT *
         FROM population
-        WHERE dong_code = #{dongCode}
+        WHERE dong_code = LEFT(#{dongCode}, 5)
     </select>
 
 </mapper>

@@ -71,24 +71,6 @@ public class HouseController {
 		return new ResponseEntity<>(houseService.getHouseGraph(houseSeq, year), HttpStatus.OK);
 	}
 
-	@Operation(
-			summary = "매물별 모든 거래 내역 반환",
-			description = "특정 매물의 거래금액을 반환합니다."
-	)
-	@GetMapping("/deal")
-	public ResponseEntity<List<HouseDealDto>> getHouseDeals(
-			@RequestParam("houseSeq")
-			String houseSeq,
-			@RequestParam("page")
-			int page,
-			@RequestParam("limit")
-			int limit
-	) {
-
-		return new ResponseEntity<>(houseService.getHouseDealList(houseSeq, page, limit), HttpStatus.OK);
-	}
-
-
 
 
 
@@ -96,10 +78,11 @@ public class HouseController {
 			summary = "동코드별 인구통계 반환",
 			description = "지역별 총인구, 가구총계, 노령화지수, 평균연령을 반환합니다."
 	)
-	@GetMapping("/status")
+	@GetMapping("/population")
 	public ResponseEntity<PopulationEntity> getPopulation(
 			@Parameter(
-			          name = "dongCode"
+			          name = "dongCode",
+			          example = "1111010100"
 			      )
 			@RequestParam("dongCode")
 			String dongCode
