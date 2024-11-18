@@ -33,4 +33,5 @@ public interface HouseMapper {
 	void insertPopulation(PopulationEntity populationEntity);
 	void insertPopulation2(List<PopulationEntity> populationEntityList);
 	List<PopulationEntity> getPopulationList();
+	String getDongNameByCode(String dongCode);
 }
