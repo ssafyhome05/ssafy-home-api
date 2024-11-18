@@ -1,9 +1,13 @@
 package com.ssafyhome.auth.filter;
 
+import com.ssafyhome.auth.response.AuthResponseCode;
+import com.ssafyhome.common.response.ResponseMessage;
 import com.ssafyhome.user.dao.UserMapper;
 import com.ssafyhome.user.entity.UserEntity;
 import com.ssafyhome.auth.service.CustomUserDetailsService;
 import com.ssafyhome.common.util.JWTUtil;
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.security.SignatureException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -44,17 +48,25 @@ public class JWTFilter extends OncePerRequestFilter {
 
 		if (!authorizationHeader.startsWith("Bearer ")) {
 
-			response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
+			ResponseMessage.setBasicResponse(response,AuthResponseCode.INVALID_JWT_TOKEN);
 			return;
 		}
 
 		String accessToken = authorizationHeader.substring(7);
 
-		if (jwtUtil.isExpired(accessToken)) {
+		try {
+			jwtUtil.isExpired(accessToken);
+		} catch (ExpiredJwtException e) {
 
-			response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
+			ResponseMessage.setBasicResponse(response, AuthResponseCode.ACCESS_TOKEN_EXPIRED);
+			return;
+		} catch (SignatureException e) {
+
+			ResponseMessage.setBasicResponse(response, AuthResponseCode.INVALID_JWT_TOKEN);
 			return;
 		}
+
+
 
 		String category = jwtUtil.getKey(accessToken, "category");
 		String userSeq = jwtUtil.getKey(accessToken, "userSeq");
@@ -63,7 +75,7 @@ public class JWTFilter extends OncePerRequestFilter {
 
 		if (!category.equals("access") || userEntity == null) {
 
-			response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
+			ResponseMessage.setBasicResponse(response, AuthResponseCode.INVALID_JWT_TOKEN);
 			return;
 		}
 

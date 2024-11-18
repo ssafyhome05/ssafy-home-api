@@ -1,4 +1,4 @@
-package com.ssafyhome.common.exception;
+package com.ssafyhome.user.exception;
 
 public class EncryptUserSeqException extends RuntimeException {
 	public EncryptUserSeqException(String message) {

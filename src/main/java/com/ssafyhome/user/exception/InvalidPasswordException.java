@@ -1,4 +1,4 @@
-package com.ssafyhome.common.exception;
+package com.ssafyhome.user.exception;
 
 public class InvalidPasswordException extends RuntimeException {
   public InvalidPasswordException(String message) {

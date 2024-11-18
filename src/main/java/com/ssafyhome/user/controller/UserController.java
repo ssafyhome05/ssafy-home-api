@@ -1,6 +1,8 @@
 package com.ssafyhome.user.controller;
 
+import com.ssafyhome.common.response.ResponseMessage;
 import com.ssafyhome.user.dto.*;
+import com.ssafyhome.user.response.UserResponseCode;
 import com.ssafyhome.user.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -8,12 +10,10 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @Tag(
 		name = "User Controller",
@@ -42,13 +42,13 @@ public class UserController {
 				+ "2. 중복 아이디")
 	  })
 	@PostMapping("")
-	public ResponseEntity<?> addUser(
+	public ResponseEntity<ResponseMessage.CustomMessage> addUser(
 			@RequestBody
 			UserDto userDto
 	) {
 
 		userService.register(userDto);
-		return new ResponseEntity<>(HttpStatus.CREATED);
+		return ResponseMessage.responseBasicEntity(UserResponseCode.USER_CREATED);
 	}
 
 	@Operation(
@@ -61,8 +61,8 @@ public class UserController {
 	  })
 
 	@PostMapping("/find/{type}")
-	public ResponseEntity<?> findUserInfo(
-			@Parameter(
+	public ResponseEntity<ResponseMessage.CustomMessage> findUserInfo(
+    			@Parameter(
 			          name = "type",
 			          description = "#### user의 id 혹은 password 를 찾습니다. \n\n"
 			          		+ "1. type 에 'id'를 입력하는 경우 \n\n"
@@ -88,11 +88,11 @@ public class UserController {
 
 		if (type.equals("id")) {
 			String id = userService.findUserId(findUserDto);
-			return new ResponseEntity<>(id, HttpStatus.OK);
+			return ResponseMessage.responseDataEntity(UserResponseCode.FIND_ID, id);
 		}
 		else {
 			userService.findPassword(findUserDto);
-			return new ResponseEntity<>("check email secret", HttpStatus.CREATED);
+			return ResponseMessage.responseBasicEntity(UserResponseCode.MAIL_SEND_SUCCESS);
 		}
 	}
 
@@ -105,7 +105,7 @@ public class UserController {
 	  })
 
 	@PostMapping("/send/mail")
-	public ResponseEntity<?> sendEmail(
+	public ResponseEntity<ResponseMessage.CustomMessage> sendEmail(
 			@RequestBody
 			@Schema(
 			        description = "이메일 주소",
@@ -115,7 +115,7 @@ public class UserController {
 	) {
 
 		userService.sendEmail(email);
-		return new ResponseEntity<>("send Email success", HttpStatus.OK);
+		return ResponseMessage.responseBasicEntity(UserResponseCode.MAIL_SEND_SUCCESS);
 	}
 
 	@Operation(
@@ -123,16 +123,21 @@ public class UserController {
 			description = "userSeq 에 해당하는 UserDto 를 반환합니다."
 	)
 	@GetMapping("")
-	//@PreAuthorize("hasRole('ROLE_ADMIN') or  #userSeq == authentication.name")
-	public ResponseEntity<UserDto> getUserInfo(
-			@Parameter(
-			          name = "userSeq"
-			      )
+	@PreAuthorize("hasRole('ROLE_ADMIN') or  #userSeq == authentication.name")
+	public ResponseEntity<ResponseMessage.CustomMessage> getUserInfo(
 			@RequestParam("userSeq")
+
 			String userSeq
 	) {
 
-		return new ResponseEntity<>(userService.getUserInfo(userSeq), HttpStatus.OK);
+		return ResponseMessage.responseDataEntity(UserResponseCode.OK, userService.getUserInfo(userSeq));
+	}
+
+	@GetMapping("/info")
+	public ResponseEntity<ResponseMessage.CustomMessage> getUserInfo(){
+
+		UserDto userDto = userService.getUserInfo(SecurityContextHolder.getContext().getAuthentication().getName());
+		return ResponseMessage.responseDataEntity(UserResponseCode.OK, userDto);
 	}
 
 	@Operation(
@@ -143,13 +148,14 @@ public class UserController {
 		  @ApiResponse(responseCode = "200", description="사용자 목록 반환")
 	  })
 	@GetMapping("/list")
-	//@PreAuthorize("hasRole('ROLE_ADMIN')")
-	public ResponseEntity<List<UserDto>> getUserList(
+
+	@PreAuthorize("hasRole('ROLE_ADMIN')")
+	public ResponseEntity<ResponseMessage.CustomMessage> getUserList(
 			@ModelAttribute
 			UserSearchDto userSearchDto
 	) {
 
-		return new ResponseEntity<>(userService.getUserList(userSearchDto), HttpStatus.OK);
+		return ResponseMessage.responseDataEntity(UserResponseCode.OK, userService.getUserList(userSearchDto));
 	}
 
 	@Operation(
@@ -161,13 +167,13 @@ public class UserController {
 	  })
 
 	@GetMapping("/check/mail")
-	public ResponseEntity<?> checkEmailSecret(
+	public ResponseEntity<ResponseMessage.CustomMessage> checkEmailSecret(
 			@Parameter(
 			          name = "email",
 			          description = "secret key 를 전송한 mail"
 			      )
 			@RequestParam(value="email")
-			String email,
+      String email,
 
 			@Parameter(
 			          name = "key",
@@ -177,7 +183,7 @@ public class UserController {
 			String key
 	) {
 
-		return new ResponseEntity<>(userService.checkEmailSecret(new EmailSecretDto(email, key)), HttpStatus.OK);
+		return ResponseMessage.responseDataEntity(UserResponseCode.VERIFICATION_SUCCESS, userService.checkEmailSecret(new EmailSecretDto(email, key)));
 	}
 
 	@Operation(
@@ -191,8 +197,8 @@ public class UserController {
 	  })
 
 	@GetMapping("/check/duplicate")
-	public ResponseEntity<?> checkIdDuplicate(
-			@RequestParam(value="userId")
+	public ResponseEntity<ResponseMessage.CustomMessage> checkIdDuplicate(
+    @RequestParam(value="userId")
 			@Parameter(
 			          name = "userId",
 			          description = "user id"
@@ -200,7 +206,8 @@ public class UserController {
 			String userId
 	) {
 
-		return new ResponseEntity<>(userService.checkIdDuplicate(userId), HttpStatus.OK);
+		userService.checkIdDuplicate(userId);
+		return ResponseMessage.responseBasicEntity(UserResponseCode.NOT_DUPLICATE);
 	}
 
 	@Operation(
@@ -208,7 +215,7 @@ public class UserController {
 			description = " passwordDto 받아 비밀번호를 변경합니다."
 	)
 	@PatchMapping("")
-	public ResponseEntity<?> changePassword(
+	public ResponseEntity<ResponseMessage.CustomMessage> changePassword(
 			@RequestBody
 			@Schema(
 			        description = "passwordDto",
@@ -223,7 +230,7 @@ public class UserController {
 	) {
 		String userSeq = passwordDto.getUserSeq();
 		userService.changePassword(userSeq, passwordDto);
-		return new ResponseEntity<>("change password success", HttpStatus.OK);
+		return ResponseMessage.responseBasicEntity(UserResponseCode.PASSWORD_CHANGED);
 	}
 
 	@Operation(
@@ -232,14 +239,14 @@ public class UserController {
 	)
 	@PutMapping("/{userSeq}")
 	@PreAuthorize("hasRole('ROLE_ADMIN') or  #userSeq == authentication.name")
-	public ResponseEntity<?> updateUserInfo(
+	public ResponseEntity<ResponseMessage.CustomMessage> updateUserInfo(
 			@PathVariable("userSeq")
 			@Parameter(
 			          name = "userSeq",
 			          description = "user 의 userSeq",
 			          example = "13"
 			      )
-			long userSeq,
+      long userSeq,
 
 			@RequestBody
 			@Schema(
@@ -263,7 +270,7 @@ public class UserController {
 	) {
 
 		userService.updateUser(userSeq, userDto);
-		return new ResponseEntity<>("update user success", HttpStatus.OK);
+		return ResponseMessage.responseBasicEntity(UserResponseCode.USER_UPDATED);
 	}
 
 	@Operation(
@@ -272,7 +279,8 @@ public class UserController {
 	)
 	@DeleteMapping("/{userSeq}")
 	@PreAuthorize("hasRole('ROLE_ADMIN') or  #userSeq == authentication.name")
-	public ResponseEntity<?> deleteUser(
+	public ResponseEntity<ResponseMessage.CustomMessage> deleteUser(
+    
 			@Parameter(
 			          name = "userSeq",
 			          description = "사용자번호",
@@ -283,6 +291,6 @@ public class UserController {
 	) {
 
 		userService.deleteUser(userSeq);
-		return new ResponseEntity<>("delete user success", HttpStatus.OK);
+		return ResponseMessage.responseBasicEntity(UserResponseCode.USER_DELETED);
 	}
 }

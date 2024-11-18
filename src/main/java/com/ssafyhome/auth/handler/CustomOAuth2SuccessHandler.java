@@ -9,12 +9,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
-import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
-import org.springframework.security.web.context.SecurityContextRepository;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
@@ -39,7 +35,7 @@ public class CustomOAuth2SuccessHandler implements AuthenticationSuccessHandler 
 		if (oAuth2User instanceof CustomOAuth2User) {
 			onAuthenticationUserSuccess(response, (CustomOAuth2User) oAuth2User);
 		} else {
-			onAuthenticationAdminSuccess(request, response, (AdminOAuth2User) oAuth2User);
+			onAuthenticationAdminSuccess(response, (AdminOAuth2User) oAuth2User);
 		}
 	}
 
@@ -48,21 +44,18 @@ public class CustomOAuth2SuccessHandler implements AuthenticationSuccessHandler 
 		String userSeq = String.valueOf(customOAuth2User.getSeq());
 		String userEmail = customOAuth2User.getEmail();
 		JwtDto jwtDto = jwtService.setTokens(userSeq, userEmail);
-		response.setHeader("Authorization", "Bearer " + jwtDto.getAccessToken());
-		response.addCookie(jwtDto.getRefreshToken());
 
-		response.sendRedirect(frontEndUrl);
+		response.addCookie(jwtDto.getRefreshToken());
+		response.sendRedirect(frontEndUrl + "?token=" + jwtDto.getAccessToken());
 	}
 
-	private void onAuthenticationAdminSuccess(HttpServletRequest request, HttpServletResponse response, AdminOAuth2User adminOAuth2User) {
+	private void onAuthenticationAdminSuccess(HttpServletResponse response, AdminOAuth2User adminOAuth2User) throws IOException {
 
-		Authentication authentication = new OAuth2AuthenticationToken(
-				adminOAuth2User,
-				adminOAuth2User.getAuthorities(),
-				"admin"
-		);
-		SecurityContextHolder.getContext().setAuthentication(authentication);
-		SecurityContextRepository repository = new HttpSessionSecurityContextRepository();
-		repository.saveContext(SecurityContextHolder.getContext(), request, response);
+		String adminSeq = String.valueOf(adminOAuth2User.getName());
+		String adminRole = adminOAuth2User.getAuthorities().iterator().next().getAuthority();
+		JwtDto jwtDto = jwtService.setTokens(adminSeq, adminRole);
+
+		response.addCookie(jwtDto.getRefreshToken());
+		response.sendRedirect(frontEndUrl + "/admin?token=" + jwtDto.getAccessToken());
 	}
 }

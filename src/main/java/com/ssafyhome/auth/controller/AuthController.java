@@ -1,14 +1,16 @@
 package com.ssafyhome.auth.controller;
 
 import com.ssafyhome.auth.dto.JwtDto;
+import com.ssafyhome.auth.response.AuthResponseCode;
 import com.ssafyhome.auth.service.JWTService;
+import com.ssafyhome.common.response.ResponseMessage;
 import com.ssafyhome.common.util.CookieUtil;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -50,14 +52,16 @@ public class AuthController {
           name = "refresh token",
           description = "JWT Refresh Token"
       )
-      @CookieValue(value = "refreshToken", defaultValue = "no_refresh_token")
+      @CookieValue(value = "refresh", defaultValue = "no_refresh_token")
       String refreshToken
   ) {
 
     JwtDto jwtDto = jwtService.reissueRefreshToken(refreshToken);
-    ResponseEntity<?> responseEntity = new ResponseEntity<>("reissue jwt tokens", HttpStatus.CREATED);
-    responseEntity.getHeaders().add("Authorization", "Bearer " + jwtDto.getAccessToken());
-    responseEntity.getHeaders().add("Cookie", cookieUtil.convertToString(jwtDto.getRefreshToken()));
-    return responseEntity;
+
+    HttpHeaders headers = new HttpHeaders();
+    headers.add(HttpHeaders.AUTHORIZATION, "Bearer " + jwtDto.getAccessToken());
+    headers.add(HttpHeaders.SET_COOKIE, cookieUtil.convertToString(jwtDto.getRefreshToken()));
+
+    return ResponseMessage.responseHeadersEntity(AuthResponseCode.TOKEN_REISSUED, headers);
   }
 }

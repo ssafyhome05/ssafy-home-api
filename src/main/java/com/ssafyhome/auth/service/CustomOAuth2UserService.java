@@ -1,6 +1,7 @@
 package com.ssafyhome.auth.service;
 
 import com.ssafyhome.auth.dto.oauth2response.*;
+import com.ssafyhome.common.exception.SQLInsertException;
 import com.ssafyhome.user.dao.UserMapper;
 import com.ssafyhome.auth.dto.AdminOAuth2User;
 import com.ssafyhome.auth.dto.CustomOAuth2User;
@@ -63,7 +64,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 			try {
 				userMapper.insertOAuth2User(userEntity);
 			} catch (Exception e) {
-				throw new RuntimeException(e);
+				throw new SQLInsertException(e);
 			}
 			existUser = userEntity;
 		}

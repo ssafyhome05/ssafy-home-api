@@ -1,5 +1,7 @@
 package com.ssafyhome.auth.filter;
 
+import com.ssafyhome.auth.response.AuthResponseCode;
+import com.ssafyhome.common.response.ResponseMessage;
 import com.ssafyhome.user.dao.UserMapper;
 import com.ssafyhome.auth.dto.JwtDto;
 import com.ssafyhome.user.entity.UserEntity;
@@ -8,7 +10,7 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -54,13 +56,17 @@ public class CustomLoginFilter extends UsernamePasswordAuthenticationFilter {
 		String userSeq = String.valueOf(userEntity.getUserSeq());
 		String userEmail = userEntity.getUserEmail();
 		JwtDto jwtDto = jwtService.setTokens(userSeq, userEmail);
-		response.setHeader("Authorization", "Bearer " + jwtDto.getAccessToken());
-		response.addCookie(jwtDto.getRefreshToken());
+
+		HttpHeaders headers = new HttpHeaders();
+		headers.add(HttpHeaders.AUTHORIZATION, "Bearer " + jwtDto.getAccessToken());
+		headers.add(HttpHeaders.SET_COOKIE, jwtDto.getAccessToken());
+
+		ResponseMessage.setHeadersResponse(response, AuthResponseCode.LOGIN_SUCCESS, headers);
 	}
 
 	@Override
 	protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response, AuthenticationException failed) throws IOException, ServletException {
 
-		response.setStatus(HttpStatus.UNAUTHORIZED.value());
+		ResponseMessage.setBasicResponse(response, AuthResponseCode.FAIL_TO_LOGIN);
 	}
 }

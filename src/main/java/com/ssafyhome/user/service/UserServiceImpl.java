@@ -1,14 +1,11 @@
 package com.ssafyhome.user.service;
 
-import com.ssafyhome.common.exception.DecryptUserSeqException;
-import com.ssafyhome.common.exception.EncryptUserSeqException;
-import com.ssafyhome.common.exception.InvalidEmailSecretException;
-import com.ssafyhome.common.exception.InvalidPasswordException;
 import com.ssafyhome.user.dao.UserMapper;
 import com.ssafyhome.user.dto.*;
 import com.ssafyhome.user.entity.UserEntity;
 import com.ssafyhome.common.util.ConvertUtil;
 import com.ssafyhome.common.util.SecretUtil;
+import com.ssafyhome.user.exception.*;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import org.springframework.mail.MailSendException;
@@ -17,7 +14,6 @@ import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.webjars.NotFoundException;
 
 import java.util.List;
 
@@ -66,7 +62,7 @@ public class UserServiceImpl implements UserService {
     if (userId != null) {
       return userId;
     } else {
-      throw new NotFoundException("user not found");
+      throw new UserNotFoundException();
     }
   }
 
@@ -76,7 +72,7 @@ public class UserServiceImpl implements UserService {
     if (userMapper.isUserExist(findUserDto)) {
       sendEmail(findUserDto.getUserEmail());
     } else {
-      throw new NotFoundException("user not found");
+      throw new UserNotFoundException();
     }
   }
 
@@ -103,6 +99,9 @@ public class UserServiceImpl implements UserService {
   public UserDto getUserInfo(String userSeq) {
 
     UserEntity userEntity = userMapper.getUserBySeq(userSeq);
+    if(userEntity == null) {
+      throw new UserNotFoundException();
+    }
     return convertUtil.convert(userEntity, UserDto.class);
   }
 
@@ -110,6 +109,9 @@ public class UserServiceImpl implements UserService {
   public List<UserDto> getUserList(UserSearchDto userSearchDto) {
 
     List<UserEntity> userEntityList = userMapper.getUserList(userSearchDto);
+    if(userEntityList.isEmpty()) {
+      throw new UserNotFoundException();
+    }
     return convertUtil.convert(userEntityList, UserDto.class);
   }
 
@@ -118,15 +120,11 @@ public class UserServiceImpl implements UserService {
 
     if (secretUtil.checkSecret(emailSecretDto.getEmail(), emailSecretDto.getSecret())) {
       secretUtil.removeSecretOnRedis(emailSecretDto.getEmail());
+      long userSeq = userMapper.getSeqByEmail(emailSecretDto.getEmail());
       try {
-        long userSeq = userMapper.getSeqByEmail(emailSecretDto.getEmail());
-        try {
-          return secretUtil.encrypt(String.valueOf(userSeq));
-        } catch (Exception e) {
-          throw new EncryptUserSeqException("encrypt fail");
-        }
+        return secretUtil.encrypt(String.valueOf(userSeq));
       } catch (Exception e) {
-        return "mail check success";
+        throw new EncryptUserSeqException("encrypt fail");
       }
     }
     else {
@@ -135,9 +133,11 @@ public class UserServiceImpl implements UserService {
   }
 
   @Override
-  public boolean checkIdDuplicate(String id) {
+  public void checkIdDuplicate(String id) {
 
-    return userMapper.getUserById(id) == null;
+    if(userMapper.getUserById(id) != null) {
+      throw new RuntimeException();
+    };
   }
 
   @Override

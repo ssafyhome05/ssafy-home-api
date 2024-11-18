@@ -115,6 +115,7 @@ public class HouseController {
 			@Parameter(
 			          name = "dongCode"
 			      )
+
 			@RequestParam("dongCode")
 			String dongCode
 	) {
@@ -150,9 +151,11 @@ public class HouseController {
 			String startDate,
 			@RequestParam(value = "endDate", required = false) 
 			String endDate,
-			@RequestParam(value = "keyWord", required = false) String keyWord
+			@RequestParam(value = "keyWord", required = false) String keyWord,
+			@RequestParam(value = "userSeq", required = false) String userSeq
 	) {
 		Map<String, Object> params = new HashMap<>();
+
 		params.put("dongCode", dongCode);
 
 		if (startDate != null && !startDate.isEmpty()) {
@@ -161,7 +164,7 @@ public class HouseController {
 			params.put("startMonth", start[1]);
 		}else{
 			params.put("startYear", "");
-			params.put("startMonth", "");
+			params.put("startMonth" , "");
 		}
 
 		if (endDate != null && !endDate.isEmpty()) {
@@ -172,10 +175,16 @@ public class HouseController {
 			params.put("endYear", "");
 			params.put("endMonth", "");
 		}
+
 		params.put("keyWord", keyWord);
 
+		if(userSeq != null && !userSeq.isEmpty()){
+			params.put("userSeq", userSeq);
+		}else{
+			params.put("userSeq", "");
+		}
+
 		return new ResponseEntity<>(houseService.getHouseInfo(params), HttpStatus.OK);
-//		return new ResponseEntity<>(houseService.getHouseInfo(dongCode), HttpStatus.OK);
 	}
 
 	@Operation(
