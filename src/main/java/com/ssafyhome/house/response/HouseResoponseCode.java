@@ -14,6 +14,7 @@ public enum HouseResoponseCode implements ResponseCode {
 	//201 CREATED
 	TASK_STATUS_CREATED(201050, "데이터 저장 태스크 시작", HttpStatus.CREATED),
 	POPULATION_UPDATED(201051, "인구 통계 데이터 업데이트 성공", HttpStatus.CREATED),
+	KEYWORD_SUCCESS_SAVED(201052, "검색어가 성공적으로 저장되었습니다.", HttpStatus.CREATED),
 
 
 	//Enum end

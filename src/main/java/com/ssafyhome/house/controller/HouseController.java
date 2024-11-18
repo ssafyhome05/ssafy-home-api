@@ -209,4 +209,20 @@ public class HouseController {
 		houseService.startPopulationTask("2022");
 		return ResponseMessage.responseBasicEntity(HouseResoponseCode.POPULATION_UPDATED);
 	}
+
+	@PostMapping("/search")
+	public ResponseEntity<ResponseMessage.CustomMessage> inputSearchKeyword(
+			@RequestBody
+			String dongCode
+	) {
+
+		houseService.saveSearchKeyword(dongCode);
+		return ResponseMessage.responseBasicEntity(HouseResoponseCode.KEYWORD_SUCCESS_SAVED);
+	}
+
+	@GetMapping("/top-ten")
+	public ResponseEntity<ResponseMessage.CustomMessage> getTopTen() {
+
+		return ResponseMessage.responseDataEntity(HouseResoponseCode.OK, houseService.getTopTen());
+	}
 }
