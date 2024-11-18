@@ -11,9 +11,13 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import com.ssafyhome.common.util.ConvertUtil;
+import com.ssafyhome.house.dao.repository.SearchKeywordRepository;
+import com.ssafyhome.house.dao.repository.TopTenRepository;
 import com.ssafyhome.house.dto.*;
+import com.ssafyhome.house.entity.SearchKeywordEntity;
+import com.ssafyhome.house.entity.TopTenEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import com.ssafyhome.common.exception.GonggongApplicationErrorException;
@@ -34,16 +38,25 @@ public class HouseServiceImpl implements HouseService {
 	private final HouseMapper houseMapper;
 	private final HouseInternalService houseInternalService;
 	private final ExecutorService executorService;
+	private final SearchKeywordRepository searchKeywordRepository;
+	private final TopTenRepository topTenRepository;
+	private final ConvertUtil convertUtil;
 
 	public HouseServiceImpl(
 			HouseMapper houseMapper,
 			HouseInternalService houseInternalService,
-			ExecutorService executorService
+			ExecutorService executorService,
+			SearchKeywordRepository searchKeywordRepository,
+			TopTenRepository topTenRepository,
+			ConvertUtil convertUtil
 	) {
 
 		this.houseMapper = houseMapper;
 		this.houseInternalService = houseInternalService;
 		this.executorService = executorService;
+		this.searchKeywordRepository = searchKeywordRepository;
+		this.topTenRepository = topTenRepository;
+		this.convertUtil = convertUtil;
 	}
 
 	@Override
@@ -203,8 +216,29 @@ public class HouseServiceImpl implements HouseService {
 		return DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 	}
 
+	@Override
+	public void saveSearchKeyword(String dongCode) {
 
+		searchKeywordRepository.save(new SearchKeywordEntity(dongCode, LocalDateTime.now()));
+	}
 
+	@Override
+	public TopTenDto getTopTen() {
+
+		TopTenEntity topTenEntity = topTenRepository.findLastByOrderByRankTimeDesc().get();
+		TopTenDto topTenDto = new TopTenDto(topTenEntity.getRankTime());
+		if (topTenEntity.getElements() != null) {
+
+			List<TopTenDto.Element> elements = convertUtil.convert(topTenEntity.getElements().values().stream().toList(), TopTenDto.Element.class);
+			elements = elements.stream()
+					.sorted(Comparator.comparingInt(TopTenDto.Element::getRank))
+					.peek(e -> e.setDongName(houseMapper.getDongNameByCode(e.getKeyword())))
+					.toList();
+			topTenDto.setElements(elements);
+		}
+
+		return topTenDto;
+	}
 }
 
 

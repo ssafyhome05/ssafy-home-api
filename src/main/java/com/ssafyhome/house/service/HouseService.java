@@ -21,4 +21,8 @@ public interface HouseService {
     void startPopulationTask(String year);
 
     SseEmitter getSseEmitter(String requestId);
+
+    void saveSearchKeyword(String dongCode);
+
+    TopTenDto getTopTen();
 }
