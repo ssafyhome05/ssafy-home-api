@@ -8,6 +8,7 @@ import com.ssafyhome.common.util.SecretUtil;
 import com.ssafyhome.user.exception.*;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.mail.MailSendException;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
@@ -15,6 +16,9 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.List;
 
 @Service
@@ -83,10 +87,23 @@ public class UserServiceImpl implements UserService {
     MimeMessage mimeMessage = mailSender.createMimeMessage();
 
     try {
-      MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage, false, "UTF-8");
+      ClassPathResource template = new ClassPathResource("mail/mailForm.html");
+      ClassPathResource headerLogo = new ClassPathResource("mail/zipchack_header_logo.png");
+      ClassPathResource footerLogo = new ClassPathResource("mail/zipchack_footer_logo.png");
+      String content;
+      try {
+        content = Files.readString(Paths.get(template.getURI()));
+      } catch (IOException e) {
+        throw new RuntimeException(e);
+      }
+      content = content.replace("${secretKey}", secret);
+
+      MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
       mimeMessageHelper.setTo(email);
-      mimeMessageHelper.setSubject("SSAFY HOME 이메일 인증");
-      mimeMessageHelper.setText(secret, true);
+      mimeMessageHelper.setSubject("\uD83C\uDF89 [Zipchak] 거의 다 왔어요! 인증번호를 입력해주세요");
+      mimeMessageHelper.setText(content, true);
+      mimeMessageHelper.addInline("headerLogo", headerLogo);
+      mimeMessageHelper.addInline("footerLogo", footerLogo);
       mailSender.send(mimeMessage);
       secretUtil.addSecretOnRedis(email, secret);
     }

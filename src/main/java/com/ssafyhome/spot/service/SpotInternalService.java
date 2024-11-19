@@ -97,7 +97,7 @@ public class SpotInternalService {
                             try {
                                 spotEntityList.add(convertToSpotEntity(document, key));
                             } catch (Exception e) {
-                                e.printStackTrace();
+                                log.error(e.getMessage());
                             } finally {
                                 countDownLatch.countDown();
                             }
@@ -108,7 +108,7 @@ public class SpotInternalService {
                 try {
                     countDownLatch.await();
                 } catch (InterruptedException e) {
-                    e.printStackTrace();
+                    log.error(e.getMessage());
                 }
 
                 spotMapper.insertSpots(spotEntityList);

@@ -61,15 +61,14 @@ public class HouseInternalService {
 	
 	/**
 	 * db 에서 행정동코드를 하나씩 받아와, year 년도 데이터로 갱신
-	 * @param pop, year
+	 * @param popList, year
 	 * @return 갱신된 PopulatonEntity
 	 */
 	@Transactional
 	protected void getPopulation(List<PopulationEntity> popList, String year) {
 		
 		for (PopulationEntity pop : popList) {
-			
-			
+
 			SgisPopulationCode population = sgisClient.getPopulation(sgisUtil.getAccessToken(), 
 																		year, 
 																		pop.getAdmCd().substring(0, 2), 
@@ -82,7 +81,7 @@ public class HouseInternalService {
 					newPop.setAdmCd(population.getResult().get(i).getAdmCd());
 					newPop.setAgedChildIdx(population.getResult().get(i).getAgedChildIdx());
 					newPop.setCorpCnt(population.getResult().get(i).getCorpCnt());
-					newPop.setPpltnDnsty(population.getResult().get(i).getPpltnDnsty());
+					newPop.setPpltnDnsty(String.valueOf(population.getResult().get(i).getPpltnDnsty()));
 					newPop.setTotHouse(population.getResult().get(i).getTotHouse());
 					newPop.setTotPpltn(population.getResult().get(i).getTotPpltn());
 					
@@ -90,9 +89,28 @@ public class HouseInternalService {
 				}
 			}
 		}
-		
 	}
-	
+
+	@Transactional
+	protected void getPopulation2(List<PopulationEntity> popList, String year) {
+
+		List<PopulationEntity> populationList = new ArrayList<>();
+
+		for (PopulationEntity pop : popList) {
+
+			SgisPopulationCode populationCode = sgisClient.getPopulation(
+					sgisUtil.getAccessToken(),
+					year,
+					pop.getAdmCd().substring(0, 2),
+					"1"
+			);
+			if(populationCode.getErrMsg().equals("Success")) {
+				populationList.add(convertUtil.convert(populationCode, PopulationEntity.class));
+			}
+		}
+
+		houseMapper.insertPopulation2(populationList);
+	}
 
 	@Transactional
 	protected HouseInfoTask insertHouseData(int lawdCd, int dealYmd, SseEmitter sseEmitter) throws Exception {
