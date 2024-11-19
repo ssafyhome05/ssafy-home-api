@@ -31,16 +31,14 @@ public class NavigateController {
 			summary = "매물 과 검색한 장소 간 이동시간",
 			description = "houseSeq 의 장소와 spotSearchDto 장소 간 NavigateDto 반환"
 	)
-	@GetMapping("/search")
+	@PostMapping("/search")
 	public ResponseEntity<NavigateDto> getTimeWithSearchSpot(
-			@RequestParam
-			String houseSeq,
-
 			@RequestBody
 			SpotSearchDto spotSearchDto
 	) {
+		System.out.println(spotSearchDto);
 
-		return new ResponseEntity<>(navigateService.getNavigate("search", houseSeq, navigateService.getEndPoint(spotSearchDto)), HttpStatus.OK);
+		return new ResponseEntity<>(navigateService.getNavigate("search", spotSearchDto.getAptSeq(), navigateService.getEndPoint(spotSearchDto)), HttpStatus.OK);
 	}
 
 	@Operation(
@@ -53,7 +51,7 @@ public class NavigateController {
 			@PathVariable
 			String type,
 
-			@RequestParam
+			@RequestBody
 			String houseSeq
 	) {
 

@@ -72,8 +72,17 @@ public class NavigateServiceImpl implements NavigateService {
 
     @Override
     public TMapPoint getEndPoint(SpotSearchDto spotSearchDto) {
-        return null;
+        if (spotSearchDto.getLatitude() != null && spotSearchDto.getLongitude() != null) {
+            return TMapPoint.builder()
+                    .name(spotSearchDto.getRoad_name())
+                    .x(Double.parseDouble(spotSearchDto.getLongitude()))
+                    .y(Double.parseDouble(spotSearchDto.getLatitude()))
+                    .build();
+        } else {
+            return null;
+        }
     }
+
 
     private List<TMapPoint> getEndpoints(String type, String aptSeq, TMapPoint start) {
         if (type.equals("spot")) {
