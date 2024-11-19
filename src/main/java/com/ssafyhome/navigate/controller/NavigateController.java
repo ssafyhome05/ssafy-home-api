@@ -1,11 +1,13 @@
 package com.ssafyhome.navigate.controller;
 
 import com.ssafyhome.common.response.ResponseMessage;
+import com.ssafyhome.navigate.dto.NavigateDto;
 import com.ssafyhome.navigate.response.NavigateResponseCode;
 import com.ssafyhome.navigate.service.NavigateService;
 import com.ssafyhome.spot.dto.SpotSearchDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
