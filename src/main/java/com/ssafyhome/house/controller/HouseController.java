@@ -200,7 +200,7 @@ public class HouseController {
 		return ResponseMessage.responseBasicEntity(HouseResoponseCode.KEYWORD_SUCCESS_SAVED);
 	}
 
-	@GetMapping("/top-ten")
+	@GetMapping("/topten")
 	public ResponseEntity<ResponseMessage.CustomMessage> getTopTen() {
 
 		return ResponseMessage.responseDataEntity(HouseResoponseCode.OK, houseService.getTopTen());
