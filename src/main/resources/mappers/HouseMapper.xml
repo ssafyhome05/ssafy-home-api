@@ -18,8 +18,8 @@
             </if>
         FROM house_info
         WHERE CONCAT(sgg_cd, umd_cd) = #{dongCode}
-        <if test="keyWord != null and keyWord != ''">
-            AND apt_nm LIKE CONCAT('%', #{keyWord}, '%')
+        <if test="keyword != null and keyword != ''">
+            AND apt_nm LIKE CONCAT('%', #{keyword}, '%')
         </if>
     </select>
 

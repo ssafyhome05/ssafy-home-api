@@ -109,11 +109,12 @@ public class HouseController {
 			summary = "특정 지역의 매물 존재정보 반환",
 			description = "사용자가 입력한 dongcode(필수) 와 세부사항(연도, 매물이름) 을 기준으로 매물 존재내역을 반환합니다."
 	)
-	@GetMapping("")
+	@PostMapping("")
 	public ResponseEntity<ResponseMessage.CustomMessage> getHouseInfo(
-			@RequestParam
+			@RequestBody
 			HouseSearchWithTimeDto searchDto
 	) {
+		System.out.println(searchDto);
 		return ResponseMessage.responseDataEntity(HouseResoponseCode.OK, houseService.getHouseInfo(searchDto));
 	}
 
