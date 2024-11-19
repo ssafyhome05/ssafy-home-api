@@ -20,6 +20,8 @@ import com.ssafyhome.house.entity.TopTenEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
+import com.ssafyhome.common.api.news.NewsClient;
+import com.ssafyhome.common.api.news.dto.NewsDto;
 import com.ssafyhome.common.exception.GonggongApplicationErrorException;
 import com.ssafyhome.house.dao.HouseMapper;
 import com.ssafyhome.house.entity.PopulationEntity;
@@ -41,6 +43,7 @@ public class HouseServiceImpl implements HouseService {
 	private final SearchKeywordRepository searchKeywordRepository;
 	private final TopTenRepository topTenRepository;
 	private final ConvertUtil convertUtil;
+	private final NewsClient newsClient;
 
 	public HouseServiceImpl(
 			HouseMapper houseMapper,
@@ -48,7 +51,8 @@ public class HouseServiceImpl implements HouseService {
 			ExecutorService executorService,
 			SearchKeywordRepository searchKeywordRepository,
 			TopTenRepository topTenRepository,
-			ConvertUtil convertUtil
+			ConvertUtil convertUtil,
+			NewsClient newsClient
 	) {
 
 		this.houseMapper = houseMapper;
@@ -57,6 +61,7 @@ public class HouseServiceImpl implements HouseService {
 		this.searchKeywordRepository = searchKeywordRepository;
 		this.topTenRepository = topTenRepository;
 		this.convertUtil = convertUtil;
+		this.newsClient = newsClient;
 	}
 
 	@Override
@@ -241,6 +246,12 @@ public class HouseServiceImpl implements HouseService {
 		}
 
 		return topTenDto;
+	}
+
+	@Override
+	public NewsDto getNews() {
+		
+		return newsClient.getNews();
 	}
 }
 

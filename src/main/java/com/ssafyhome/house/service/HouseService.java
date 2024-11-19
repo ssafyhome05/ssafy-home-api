@@ -5,6 +5,8 @@ import java.util.List;
 import com.ssafyhome.house.dto.HouseGraphDto;
 import com.ssafyhome.house.entity.PopulationEntity;
 import org.apache.ibatis.annotations.Param;
+
+import com.ssafyhome.common.api.news.dto.NewsDto;
 import com.ssafyhome.house.dto.*;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
@@ -23,4 +25,5 @@ public interface HouseService {
     void saveSearchKeyword(String dongCode);
 
     TopTenDto getTopTen();
+    NewsDto getNews();
 }
