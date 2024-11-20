@@ -8,7 +8,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.Semaphore;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import com.ssafyhome.common.util.ConvertUtil;
@@ -17,6 +16,7 @@ import com.ssafyhome.house.dao.repository.TopTenRepository;
 import com.ssafyhome.house.dto.*;
 import com.ssafyhome.house.entity.SearchKeywordEntity;
 import com.ssafyhome.house.entity.TopTenEntity;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
@@ -94,12 +94,10 @@ public class HouseServiceImpl implements HouseService {
 	 *  SGISClient 사용
 	 */
 	@Override
-	public void startPopulationTask(String year) {
+	public void updatePopulationTask(int year) {
 
-		List<PopulationEntity> popList = houseMapper.getPopulationList();
-		houseInternalService.getPopulation(popList, year);
+		houseInternalService.getPopulation(year);
 	}
-	
 	
 	@Override
 	public String startHouseInfoTask(int dealYmd, int startCd, int endCd) {
@@ -110,7 +108,6 @@ public class HouseServiceImpl implements HouseService {
 		sseEmitters.put(requestId, sseEmitter);
 
 		ConcurrentHashMap<Integer, Boolean> processingLawdMap = new ConcurrentHashMap<>();
-		Semaphore semaphore = new Semaphore(20);
 
 		executorService.submit(() -> {
 			try {
@@ -222,8 +219,25 @@ public class HouseServiceImpl implements HouseService {
 	}
 
 	@Override
-	public PopulationEntity getPopulation(String dongCode) {
-		return houseMapper.getPopulation(dongCode);
+	public PopulationDto getPopulation(String dongCode) {
+
+		PopulationEntity entity = houseMapper.getPopulation(dongCode);
+		int totalPopulation = entity.getAgeUnder20Population() + entity.getAge2030Population() + entity.getAge4060Population() + entity.getAgeOver70Population();
+
+		List<PopulationDto.Generation> generations = new ArrayList<>();
+		generations.add(new PopulationDto.Generation("under_20", entity.getAgeUnder20Population(), totalPopulation));
+		generations.add(new PopulationDto.Generation("20_30", entity.getAge2030Population(), totalPopulation));
+		generations.add(new PopulationDto.Generation("40_60", entity.getAge4060Population(), totalPopulation));
+		generations.add(new PopulationDto.Generation("over_70", entity.getAgeOver70Population(), totalPopulation));
+
+		return PopulationDto.builder()
+				.dongCode(entity.getDongCode())
+				.totalPopulation(totalPopulation)
+				.populationDensity(entity.getPpltnDnsty())
+				.corpCnt(Integer.parseInt(entity.getCorpCnt()))
+				.houseCnt(Integer.parseInt(entity.getTotHouse()))
+				.generations(generations)
+				.build();
 	}
 
 	public void saveSearchKeyword(String dongCode) {

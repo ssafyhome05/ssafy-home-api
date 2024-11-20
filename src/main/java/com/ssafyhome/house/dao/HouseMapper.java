@@ -30,9 +30,9 @@ public interface HouseMapper {
 	List<Integer> getLawdCdList(@Param("startCd") String startCd, @Param("endCd") String endCd);
 	Set<String> getExistAptSeq(String sggCode);
 	
-	void insertPopulation(PopulationEntity populationEntity);
-	void insertPopulation2(List<PopulationEntity> populationEntityList);
-	List<PopulationEntity> getPopulationList();
+//	void insertPopulation(PopulationEntity populationEntity);
+	void insertPopulation(List<PopulationEntity> populationEntityList);
+	List<String> getAdmCdList();
 	
 	PopulationEntity getPopulation(@Param("dongCode")String dongCode);
 	String getDongNameByCode(String dongCode);

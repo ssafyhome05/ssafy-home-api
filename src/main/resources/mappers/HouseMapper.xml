@@ -51,33 +51,34 @@
     </insert>
     
     <!-- 있으면 update, 없으면 insert -->
+<!--    <insert id="insertPopulation" parameterType="com.ssafyhome.house.entity.PopulationEntity">-->
+<!--    -->
+<!--      INSERT INTO population (adm_cd, tot_ppltn, ppltn_dnsty, aged_child_idx, corp_cnt, tot_house)-->
+<!--      VALUES (#{admCd}, #{totPpltn}, #{ppltnDnsty}, #{agedChildIdx}, #{corpCnt}, #{totHouse})-->
+<!--      ON DUPLICATE KEY UPDATE-->
+<!--          tot_ppltn = #{totPpltn},-->
+<!--          ppltn_dnsty = #{ppltnDnsty},-->
+<!--          aged_child_idx = #{agedChildIdx},-->
+<!--          corp_cnt = #{corpCnt},-->
+<!--          tot_house = #{totHouse}-->
+<!--  -->
+<!--	</insert>-->
     <insert id="insertPopulation" parameterType="com.ssafyhome.house.entity.PopulationEntity">
-    
-      INSERT INTO population (adm_cd, tot_ppltn, ppltn_dnsty, aged_child_idx, corp_cnt, tot_house)
-      VALUES (#{admCd}, #{totPpltn}, #{ppltnDnsty}, #{agedChildIdx}, #{corpCnt}, #{totHouse})
-      ON DUPLICATE KEY UPDATE
-          tot_ppltn = #{totPpltn},
-          ppltn_dnsty = #{ppltnDnsty},
-          aged_child_idx = #{agedChildIdx},
-          corp_cnt = #{corpCnt},
-          tot_house = #{totHouse}
-  
-	</insert>
-    <insert id="insertPopulation2" parameterType="com.ssafyhome.house.entity.PopulationEntity">
-        INSERT INTO population
+        INSERT INTO population (adm_cd, tot_ppltn, ppltn_dnsty, aged_child_idx, corp_cnt, tot_house, age_under20_population, age_2030_population, age_4060_population, age_over70_population)
         VALUES
-        <foreach
-                collection="list"
-                item="item"
-                separator=",">
-            (#{item.admCd},#{item.totPPltn},#{item.ppltnDnsty},#{item.agedChildIdx},#{item.corpCnt},#{item.totHouse})
+        <foreach collection="list" item="item" separator=",">
+            (#{item.admCd},#{item.totPpltn},#{item.ppltnDnsty},#{item.agedChildIdx},#{item.corpCnt},#{item.totHouse}, #{item.ageUnder20Population}, #{item.age2030Population}, #{item.age4060Population}, #{item.ageOver70Population})
         </foreach>
         ON DUPLICATE KEY UPDATE
-        tot_ppltn = #{totPpltn},
-        ppltn_dnsty = #{ppltnDnsty},
-        aged_child_idx = #{agedChildIdx},
-        corp_cnt = #{corpCnt},
-        tot_house = #{totHouse}
+        tot_ppltn = VALUES(tot_ppltn),
+        ppltn_dnsty = VALUES(ppltn_dnsty),
+        aged_child_idx = VALUES(aged_child_idx),
+        corp_cnt = VALUES(corp_cnt),
+        tot_house = VALUES(tot_house),
+        age_under20_population = VALUES(age_under20_population),
+        age_2030_population = VALUES(age_2030_population),
+        age_4060_population = VALUES(age_4060_population),
+        age_over70_population = VALUES(age_over70_population)
     </insert>
 
     <select id="getSidoGugun" parameterType="string" resultType="com.ssafyhome.common.entity.DongCodeEntity">
@@ -87,7 +88,7 @@
     </select>
     
     
-    <select id="getPopulationList" resultType="com.ssafyhome.house.entity.PopulationEntity">
+    <select id="getAdmCdList" resultType="string">
         SELECT adm_cd
         FROM population
     </select>
