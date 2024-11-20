@@ -205,4 +205,15 @@ public class HouseController {
 
 		return ResponseMessage.responseDataEntity(HouseResoponseCode.OK, houseService.getTopTen());
 	}
+	
+	
+	@Operation(
+			summary = "최신 뉴스기사 크롤링",
+			description = "네이버부동산 기준 최신 뉴스기사 제목, 링크, 관련동네, 출처를 가져옵니다."
+	)
+	@GetMapping("/news")
+	public ResponseEntity<ResponseMessage.CustomMessage> getNews() {
+
+		return ResponseMessage.responseDataEntity(HouseResoponseCode.OK, houseService.getNews());
+	}
 }
