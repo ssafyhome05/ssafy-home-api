@@ -16,6 +16,7 @@ import com.ssafyhome.house.dao.repository.TopTenRepository;
 import com.ssafyhome.house.dto.*;
 import com.ssafyhome.house.entity.SearchKeywordEntity;
 import com.ssafyhome.house.entity.TopTenEntity;
+import com.ssafyhome.house.response.SseMessageCode;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
@@ -112,10 +113,10 @@ public class HouseServiceImpl implements HouseService {
 		executorService.submit(() -> {
 			try {
 				LocalDateTime start = LocalDateTime.now();
-				sseEmitter.send(SseEmitter.event()
-						.name("Task start time")
-						.data(start.format(timeFormatter()))
-				);
+				new SseMessageDto<>(
+						SseMessageCode.START_TASK,
+						start.format(timeFormatter())
+				).sendEvent(sseEmitter);
 
 				List<Integer> lawdCdList = houseMapper.getLawdCdList(
 						String.valueOf(startCd),
@@ -154,17 +155,16 @@ public class HouseServiceImpl implements HouseService {
 								}
 							}
 							if (tryTimes == 0 && houseInfoTask == null) {
-								sseEmitter.send(SseEmitter.event()
-										.name(lawdCd+ "gonggong Error")
-										.data( "error (" + seq.getAndIncrement() + "/" + size + ")")
-
-								);
+								new SseMessageDto<>(
+										SseMessageCode.API_ERROR,
+										new SseMessageDto.Stats(String.valueOf(lawdCd), seq.getAndIncrement(), size)
+								).sendEvent(sseEmitter);
 							}
 							else {
-								sseEmitter.send(SseEmitter.event()
-										.name(houseInfoTask.getTaskName())
-										.data(houseInfoTask.getTotalRows() + " rows completed!! commit (" + seq.getAndIncrement() + "/" + size + ") " + houseInfoTask.getDuration().toSeconds() + " seconds")
-								);
+								new SseMessageDto<>(
+										SseMessageCode.TASK_COMPLETED,
+										new SseMessageDto.Stats(houseInfoTask.getTaskName(), seq.getAndIncrement(), size)
+								).sendEvent(sseEmitter);
 							}
 						} catch (Exception e) {
 							System.out.println(e.getMessage());
@@ -177,23 +177,21 @@ public class HouseServiceImpl implements HouseService {
 				countDownLatch.await();
 
 				LocalDateTime end = LocalDateTime.now();
-				sseEmitter.send(SseEmitter.event()
-						.name("Task end time")
-						.data(end.format(timeFormatter()))
-				);
+				new SseMessageDto<>(
+						SseMessageCode.TASK_FINISHED,
+						end.format(timeFormatter())
+				).sendEvent(sseEmitter);
 
 				Duration duration = Duration.between(start, end);
-				sseEmitter.send(SseEmitter.event()
-						.name("Task duration")
-						.data(
-								String.format(
-										"%d:%d:%d",
-										duration.toHours(),
-										duration.toMinutes() - 60 * duration.toHours(),
-										duration.toSeconds() - 60 * duration.toMinutes()
-								)
+				new SseMessageDto<>(
+						SseMessageCode.TASK_SPEND_TIME,
+						String.format(
+								"%d:%d:%d",
+								duration.toHours(),
+								duration.toMinutes() - 60 * duration.toHours(),
+								duration.toSeconds() - 60 * duration.toMinutes()
 						)
-				);
+				).sendEvent(sseEmitter);
 			} catch (Exception e) {
 				sseEmitter.completeWithError(e);
 			} finally {
