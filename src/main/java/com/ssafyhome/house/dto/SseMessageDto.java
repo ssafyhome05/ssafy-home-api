@@ -23,11 +23,8 @@ public class SseMessageDto<T> {
 	}
 
 	public void sendEvent(SseEmitter emitter) throws IOException {
-		emitter.send(
-				SseEmitter.event()
-						.name(String.valueOf(this.code))
-						.data(this, MediaType.APPLICATION_JSON)
-		);
+
+		emitter.send(this, MediaType.APPLICATION_JSON);
 	}
 
 	@Data
