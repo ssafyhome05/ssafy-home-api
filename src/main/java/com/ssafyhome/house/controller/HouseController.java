@@ -94,7 +94,7 @@ public class HouseController {
 			description = "지역별 총인구, 가구총계, 노령화지수, 평균연령을 반환합니다."
 	)
 	@GetMapping("/population")
-	public ResponseEntity<PopulationEntity> getPopulation(
+	public ResponseEntity<ResponseMessage.CustomMessage> getPopulation(
 			@Parameter(
 			          name = "dongCode",
 			          example = "1111010100"
@@ -102,7 +102,7 @@ public class HouseController {
 			@RequestParam("dongCode")
 			String dongCode
 	) {
-		return new ResponseEntity<>(houseService.getPopulation(dongCode), HttpStatus.OK);
+		return ResponseMessage.responseDataEntity(HouseResoponseCode.OK, houseService.getPopulation(dongCode));
 	}
 
 	@Operation(
@@ -141,7 +141,7 @@ public class HouseController {
 			summary = "새로운 매물 데이터 업데이트 (관리자) ",
 			description = "신규 매물 거래 내역을 업데이트 합니다. (관리자) "
 	)
-	@PostMapping("/admin/register")
+	@PostMapping("/admin/house")
 //	@PreAuthorize("hasRole('ROLE_ADMIN')")
 
 	public ResponseEntity<ResponseMessage.CustomMessage> updateHouseInfo(
@@ -182,11 +182,14 @@ public class HouseController {
 			summary = "행정동별 인구통계 데이터 업데이트",
 			description = "행정동 시군구별 총인구수, 인구밀도, 노령화지수, 사업체 수, 총 주택수 정보를 테이블에 업데이트합니다."
 	)
-	@GetMapping("/admin/register")
+	@PostMapping("/admin/population")
 //	@PreAuthorize("hasRole('ROLE_ADMIN')")
-	public ResponseEntity<ResponseMessage.CustomMessage> updatePopulationInfo() {
+	public ResponseEntity<ResponseMessage.CustomMessage> updatePopulationInfo(
+			@RequestParam(defaultValue = "2022")
+			int year
+	) {
 
-		houseService.startPopulationTask("2022"); 
+		houseService.updatePopulationTask(year);
 		return ResponseMessage.responseBasicEntity(HouseResoponseCode.POPULATION_UPDATED);
 	}
 
