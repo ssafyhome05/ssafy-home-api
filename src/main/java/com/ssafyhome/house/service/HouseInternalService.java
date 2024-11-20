@@ -3,12 +3,18 @@ package com.ssafyhome.house.service;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
+import com.ssafyhome.common.api.sgis.dto.SgisSearchPopulation;
+import com.ssafyhome.house.dto.SearchPopulationDto;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,7 +25,7 @@ import com.ssafyhome.common.api.gonggong.dto.GonggongAptTradeResponse;
 import com.ssafyhome.common.api.sgis.SGISClient;
 import com.ssafyhome.common.api.sgis.SGISUtil;
 import com.ssafyhome.common.api.sgis.dto.SgisGeoCode;
-import com.ssafyhome.common.api.sgis.dto.SgisPopulationCode;
+import com.ssafyhome.common.api.sgis.dto.SgisPopulation;
 import com.ssafyhome.common.entity.DongCodeEntity;
 import com.ssafyhome.common.exception.GonggongApplicationErrorException;
 import com.ssafyhome.common.util.ConvertUtil;
@@ -29,6 +35,7 @@ import com.ssafyhome.house.entity.HouseDealEntity;
 import com.ssafyhome.house.entity.HouseInfoEntity;
 import com.ssafyhome.house.entity.PopulationEntity;
 
+@Slf4j
 @Service
 public class HouseInternalService {
 
@@ -64,52 +71,105 @@ public class HouseInternalService {
 	 * @param popList, year
 	 * @return 갱신된 PopulatonEntity
 	 */
-	@Transactional
-	protected void getPopulation(List<PopulationEntity> popList, String year) {
-		
-		for (PopulationEntity pop : popList) {
+//	@Transactional
+//	protected void getPopulation(String admCd, int year) {
+//
+//		for (PopulationEntity pop : popList) {
+//
+//			SgisPopulation population = sgisClient.getPopulation(sgisUtil.getAccessToken(),
+//																		year,
+//																		pop.getAdmCd().substring(0, 2),
+//																		"1");
+//			if(population.getErrMsg().equals("Success")) {
+//
+//				PopulationEntity newPop = new PopulationEntity();
+//
+//				for (int i = 0; i < population.getResult().size(); i++) {
+//					newPop.setAdmCd(population.getResult().get(i).getdmCd());
+//					newPop.setAgedChildIdx(population.getResult().get(i).getAgedChildIdx());
+//					newPop.setCorpCnt(population.getResult().get(i).getCorpCnt());
+//					newPop.setPpltnDnsty(String.valueOf(population.getResult().get(i).getPpltnDnsty()));
+//					newPop.setTotHouse(population.getResult().get(i).getTotHouse());
+//					newPop.setTotPpltn(population.getResult().get(i).getTotPpltn());
+//
+//					houseMapper.insertPopulation(newPop);
+//				}
+//			}
+//		}
+//	}
 
-			SgisPopulationCode population = sgisClient.getPopulation(sgisUtil.getAccessToken(), 
-																		year, 
-																		pop.getAdmCd().substring(0, 2), 
-																		"1");
-			if(population.getErrMsg().equals("Success")) {
-				
-				PopulationEntity newPop = new PopulationEntity();
-				
-				for (int i = 0; i < population.getResult().size(); i++) {
-					newPop.setAdmCd(population.getResult().get(i).getAdmCd());
-					newPop.setAgedChildIdx(population.getResult().get(i).getAgedChildIdx());
-					newPop.setCorpCnt(population.getResult().get(i).getCorpCnt());
-					newPop.setPpltnDnsty(String.valueOf(population.getResult().get(i).getPpltnDnsty()));
-					newPop.setTotHouse(population.getResult().get(i).getTotHouse());
-					newPop.setTotPpltn(population.getResult().get(i).getTotPpltn());
-					
-					houseMapper.insertPopulation(newPop);
+	@Transactional
+	protected void getPopulation(int year) {
+
+		List<Integer> admCdList = AdmCd.getAllCodes();
+		List<PopulationEntity> populationList = new ArrayList<>();
+		CountDownLatch countDownLatch = new CountDownLatch(admCdList.size());
+		for (int admCd : admCdList) {
+			executorService.execute(() -> {
+				try {
+					SgisPopulation populationCode = sgisClient.getPopulation(
+							sgisUtil.getAccessToken(),
+							year,
+							admCd,
+							1
+					);
+					if (populationCode.getErrMsg().equals("Success")) {
+						List<PopulationEntity> tempList = convertUtil.convert(populationCode.getResult(), PopulationEntity.class);
+						Map<String, SearchPopulationDto> map = getSearchPopulation(year, admCd);
+						tempList.forEach(entity -> {
+							SearchPopulationDto defaultDto = new SearchPopulationDto();
+							entity.setAgeUnder20Population(map.getOrDefault(entity.getAdmCd(), defaultDto).getAgeUnder20Population().get());
+							entity.setAge2030Population(map.getOrDefault(entity.getAdmCd(), defaultDto).getAge2030Population().get());
+							entity.setAge4060Population(map.getOrDefault(entity.getAdmCd(), defaultDto).getAge4060Population().get());
+							entity.setAgeOver70Population(map.getOrDefault(entity.getAdmCd(), defaultDto).getAgeOver70Population().get());
+						});
+						populationList.addAll(tempList);
+					}
+				} finally {
+					countDownLatch.countDown();
 				}
-			}
+			});
 		}
+
+		try {
+			countDownLatch.await();
+		} catch (InterruptedException e) {
+			log.info(e.getMessage());
+		}
+
+		houseMapper.insertPopulation(populationList);
 	}
 
-	@Transactional
-	protected void getPopulation2(List<PopulationEntity> popList, String year) {
+	private Map<String, SearchPopulationDto> getSearchPopulation(int year, int admCd) {
 
-		List<PopulationEntity> populationList = new ArrayList<>();
-
-		for (PopulationEntity pop : popList) {
-
-			SgisPopulationCode populationCode = sgisClient.getPopulation(
-					sgisUtil.getAccessToken(),
-					year,
-					pop.getAdmCd().substring(0, 2),
-					"1"
-			);
-			if(populationCode.getErrMsg().equals("Success")) {
-				populationList.add(convertUtil.convert(populationCode, PopulationEntity.class));
-			}
+		Map<String, SearchPopulationDto> searchPopulationMap = new ConcurrentHashMap<>();
+		CountDownLatch countDownLatch = new CountDownLatch(AgeCd.values().length);
+		for(AgeCd THIS_CODE : AgeCd.values() ) {
+			executorService.execute(() -> {
+				try{
+					SgisSearchPopulation sgisSearchPopulation = sgisClient.getSearchPopulation(
+							sgisUtil.getAccessToken(),
+							year,
+							admCd,
+							THIS_CODE.getCode(),
+							1
+					);
+					sgisSearchPopulation.getResult().forEach(result -> {
+						searchPopulationMap.putIfAbsent(result.getAdmCd(), new SearchPopulationDto());
+						searchPopulationMap.get(result.getAdmCd()).setPopulationByAge(THIS_CODE.getGeneration(), result.getPopulation());
+					});
+				}
+				finally {
+					countDownLatch.countDown();
+				}
+			});
 		}
-
-		houseMapper.insertPopulation2(populationList);
+		try {
+			countDownLatch.await();
+		}
+		catch (InterruptedException e) {
+		}
+		return searchPopulationMap;
 	}
 
 	@Transactional
