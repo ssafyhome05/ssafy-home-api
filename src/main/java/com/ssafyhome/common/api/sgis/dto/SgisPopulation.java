@@ -7,7 +7,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
 @Data
-public class SgisPopulationCode {
+public class SgisPopulation {
 
 	
 	private String id;
