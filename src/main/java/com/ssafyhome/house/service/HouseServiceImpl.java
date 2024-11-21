@@ -47,7 +47,7 @@ public class HouseServiceImpl implements HouseService {
 	private String serverPort;
 
 	@Value("${spring.datasource.hikari.maximum-pool-size")
-	private int maxPoolSize;
+	private String maxPoolSize;
 
 	/**
 	 * 작업을 비동기로 진행하고 완료가 된 경우, 실시간으로 알림을 사용자에게 전송하기 위해서
@@ -145,7 +145,7 @@ public class HouseServiceImpl implements HouseService {
 			AtomicInteger seq = new AtomicInteger(1);
 			CountDownLatch countDownLatch = new CountDownLatch(size);
 
-      try (ExecutorService fixedExecutorService = Executors.newFixedThreadPool(maxPoolSize)) {
+      try (ExecutorService fixedExecutorService = Executors.newFixedThreadPool(Integer.parseInt(maxPoolSize))) {
 
         for (int lawdCd : lawdCdList) {
           fixedExecutorService.submit(() ->
