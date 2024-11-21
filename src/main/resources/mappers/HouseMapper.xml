@@ -94,6 +94,12 @@
         FROM population
         WHERE dong_code = LEFT(#{dongCode}, 5)
     </select>
+    
+    <select id="getNewsList" resultType="com.ssafyhome.house.dto.NewsDto">
+    	SELECT *
+    	FROM news
+    	LIMIT 5;
+    </select>
 
     <insert id="insertHouseInfo" parameterType="java.util.List">
         INSERT IGNORE INTO house_info
