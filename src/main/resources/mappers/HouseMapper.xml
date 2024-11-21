@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.ssafyhome.house.dao.HouseMapper">
+
     <select id="getHouseInfo" parameterType="com.ssafyhome.house.dto.HouseSearchWithTimeDto" resultType="com.ssafyhome.house.dto.HouseDto">
         SELECT
             *,
@@ -10,7 +11,7 @@
             (SELECT FORMAT(ROUND(AVG(CAST(REPLACE(deal_amount, ',', '') AS DOUBLE)), 1), 0)
                 FROM house_deal
                 WHERE house_deal.apt_seq = house_info.apt_seq) AS avg_deal_amount,
-             <if test="userSeq != null">
+            <if test="userSeq != null">
                 (SELECT CASE WHEN COUNT(*) > 0 THEN TRUE ELSE FALSE END
                 FROM favorite_house
                 WHERE favorite_house.user_seq = #{userSeq}
@@ -29,6 +30,71 @@
         WHERE apt_seq = #{aptSeq}
             LIMIT #{limit} OFFSET #{offset};
     </select>
+
+    <select id="getHouseGraph" resultType="com.ssafyhome.house.dto.HouseGraphDto">
+        SELECT
+            months.month AS 'month',
+            COALESCE(house_deal_data.cnt, 0) AS 'dealCnt',
+            COALESCE(house_deal_data.dealAvg, 0) AS 'avgDealAmount',
+            COALESCE(house_deal_data.areaDealAvg, 0) AS 'avgAreaPrice'
+        FROM
+            (SELECT 1 AS month UNION SELECT 2 UNION SELECT 3 UNION SELECT 4 UNION SELECT 5 UNION SELECT 6
+                UNION SELECT 7 UNION SELECT 8 UNION SELECT 9 UNION SELECT 10 UNION SELECT 11 UNION SELECT 12) AS months
+                LEFT JOIN
+            (SELECT
+                deal_month AS month,
+                COUNT(*) AS cnt,
+                ROUND(AVG(CAST(REPLACE(deal_amount, ',', '') AS DOUBLE)), 1) AS dealAvg,
+                ROUND(AVG(CAST(REPLACE(deal_amount, ',', '') AS DOUBLE)) / AVG(exclu_use_ar), 1) AS areaDealAvg
+            FROM
+                house_deal
+            WHERE
+                apt_seq = #{houseSeq}
+                AND deal_year = #{year}
+            GROUP BY
+                deal_month
+            ) AS house_deal_data
+            ON
+                months.month = house_deal_data.month
+        ORDER BY
+            months.month
+    </select>
+
+    <select id="getSidoGugun" parameterType="string" resultType="com.ssafyhome.common.entity.DongCodeEntity">
+        SELECT DISTINCT sido_name, gugun_name, bdong_code, bdong_name
+        FROM dong_code
+        WHERE substr(bdong_code, 1, 5) = substr(#{dongCode}, 1, 5)
+    </select>
+
+    <select id="getExistAptSeq" resultType="String">
+        SELECT apt_seq
+        FROM house_info
+        WHERE sgg_cd = #{sggCode}
+    </select>
+    
+    <select id="getLawdCdList" resultType="Integer">
+        SELECT DISTINCT SUBSTR(bdong_code, 1, 5)
+        FROM dong_code
+        WHERE bdong_code BETWEEN #{startCd} AND #{endCd}
+    </select>
+
+    <select id="getDongNameByCode" resultType="java.lang.String">
+        SELECT DISTINCT CONCAT(sido_name, ' ', gugun_name, ' ', bdong_name)
+        FROM dong_code
+        WHERE bdong_code = #{dongCode}
+    </select>
+
+    <select id="getAdmCdList" resultType="string">
+        SELECT adm_cd
+        FROM population
+    </select>
+
+    <select id="getPopulation" resultType="com.ssafyhome.house.entity.PopulationEntity">
+        SELECT *
+        FROM population
+        WHERE dong_code = LEFT(#{dongCode}, 5)
+    </select>
+
     <insert id="insertHouseInfo" parameterType="java.util.List">
         INSERT IGNORE INTO house_info
         VALUES
@@ -39,6 +105,7 @@
             (#{item.aptSeq},#{item.sggCd},#{item.umdCd},#{item.umdNm},#{item.jibun},#{item.roadNmSggCd},#{item.roadNm},#{item.roadNmBonbun},#{item.roadNmBubun},#{item.aptNm},#{item.buildYear},#{item.latitude},#{item.longitude})
         </foreach>
     </insert>
+
     <insert id="insertHouseDeal" parameterType="java.util.List">
         INSERT INTO house_deal
         VALUES
@@ -49,20 +116,7 @@
             (#{item.dealSeq},#{item.aptSeq},#{item.aptDong},#{item.floor},#{item.dealYear},#{item.dealMonth},#{item.dealDay},#{item.excluUseAr},#{item.dealAmount})
         </foreach>
     </insert>
-    
-    <!-- 있으면 update, 없으면 insert -->
-<!--    <insert id="insertPopulation" parameterType="com.ssafyhome.house.entity.PopulationEntity">-->
-<!--    -->
-<!--      INSERT INTO population (adm_cd, tot_ppltn, ppltn_dnsty, aged_child_idx, corp_cnt, tot_house)-->
-<!--      VALUES (#{admCd}, #{totPpltn}, #{ppltnDnsty}, #{agedChildIdx}, #{corpCnt}, #{totHouse})-->
-<!--      ON DUPLICATE KEY UPDATE-->
-<!--          tot_ppltn = #{totPpltn},-->
-<!--          ppltn_dnsty = #{ppltnDnsty},-->
-<!--          aged_child_idx = #{agedChildIdx},-->
-<!--          corp_cnt = #{corpCnt},-->
-<!--          tot_house = #{totHouse}-->
-<!--  -->
-<!--	</insert>-->
+
     <insert id="insertPopulation" parameterType="com.ssafyhome.house.entity.PopulationEntity">
         INSERT INTO population (adm_cd, tot_ppltn, ppltn_dnsty, aged_child_idx, corp_cnt, tot_house, age_under20_population, age_2030_population, age_4060_population, age_over70_population)
         VALUES
@@ -80,68 +134,4 @@
         age_4060_population = VALUES(age_4060_population),
         age_over70_population = VALUES(age_over70_population)
     </insert>
-
-    <select id="getSidoGugun" parameterType="string" resultType="com.ssafyhome.common.entity.DongCodeEntity">
-        SELECT DISTINCT sido_name, gugun_name, bdong_code, bdong_name
-        FROM dong_code
-        WHERE substr(bdong_code, 1, 5) = substr(#{dongCode}, 1, 5)
-    </select>
-    
-    
-    <select id="getAdmCdList" resultType="string">
-        SELECT adm_cd
-        FROM population
-    </select>
-    
-    
-    <select id="getLawdCdList" resultType="Integer">
-        SELECT DISTINCT SUBSTR(bdong_code, 1, 5)
-        FROM dong_code
-        WHERE bdong_code BETWEEN #{startCd} AND #{endCd}
-    </select>
-    <select id="getExistAptSeq" resultType="String">
-        SELECT apt_seq
-        FROM house_info
-        WHERE sgg_cd = #{sggCode}
-    </select>
-
-    <select id="getHouseGraph" resultType="com.ssafyhome.house.dto.HouseGraphDto">
-        SELECT
-            months.month AS 'month',
-                COALESCE(house_deal_data.cnt, 0) AS 'dealCnt',
-                COALESCE(house_deal_data.dealAvg, 0) AS 'avgDealAmount',
-                COALESCE(house_deal_data.areaDealAvg, 0) AS 'avgAreaPrice'
-        FROM
-            (SELECT 1 AS month UNION SELECT 2 UNION SELECT 3 UNION SELECT 4 UNION SELECT 5 UNION SELECT 6
-             UNION SELECT 7 UNION SELECT 8 UNION SELECT 9 UNION SELECT 10 UNION SELECT 11 UNION SELECT 12) AS months
-                LEFT JOIN
-            (SELECT
-                 deal_month AS month,
-        COUNT(*) AS cnt,
-        ROUND(AVG(CAST(REPLACE(deal_amount, ',', '') AS DOUBLE)), 1) AS dealAvg,
-        ROUND(AVG(CAST(REPLACE(deal_amount, ',', '') AS DOUBLE)) / AVG(exclu_use_ar), 1) AS areaDealAvg
-             FROM
-                 house_deal
-             WHERE
-                 apt_seq = #{houseSeq}
-               AND deal_year = #{year}
-             GROUP BY
-                 deal_month
-            ) AS house_deal_data
-            ON
-                months.month = house_deal_data.month
-        ORDER BY
-            months.month
-    </select>
-    <select id="getPopulation" resultType="com.ssafyhome.house.entity.PopulationEntity">
-        SELECT *
-        FROM population
-        WHERE dong_code = LEFT(#{dongCode}, 5)
-    </select>
-  
-    <select id="getDongNameByCode" resultType="java.lang.String">
-        SELECT DISTINCT CONCAT(sido_name, ' ', gugun_name, ' ', bdong_name)
-        FROM dong_code
-        WHERE bdong_code = #{dongCode}
-    </select>
 </mapper>

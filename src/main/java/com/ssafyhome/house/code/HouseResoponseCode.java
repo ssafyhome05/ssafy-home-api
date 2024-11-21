@@ -1,4 +1,4 @@
-package com.ssafyhome.house.response;
+package com.ssafyhome.house.code;
 
 import com.ssafyhome.common.response.ResponseCode;
 import lombok.AllArgsConstructor;
@@ -15,6 +15,8 @@ public enum HouseResoponseCode implements ResponseCode {
 	TASK_STATUS_CREATED(201050, "데이터 저장 태스크 시작", HttpStatus.CREATED),
 	POPULATION_UPDATED(201051, "인구 통계 데이터 업데이트 성공", HttpStatus.CREATED),
 	KEYWORD_SUCCESS_SAVED(201052, "검색어가 성공적으로 저장되었습니다.", HttpStatus.CREATED),
+	//404 NOT_FOUND
+	REQUEST_ID_NOT_FOUND(404050, "해당하는 진행 작업을 찾을 수 없습니다", HttpStatus.NOT_FOUND),
 
 
 	//Enum end

@@ -5,6 +5,8 @@ import com.ssafyhome.auth.exception.ExpiredRefreshException;
 import com.ssafyhome.auth.exception.InvalidJwtException;
 import com.ssafyhome.auth.response.AuthResponseCode;
 import com.ssafyhome.common.response.ResponseMessage;
+import com.ssafyhome.house.exception.RequestIdNotFoundException;
+import com.ssafyhome.house.code.HouseResoponseCode;
 import com.ssafyhome.user.exception.*;
 import com.ssafyhome.user.response.UserResponseCode;
 import org.springframework.http.ResponseEntity;
@@ -58,5 +60,10 @@ public class GlobalExceptionHandler {
   @ExceptionHandler(UserNotFoundException.class)
   public ResponseEntity<ResponseMessage.CustomMessage> handleUserNotFoundException(UserNotFoundException e) {
     return ResponseMessage.responseBasicEntity(UserResponseCode.USER_NOT_FOUND);
+  }
+
+  @ExceptionHandler(RequestIdNotFoundException.class)
+  public ResponseEntity<ResponseMessage.CustomMessage> handleRequestIdNotFoundException(RequestIdNotFoundException e) {
+    return ResponseMessage.responseBasicEntity(HouseResoponseCode.REQUEST_ID_NOT_FOUND);
   }
 }
