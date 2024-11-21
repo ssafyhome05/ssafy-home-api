@@ -14,6 +14,8 @@ import java.util.stream.Collectors;
 
 import com.ssafyhome.common.api.sgis.dto.SgisSearchPopulation;
 import com.ssafyhome.house.dto.SearchPopulationDto;
+import com.ssafyhome.house.dto.SseMessageDto;
+import com.ssafyhome.house.response.SseMessageCode;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -234,11 +236,10 @@ public class HouseInternalService {
 						}
 						else {
 							try {
-								sseEmitter.send(
-										SseEmitter.event()
-												.name("Not found jibun")
-												.data(lawdCd + "-" + dealYmd + "-" + seq)
-								);
+								new SseMessageDto<>(
+										SseMessageCode.NOT_FOUND_JIBUN,
+										lawdCd + "-" + dealYmd + "-" + seq
+								).sendEvent(sseEmitter);
 							} catch (Exception e) {
 							}
 						}
