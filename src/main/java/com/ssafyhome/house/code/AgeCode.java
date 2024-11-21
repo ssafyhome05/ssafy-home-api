@@ -1,11 +1,11 @@
-package com.ssafyhome.house.service;
+package com.ssafyhome.house.code;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public enum AgeCd {
+public enum AgeCode {
   UNDER_TEENAGER("30","UNDER_20"),
   TEENAGER("31","UNDER_20"),
   TWENTIES("32","2030"),

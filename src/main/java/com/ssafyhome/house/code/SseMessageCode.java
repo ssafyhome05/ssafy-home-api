@@ -1,4 +1,4 @@
-package com.ssafyhome.house.response;
+package com.ssafyhome.house.code;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

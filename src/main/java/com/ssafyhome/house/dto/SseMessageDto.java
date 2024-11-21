@@ -1,6 +1,6 @@
 package com.ssafyhome.house.dto;
 
-import com.ssafyhome.house.response.SseMessageCode;
+import com.ssafyhome.house.code.SseMessageCode;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.springframework.http.MediaType;

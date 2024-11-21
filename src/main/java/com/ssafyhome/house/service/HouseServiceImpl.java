@@ -10,13 +10,23 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import com.ssafyhome.common.api.sgis.SGISClient;
+import com.ssafyhome.common.api.sgis.SGISUtil;
+import com.ssafyhome.common.api.sgis.dto.SgisPopulation;
+import com.ssafyhome.common.api.sgis.dto.SgisSearchPopulation;
+import com.ssafyhome.common.mapper.GeometryMapper;
 import com.ssafyhome.common.util.ConvertUtil;
+import com.ssafyhome.common.util.GeometryUtil;
+import com.ssafyhome.common.util.object.Point;
+import com.ssafyhome.house.code.AdmCode;
+import com.ssafyhome.house.code.AgeCode;
 import com.ssafyhome.house.dao.repository.SearchKeywordRepository;
 import com.ssafyhome.house.dao.repository.TopTenRepository;
 import com.ssafyhome.house.dto.*;
 import com.ssafyhome.house.entity.SearchKeywordEntity;
 import com.ssafyhome.house.entity.TopTenEntity;
-import com.ssafyhome.house.response.SseMessageCode;
+import com.ssafyhome.house.exception.RequestIdNotFoundException;
+import com.ssafyhome.house.code.SseMessageCode;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
@@ -29,6 +39,15 @@ import com.ssafyhome.house.entity.PopulationEntity;
 
 @Service
 public class HouseServiceImpl implements HouseService {
+
+	@Value("${server.ip}")
+	private String serverIp;
+
+	@Value("${server.port}")
+	private String serverPort;
+
+	@Value("${spring.datasource.hikari.maximum-pool-size")
+	private int maxPoolSize;
 
 	/**
 	 * 작업을 비동기로 진행하고 완료가 된 경우, 실시간으로 알림을 사용자에게 전송하기 위해서
@@ -45,6 +64,10 @@ public class HouseServiceImpl implements HouseService {
 	private final TopTenRepository topTenRepository;
 	private final ConvertUtil convertUtil;
 	private final NewsClient newsClient;
+	private final GeometryUtil geometryUtil;
+	private final GeometryMapper geometryMapper;
+	private final SGISClient sgisClient;
+	private final SGISUtil sgisUtil;
 
 	public HouseServiceImpl(
 			HouseMapper houseMapper,
@@ -53,7 +76,11 @@ public class HouseServiceImpl implements HouseService {
 			SearchKeywordRepository searchKeywordRepository,
 			TopTenRepository topTenRepository,
 			ConvertUtil convertUtil,
-			NewsClient newsClient
+			NewsClient newsClient,
+			GeometryUtil geometryUtil,
+			GeometryMapper geometryMapper,
+			SGISClient sgisClient,
+			SGISUtil sgisUtil
 	) {
 
 		this.houseMapper = houseMapper;
@@ -63,150 +90,181 @@ public class HouseServiceImpl implements HouseService {
 		this.topTenRepository = topTenRepository;
 		this.convertUtil = convertUtil;
 		this.newsClient = newsClient;
-	}
-
-	@Override
-	public List<HouseDto> getHouseInfo(HouseSearchWithTimeDto searchDto) {
-
-		List<HouseDto> houseInfoList = houseMapper.getHouseInfo(searchDto);
-
-		return houseInfoList;
-	}
-
-	@Override
-	public List<HouseDealDto> getHouseDealList(String houseSeq, int page, int limit) {
-
-		int offset = page * limit;
-		List<HouseDealDto> houseDealList = houseMapper.getHouseDealList(houseSeq, limit, offset);
-
-		return houseDealList;
-	}
-
-	@Override
-	public List<HouseGraphDto> getHouseGraph(String houseSeq, int year){
-
-		List<HouseGraphDto> houseGraphDtoList = houseMapper.getHouseGraph(houseSeq, year);
-
-		return houseGraphDtoList;
-	}
-
-	/**
-	 *  모든 행정동 297개에 대한 population 데이터 DB 의 population table 에 저장 하는 메서드
-	 *  SGISClient 사용
-	 */
-	@Override
-	public void updatePopulationTask(int year) {
-
-		houseInternalService.getPopulation(year);
+		this.geometryUtil = geometryUtil;
+		this.geometryMapper = geometryMapper;
+		this.sgisClient = sgisClient;
+		this.sgisUtil = sgisUtil;
 	}
 	
 	@Override
 	public String startHouseInfoTask(int dealYmd, int startCd, int endCd) {
 
 		String requestId = UUID.randomUUID().toString();
-
 		SseEmitter sseEmitter = new SseEmitter(Long.MAX_VALUE);
 		sseEmitters.put(requestId, sseEmitter);
-
 		ConcurrentHashMap<Integer, Boolean> processingLawdMap = new ConcurrentHashMap<>();
 
-		executorService.submit(() -> {
-			try {
-				LocalDateTime start = LocalDateTime.now();
-				new SseMessageDto<>(
-						SseMessageCode.START_TASK,
-						start.format(timeFormatter())
-				).sendEvent(sseEmitter);
+		executorService.submit(() ->
+				asyncHouseInfoTask(
+					sseEmitter,
+					requestId,
+					processingLawdMap,
+					dealYmd,
+					String.valueOf(startCd),
+					String.valueOf(endCd)
+				)
+		);
 
-				List<Integer> lawdCdList = houseMapper.getLawdCdList(
-						String.valueOf(startCd),
-						String.valueOf(endCd)
-				);
+		return serverIp
+				+ ":"
+				+ serverPort
+				+ "/api/house/task/"
+				+ requestId
+				+ "/status";
+	}
 
-				int size = lawdCdList.size();
+	private void asyncHouseInfoTask(
+			SseEmitter sseEmitter,
+			String requestId,
+			Map<Integer, Boolean> processingLawdMap,
+			int dealYmd,
+			String startCd,
+			String endCd
+	) {
 
-				AtomicInteger seq = new AtomicInteger(1);
+		try {
 
-				CountDownLatch countDownLatch = new CountDownLatch(size);
+			LocalDateTime start = LocalDateTime.now();
+			new SseMessageDto<>(
+					SseMessageCode.START_TASK,
+					start.format(timeFormatter())
+			).sendEvent(sseEmitter);
 
-				ExecutorService executorService1 = Executors.newFixedThreadPool(20);
-				for (int lawdCd : lawdCdList) {
+			List<Integer> lawdCdList = houseMapper.getLawdCdList(startCd, endCd);
+			int size = lawdCdList.size();
+			AtomicInteger seq = new AtomicInteger(1);
+			CountDownLatch countDownLatch = new CountDownLatch(size);
 
-					executorService1.submit(() -> {
+      try (ExecutorService fixedExecutorService = Executors.newFixedThreadPool(maxPoolSize)) {
 
-						Boolean existingValue = processingLawdMap.putIfAbsent(lawdCd, true);
-						if (existingValue != null) return;
+        for (int lawdCd : lawdCdList) {
+          fixedExecutorService.submit(() ->
+							fixedPoolHouseInfoMultiTask(
+									sseEmitter,
+									requestId,
+									processingLawdMap,
+									dealYmd,
+									lawdCd,
+									countDownLatch,
+									seq,
+									size
+							)
+					);
+        }
+      }
 
-						try {
-							HouseInfoTask houseInfoTask = null;
-							int tryTimes = 5;
-							while (tryTimes-- > 0) {
-								try {
-									houseInfoTask = houseInternalService.insertHouseData(
-											lawdCd,
-											dealYmd,
-											sseEmitters.get(requestId)
-									);
-									break;
-								} catch (GonggongApplicationErrorException e) {
-									Thread.sleep(5000);
-								} catch (Exception e) {
-									throw new Exception(e);
-								}
-							}
-							if (tryTimes == 0 && houseInfoTask == null) {
-								new SseMessageDto<>(
-										SseMessageCode.API_ERROR,
-										new SseMessageDto.Stats(String.valueOf(lawdCd), seq.getAndIncrement(), size)
-								).sendEvent(sseEmitter);
-							}
-							else {
-								new SseMessageDto<>(
-										SseMessageCode.TASK_COMPLETED,
-										new SseMessageDto.Stats(houseInfoTask.getTaskName(), seq.getAndIncrement(), size)
-								).sendEvent(sseEmitter);
-							}
-						} catch (Exception e) {
-							System.out.println(e.getMessage());
-						} finally {
-							countDownLatch.countDown();
-						}
-					});
+      countDownLatch.await();
+
+			LocalDateTime end = LocalDateTime.now();
+			new SseMessageDto<>(
+					SseMessageCode.TASK_FINISHED,
+					end.format(timeFormatter())
+			).sendEvent(sseEmitter);
+
+			new SseMessageDto<>(
+					SseMessageCode.TASK_SPEND_TIME,
+					calcDuration(start, end)
+			).sendEvent(sseEmitter);
+
+		} catch (Exception e) {
+
+			sseEmitter.completeWithError(e);
+
+		} finally {
+
+			sseEmitters.remove(requestId);
+		}
+	}
+
+	private void fixedPoolHouseInfoMultiTask(
+			SseEmitter sseEmitter,
+			String requestId,
+			Map<Integer, Boolean> processingLawdMap,
+			int dealYmd,
+			int lawdCd,
+			CountDownLatch countDownLatch,
+			AtomicInteger seq,
+			int size
+	) {
+
+		Boolean existingValue = processingLawdMap.putIfAbsent(lawdCd, true);
+		if (existingValue != null) return;
+
+		try {
+
+			int tryTimes = 5;
+			while (--tryTimes >= 0) {
+				try {
+					houseInternalService.insertHouseData(
+							lawdCd,
+							dealYmd,
+							sseEmitters.get(requestId)
+					);
+					break;
+
+				} catch (GonggongApplicationErrorException e) {
+
+					Thread.sleep(5000);
+
+				} catch (Exception e) {
+
+					//추가 정리 필요
+					throw new Exception(e);
 				}
-
-				countDownLatch.await();
-
-				LocalDateTime end = LocalDateTime.now();
-				new SseMessageDto<>(
-						SseMessageCode.TASK_FINISHED,
-						end.format(timeFormatter())
-				).sendEvent(sseEmitter);
-
-				Duration duration = Duration.between(start, end);
-				new SseMessageDto<>(
-						SseMessageCode.TASK_SPEND_TIME,
-						String.format(
-								"%d:%d:%d",
-								duration.toHours(),
-								duration.toMinutes() - 60 * duration.toHours(),
-								duration.toSeconds() - 60 * duration.toMinutes()
-						)
-				).sendEvent(sseEmitter);
-			} catch (Exception e) {
-				sseEmitter.completeWithError(e);
-			} finally {
-				sseEmitters.remove(requestId);
 			}
-		});
 
-		return requestId;
+			if (tryTimes < 0) {
+
+				new SseMessageDto<>(
+						SseMessageCode.API_ERROR,
+						new SseMessageDto.Stats(String.valueOf(lawdCd), seq.getAndIncrement(), size)
+				).sendEvent(sseEmitter);
+
+			} else {
+
+				new SseMessageDto<>(
+						SseMessageCode.TASK_COMPLETED,
+						new SseMessageDto.Stats(lawdCd + "-" + dealYmd, seq.getAndIncrement(), size)
+				).sendEvent(sseEmitter);
+
+			}
+
+		} catch (Exception e) {
+
+			System.out.println(e.getMessage());
+
+		} finally {
+
+			countDownLatch.countDown();
+		}
+	}
+
+	public String calcDuration(LocalDateTime start, LocalDateTime end) {
+
+		Duration duration = Duration.between(start, end);
+		return String.format(
+				"%d:%d:%d",
+				duration.toHours(),
+				duration.toMinutes() - 60 * duration.toHours(),
+				duration.toSeconds() - 60 * duration.toMinutes()
+		);
 	}
 
 	@Override
 	public SseEmitter getSseEmitter(String requestId) {
 
 		if (!sseEmitters.containsKey(requestId)) {
-			throw new NoSuchElementException();
+			throw new RequestIdNotFoundException(requestId);
 		}
 		return sseEmitters.get(requestId);
 	}
@@ -214,6 +272,95 @@ public class HouseServiceImpl implements HouseService {
 	private DateTimeFormatter timeFormatter() {
 
 		return DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+	}
+
+	/**
+	 *  모든 행정동 297개에 대한 population 데이터 DB 의 population table 에 저장 하는 메서드
+	 *  SGISClient 사용
+	 */
+	@Override
+	public void updatePopulation(int year) {
+
+		List<Integer> admCdList = AdmCode.getAllCodes();
+		List<PopulationEntity> populationList = new ArrayList<>();
+		CountDownLatch countDownLatch = new CountDownLatch(admCdList.size());
+
+		for (int admCd : admCdList) {
+			executorService.execute(() -> {
+				try {
+					populationList.addAll(populationMultiTask(year, admCd));
+				}
+				finally {
+					countDownLatch.countDown();
+				}
+			});
+		}
+
+		try {
+			countDownLatch.await();
+		} catch (InterruptedException e) {
+		}
+
+		houseMapper.insertPopulation(populationList);
+	}
+
+	private List<PopulationEntity> populationMultiTask(
+			int year,
+			int admCd
+	) {
+
+		SgisPopulation populationCode = sgisClient.getPopulation(
+				sgisUtil.getAccessToken(),
+				year,
+				admCd,
+				1
+		);
+
+		List<PopulationEntity> tempList = convertUtil.convert(populationCode.getResult(), PopulationEntity.class);
+		Map<String, SearchPopulationDto> map = getSearchPopulation(year, admCd);
+		tempList.forEach(entity -> {
+			SearchPopulationDto defaultDto = new SearchPopulationDto();
+			entity.setAgeUnder20Population(map.getOrDefault(entity.getAdmCd(), defaultDto).getAgeUnder20Population().get());
+			entity.setAge2030Population(map.getOrDefault(entity.getAdmCd(), defaultDto).getAge2030Population().get());
+			entity.setAge4060Population(map.getOrDefault(entity.getAdmCd(), defaultDto).getAge4060Population().get());
+			entity.setAgeOver70Population(map.getOrDefault(entity.getAdmCd(), defaultDto).getAgeOver70Population().get());
+		});
+
+		return tempList;
+	}
+
+	private Map<String, SearchPopulationDto> getSearchPopulation(int year, int admCd) {
+
+		Map<String, SearchPopulationDto> searchPopulationMap = new ConcurrentHashMap<>();
+		CountDownLatch countDownLatch = new CountDownLatch(AgeCode.values().length);
+
+		for(AgeCode THIS_CODE : AgeCode.values() ) {
+			executorService.execute(() -> {
+				try{
+					SgisSearchPopulation sgisSearchPopulation = sgisClient.getSearchPopulation(
+							sgisUtil.getAccessToken(),
+							year,
+							admCd,
+							THIS_CODE.getCode(),
+							1
+					);
+					sgisSearchPopulation.getResult().forEach(result -> {
+						searchPopulationMap.putIfAbsent(result.getAdmCd(), new SearchPopulationDto());
+						searchPopulationMap.get(result.getAdmCd()).setPopulationByAge(THIS_CODE.getGeneration(), result.getPopulation());
+					});
+				}
+				finally {
+					countDownLatch.countDown();
+				}
+			});
+		}
+
+		try {
+			countDownLatch.await();
+		}
+		catch (InterruptedException e) {
+		}
+		return searchPopulationMap;
 	}
 
 	@Override
@@ -238,7 +385,9 @@ public class HouseServiceImpl implements HouseService {
 				.build();
 	}
 
+	@Override
 	public void saveSearchKeyword(String dongCode) {
+
 		searchKeywordRepository.save(new SearchKeywordEntity(dongCode, LocalDateTime.now()));
 	}
 
@@ -246,7 +395,13 @@ public class HouseServiceImpl implements HouseService {
 	public TopTenDto getTopTen() {
 
 		TopTenEntity topTenEntity = topTenRepository.findLastByOrderByRankTimeDesc().get();
+		return parseTopTenEntity(topTenEntity);
+	}
+
+	private TopTenDto parseTopTenEntity(TopTenEntity topTenEntity) {
+
 		TopTenDto topTenDto = new TopTenDto(topTenEntity.getRankTime());
+
 		if (topTenEntity.getElements() != null) {
 
 			List<TopTenDto.Element> elements = convertUtil.convert(topTenEntity.getElements().values().stream().toList(), TopTenDto.Element.class);
@@ -261,9 +416,33 @@ public class HouseServiceImpl implements HouseService {
 	}
 
 	@Override
+	public List<HouseDto> getHouseInfo(HouseSearchWithTimeDto searchDto) {
+
+		return houseMapper.getHouseInfo(searchDto);
+	}
+
+	@Override
+	public List<HouseDealDto> getHouseDealList(String houseSeq, int page, int limit) {
+
+		return houseMapper.getHouseDealList(houseSeq, limit, page * limit);
+	}
+
+	@Override
+	public List<HouseGraphDto> getHouseGraph(String houseSeq, int year){
+
+		return houseMapper.getHouseGraph(houseSeq, year);
+	}
+
+	@Override
 	public NewsDto getNews() {
 		
 		return newsClient.getNews();
+	}
+
+	@Override
+	public List<Point> getPoints(String dongCode) {
+
+		return geometryUtil.getPoints(geometryMapper.selectByDongCode(dongCode));
 	}
 }
 

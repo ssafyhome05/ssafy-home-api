@@ -1,4 +1,4 @@
-package com.ssafyhome.house.service;
+package com.ssafyhome.house.code;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -8,7 +8,7 @@ import java.util.List;
 
 @Getter
 @AllArgsConstructor
-public enum AdmCd {
+public enum AdmCode {
   SEOUL(11, "서울특별시"),
   BUSAN(21, "부산광역시"),
   DAEGU(22, "대구광역시"),
@@ -32,6 +32,6 @@ public enum AdmCd {
 
   public static List<Integer> getAllCodes() {
 
-    return Arrays.stream(AdmCd.values()).map(AdmCd::getCode).toList();
+    return Arrays.stream(AdmCode.values()).map(AdmCode::getCode).toList();
   }
 }
