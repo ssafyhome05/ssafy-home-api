@@ -32,7 +32,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import com.ssafyhome.common.api.news.NewsClient;
-import com.ssafyhome.common.api.news.dto.NewsDto;
 import com.ssafyhome.common.exception.GonggongApplicationErrorException;
 import com.ssafyhome.house.dao.HouseMapper;
 import com.ssafyhome.house.entity.PopulationEntity;
@@ -434,9 +433,9 @@ public class HouseServiceImpl implements HouseService {
 	}
 
 	@Override
-	public NewsDto getNews() {
+	public List<NewsDto> getNewsList() {
 		
-		return newsClient.getNews();
+		return houseMapper.getNewsList();
 	}
 
 	@Override

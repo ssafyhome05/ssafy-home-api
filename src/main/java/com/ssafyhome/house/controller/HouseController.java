@@ -156,14 +156,18 @@ public class HouseController {
 			description = "네이버부동산 기준 최신 뉴스기사 제목, 링크, 관련동네, 출처를 가져옵니다."
 	)
 	@GetMapping("/news")
-	public ResponseEntity<ResponseMessage.CustomMessage> getNews() {
+	public ResponseEntity<ResponseMessage.CustomMessage> getNewsList() {
 
 		return ResponseMessage.responseDataEntity(
 				HouseResoponseCode.OK,
-				houseService.getNews()
+				houseService.getNewsList()
 		);
 	}
 
+	
+	
+	
+	
 	/**
 	 * POST MAPPING
 	 */

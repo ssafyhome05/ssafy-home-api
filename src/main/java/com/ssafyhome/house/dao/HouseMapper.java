@@ -4,6 +4,8 @@ import java.util.List;
 import java.util.Set;
 
 import com.ssafyhome.house.dto.HouseSearchWithTimeDto;
+import com.ssafyhome.house.dto.NewsDto;
+
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -13,6 +15,7 @@ import com.ssafyhome.house.dto.HouseDto;
 import com.ssafyhome.house.dto.HouseGraphDto;
 import com.ssafyhome.house.entity.HouseDealEntity;
 import com.ssafyhome.house.entity.HouseInfoEntity;
+import com.ssafyhome.house.entity.NewsEntity;
 import com.ssafyhome.house.entity.PopulationEntity;
 
 @Mapper
@@ -41,6 +44,8 @@ public interface HouseMapper {
 	//population table
 	List<String> getAdmCdList();
 	PopulationEntity getPopulation(String dongCode);
+	
+	List<NewsDto> getNewsList();
 
 
 	void insertHouseInfo(List<HouseInfoEntity> infoEntityList);
