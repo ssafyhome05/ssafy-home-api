@@ -48,9 +48,9 @@ public class BookmarkServiceImpl implements BookmarkService {
 	}
 
 	@Override
-	public List<HouseDto> getHouseList() {
+	public List<HouseDto> getHouseList(Map<String, Object> params) {
 		// TODO Auto-generated method stub
-		return bookmarkMapper.getHouseList();
+		return bookmarkMapper.getHouseList(params);
 	}
 
 	@Override
@@ -60,9 +60,9 @@ public class BookmarkServiceImpl implements BookmarkService {
 	}
 
 	@Override
-	public List<CustomSpotDto> getCustomSpotList() {
+	public List<CustomSpotDto> getCustomSpotList(Map<String, Object> params) {
 		// TODO Auto-generated method stub
-		return bookmarkMapper.getCustomSpotList();
+		return bookmarkMapper.getCustomSpotList(params);
 	}
 
 	@Override

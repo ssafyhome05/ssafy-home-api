@@ -13,6 +13,20 @@
         WHERE user_seq = #{userSeq} AND apt_seq = #{aptSeq}
     </delete>
 
+    <select id="getHouseList" parameterType="map">
+        SELECT hi.*,
+               (SELECT COUNT(*)
+                FROM house_deal
+                WHERE house_deal.apt_seq = hi.apt_seq) AS deal_cnt,
+               (SELECT FORMAT(ROUND(AVG(CAST(REPLACE(deal_amount, ',', '') AS DOUBLE)), 1), 0)
+                FROM house_deal
+                WHERE house_deal.apt_seq = hi.apt_seq) AS avg_deal_amount
+        FROM favorite_house AS fs
+                 JOIN house_info AS hi
+                      ON fs.apt_seq = hi.apt_seq
+        WHERE fs.user_seq = #{userSeq};
+    </select>
+
     <insert id="addLocationBookmark" parameterType="map">
         INSERT INTO favorite_spot
         VALUES(#{dongCode}, #{userSeq})
@@ -22,5 +36,21 @@
         DELETE
         FROM favorite_spot
         WHERE dong_code = #{dongCode}
+    </delete>
+
+    <select id="getCustomSpotList" parameterType="map">
+        SELECT *
+        FROM custom_spot
+        WHERE user_seq = #{userSeq}
+    </select>
+
+    <insert id="addCustomSpotBookmark" parameterType="map">
+        INSERT INTO custom_spot(spot_name, jibun, road_nm, latitude, longitude, user_seq)
+        VALUES(#{customSpot.spotName}, #{customSpot.jibun}, #{customSpot.roadNm}, #{customSpot.latitude}, #{customSpot.longitude}, #{userSeq})
+    </insert>
+
+    <delete id="deleteCustomSpotBookmark" parameterType="map">
+        DELETE FROM custom_spot
+        WHERE user_seq = #{userSeq} AND spot_seq = #{customSeq}
     </delete>
 </mapper>

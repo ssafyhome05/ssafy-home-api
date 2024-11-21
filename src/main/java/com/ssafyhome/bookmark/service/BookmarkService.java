@@ -13,10 +13,9 @@ public interface BookmarkService {
     void addLocationBookmark(Map<String, Object> params);
     void addCustomSpotBookmark(Map<String, Object> params);
 
-    List<HouseDto> getHouseList();
+    List<HouseDto> getHouseList(Map<String, Object> params);
     List<LocationDto> getLocationList();
-    List<CustomSpotDto> getCustomSpotList();
-    
+    List<CustomSpotDto> getCustomSpotList(Map<String, Object> params);
     
     void deleteHouseBookmark(Map<String, Object> params);
     void deleteLocationBookmark(Map<String, Object> params);
