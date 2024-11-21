@@ -118,7 +118,7 @@ public class BookmarkController {
 		
 		params.put("userSeq", SecurityContextHolder.getContext().getAuthentication().getName());
 
-		List<HouseDto> houseList = bookmarkService.getHouseList();
+		List<HouseDto> houseList = bookmarkService.getHouseList(params);
 		
 		return new ResponseEntity<>(houseList, HttpStatus.OK);
 	}
@@ -132,7 +132,7 @@ public class BookmarkController {
 	public ResponseEntity<List<CustomSpotDto>> getCustomSpotList() {
 		Map<String, Object> params = new HashMap<>();
 		params.put("userSeq", SecurityContextHolder.getContext().getAuthentication().getName());
-		List<CustomSpotDto> customSpotList = bookmarkService.getCustomSpotList();
+		List<CustomSpotDto> customSpotList = bookmarkService.getCustomSpotList(params);
 		return new ResponseEntity<>(customSpotList, HttpStatus.OK);
 	}
 
