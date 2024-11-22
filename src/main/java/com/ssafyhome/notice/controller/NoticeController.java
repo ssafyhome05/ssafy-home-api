@@ -1,6 +1,8 @@
 package com.ssafyhome.notice.controller;
 
+import com.ssafyhome.common.response.ResponseMessage;
 import com.ssafyhome.notice.dto.NoticeDto;
+import com.ssafyhome.notice.response.NoticeResponseCode;
 import com.ssafyhome.notice.service.NoticeService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -46,13 +48,13 @@ public class NoticeController {
 			description = "noticeSeq 와 일치하는 NoticeDto 객체 반환"
 	)
 	@GetMapping("/detail")
-	public ResponseEntity<NoticeDto> getNotice(
+	public ResponseEntity<ResponseMessage.CustomMessage> getNotice(
 			@RequestParam
 			long noticeSeq
 	) {
 
 		NoticeDto noticeDto = noticeService.getNotice(noticeSeq);
-		return new ResponseEntity<>(noticeDto, HttpStatus.OK);
+		return ResponseMessage.responseDataEntity(NoticeResponseCode.OK, noticeDto);
 	}
 
 	@Operation(
@@ -60,13 +62,15 @@ public class NoticeController {
 			description = "모든 NoticeDto 를 List<NoticeDto>로 반환"
 	)
 	@GetMapping("/{page}")
-	public ResponseEntity<List<NoticeDto>> getNoticeList(
+	public ResponseEntity<ResponseMessage.CustomMessage> getNoticeList(
 			@PathVariable
-			int page
+			int page,
+
+			@RequestParam
+			int size
 	) {
 
-		List<NoticeDto> noticeDtoList = noticeService.getNotices(page);
-		return new ResponseEntity<>(noticeDtoList, HttpStatus.OK);
+		return ResponseMessage.responseDataEntity(NoticeResponseCode.OK, noticeService.getNotices(page, size));
 	}
 
 	@Operation(
@@ -75,7 +79,7 @@ public class NoticeController {
 	)
 	@PutMapping("/{noticeSeq}")
 	@PreAuthorize("hasRole('ROLE_ADMIN')")
-	public ResponseEntity<?> updateNotice(
+	public ResponseEntity<ResponseMessage.CustomMessage> updateNotice(
 			@PathVariable
 			long noticeSeq,
 
@@ -84,7 +88,7 @@ public class NoticeController {
 	) {
 
 		noticeService.updateNotice(noticeSeq, noticeDto);
-		return new ResponseEntity<>("update notice success", HttpStatus.OK);
+		return ResponseMessage.responseBasicEntity(NoticeResponseCode.OK);
 	}
 
 	@Operation(
@@ -93,12 +97,12 @@ public class NoticeController {
 	)
 	@DeleteMapping("/{noticeSeq}")
 	@PreAuthorize("hasRole('ROLE_ADMIN')")
-	public ResponseEntity<?> deleteNotice(
+	public ResponseEntity<ResponseMessage.CustomMessage> deleteNotice(
 			@PathVariable
 			long noticeSeq
 	) {
 
 		noticeService.deleteNotice(noticeSeq);
-		return new ResponseEntity<>("delete notice success", HttpStatus.OK);
+		return ResponseMessage.responseBasicEntity(NoticeResponseCode.OK);
 	}
 }
