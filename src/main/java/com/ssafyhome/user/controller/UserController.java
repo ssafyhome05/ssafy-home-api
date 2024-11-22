@@ -151,15 +151,18 @@ public class UserController {
 	@ApiResponses({
 		  @ApiResponse(responseCode = "200", description="사용자 목록 반환")
 	  })
-	@GetMapping("/list")
-
+	@GetMapping("/list/{page}")
 	@PreAuthorize("hasRole('ROLE_ADMIN')")
 	public ResponseEntity<ResponseMessage.CustomMessage> getUserList(
-			@ModelAttribute
-			UserSearchDto userSearchDto
+
+			@PathVariable
+			int page,
+
+			@RequestParam
+			int size
 	) {
 
-		return ResponseMessage.responseDataEntity(UserResponseCode.OK, userService.getUserList(userSearchDto));
+		return ResponseMessage.responseDataEntity(UserResponseCode.OK, userService.getUserList(page, size));
 	}
 
 	@Operation(

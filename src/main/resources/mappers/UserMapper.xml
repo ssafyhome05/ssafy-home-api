@@ -74,7 +74,8 @@
     <select id="getUserList"
             resultType="com.ssafyhome.user.entity.UserEntity">
         SELECT *
-        FROM user;
+        FROM user
+        LIMIT #{size} OFFSET #{startIdx};
     </select>
 
     <select id="getUserBySeq"
@@ -87,5 +88,8 @@
         SELECT user_seq
         FROM user
         WHERE user_email = #{userEmail}
+    </select>
+    <select id="getTotalUsers" resultType="java.lang.Integer">
+        SELECT COUNT(*) FROM user;
     </select>
 </mapper>

@@ -123,13 +123,13 @@ public class UserServiceImpl implements UserService {
   }
 
   @Override
-  public List<UserDto> getUserList(UserSearchDto userSearchDto) {
+  public UserListDto getUserList(int page, int size) {
 
-    List<UserEntity> userEntityList = userMapper.getUserList(userSearchDto);
+    List<UserEntity> userEntityList = userMapper.getUserList((page - 1) * size, size);
     if(userEntityList.isEmpty()) {
       throw new UserNotFoundException();
     }
-    return convertUtil.convert(userEntityList, UserDto.class);
+    return new UserListDto(userMapper.getTotalUsers(), convertUtil.convert(userEntityList, UserDto.class));
   }
 
   @Override

@@ -5,6 +5,8 @@ import lombok.Builder;
 import lombok.NoArgsConstructor;
 import lombok.Data;
 
+import java.time.LocalDateTime;
+
 @Data
 @Builder
 @NoArgsConstructor
@@ -23,4 +25,5 @@ public class UserDto {
   private String userAddress2;
   private boolean socialType;
   private String socialPlatform;
+  private LocalDateTime createdAt;
 }

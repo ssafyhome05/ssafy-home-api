@@ -11,7 +11,7 @@ public interface UserService {
   void findPassword(FindUserDto findUserDto);
   void sendEmail(String email);
   UserDto getUserInfo(String userSeq);
-  List<UserDto> getUserList(UserSearchDto userSearchDto);
+  UserListDto getUserList(int page, int size);
   String checkEmailSecret(EmailSecretDto emailSecretDto);
   void checkIdDuplicate(String id);
   void changePassword(String userSeq, PasswordDto passwordDto);
