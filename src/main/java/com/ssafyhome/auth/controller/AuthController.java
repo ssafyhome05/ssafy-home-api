@@ -31,7 +31,7 @@ public class AuthController {
   ) {
 
     this.jwtService = jwtService;
-    this.cookieUtil = new CookieUtil();
+    this.cookieUtil = cookieUtil;
   }
   
   

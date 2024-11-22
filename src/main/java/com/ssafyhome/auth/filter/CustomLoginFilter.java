@@ -55,7 +55,7 @@ public class CustomLoginFilter extends UsernamePasswordAuthenticationFilter {
 		UserEntity userEntity = userMapper.getUserBySeq(userId);
 		String userSeq = String.valueOf(userEntity.getUserSeq());
 		String userEmail = userEntity.getUserEmail();
-		JwtDto jwtDto = jwtService.setTokens(userSeq, userEmail);
+		JwtDto jwtDto = jwtService.setTokens(userSeq, userEmail, "user");
 
 		HttpHeaders headers = new HttpHeaders();
 		headers.add(HttpHeaders.AUTHORIZATION, "Bearer " + jwtDto.getAccessToken());

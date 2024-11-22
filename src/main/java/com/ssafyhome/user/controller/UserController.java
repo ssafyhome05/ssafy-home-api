@@ -136,8 +136,12 @@ public class UserController {
 	@GetMapping("/info")
 	public ResponseEntity<ResponseMessage.CustomMessage> getUserInfo(){
 
-		UserDto userDto = userService.getUserInfo(SecurityContextHolder.getContext().getAuthentication().getName());
-		return ResponseMessage.responseDataEntity(UserResponseCode.OK, userDto);
+		boolean isUser = SecurityContextHolder.getContext().getAuthentication().getAuthorities().iterator().next().equals("ROLE_USER");
+		if(isUser) {
+			UserDto userDto = userService.getUserInfo(SecurityContextHolder.getContext().getAuthentication().getName());
+			return ResponseMessage.responseDataEntity(UserResponseCode.OK, userDto);
+		}
+		return ResponseMessage.responseDataEntity(UserResponseCode.OK, new AdminDto("3","ADMIN"));
 	}
 
 	@Operation(

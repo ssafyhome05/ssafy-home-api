@@ -11,7 +11,7 @@ public interface JWTService {
 
   void checkRefreshTokenError(String refreshToken);
 
-  JwtDto setTokens(String userSeq, String userEmail);
+  JwtDto setTokens(String userSeq, String userEmail, String type);
 
   String getRefreshToken(HttpServletRequest request);
 }

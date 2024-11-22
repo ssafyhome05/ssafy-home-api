@@ -77,6 +77,8 @@ public class ResponseMessage<T> {
 			}
 		}
 
+		response.setStatus(this.httpStatus.value());
+
 		response.setContentType("application/json;charset=utf-8");
 		try {
 			PrintWriter writer = response.getWriter();
@@ -87,8 +89,6 @@ public class ResponseMessage<T> {
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
-
-		response.setStatus(this.httpStatus.value());
 	}
 
 	public static <E> ResponseEntity<CustomMessage> responseFullEntity(ResponseCode responseCode, HttpHeaders headers, E data) {

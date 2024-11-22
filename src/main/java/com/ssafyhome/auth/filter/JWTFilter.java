@@ -1,6 +1,7 @@
 package com.ssafyhome.auth.filter;
 
 import com.ssafyhome.auth.response.AuthResponseCode;
+import com.ssafyhome.auth.service.CustomAdminDetailsService;
 import com.ssafyhome.common.response.ResponseMessage;
 import com.ssafyhome.user.dao.UserMapper;
 import com.ssafyhome.user.entity.UserEntity;
@@ -24,16 +25,19 @@ public class JWTFilter extends OncePerRequestFilter {
 	private final JWTUtil jwtUtil;
 	private final UserMapper userMapper;
 	private final CustomUserDetailsService userDetailsService;
+	private final CustomAdminDetailsService adminDetailsService;
 
 	public JWTFilter(
 			JWTUtil jwtUtil,
 			UserMapper userMapper,
-			CustomUserDetailsService userDetailsService
+			CustomUserDetailsService userDetailsService,
+			CustomAdminDetailsService adminDetailsService
 	) {
 
 		this.jwtUtil = jwtUtil;
 		this.userMapper = userMapper;
 		this.userDetailsService = userDetailsService;
+		this.adminDetailsService = adminDetailsService;
 	}
 
 	@Override
@@ -66,20 +70,36 @@ public class JWTFilter extends OncePerRequestFilter {
 			return;
 		}
 
-
+		UserDetails userDetails = null;
 
 		String category = jwtUtil.getKey(accessToken, "category");
 		String userSeq = jwtUtil.getKey(accessToken, "userSeq");
-		String userEmail = jwtUtil.getKey(accessToken, "userEmail");
-		UserEntity userEntity = userMapper.getUserBySeqAndEmail(userSeq, userEmail);
+		if (userSeq != null) {
 
-		if (!category.equals("access") || userEntity == null) {
+			String userEmail = jwtUtil.getKey(accessToken, "userEmail");
 
-			ResponseMessage.setBasicResponse(response, AuthResponseCode.INVALID_JWT_TOKEN);
-			return;
+			UserEntity userEntity = userMapper.getUserBySeqAndEmail(userSeq, userEmail);
+
+			if (!category.equals("access") || userEntity == null) {
+
+				ResponseMessage.setBasicResponse(response, AuthResponseCode.INVALID_JWT_TOKEN);
+				return;
+			}
+			userDetails = userDetailsService.loadUserByUsername(userEntity.getUserId());
+		}
+		else {
+
+			String adminSeq = jwtUtil.getKey(accessToken, "adminSeq");
+			String role = jwtUtil.getKey(accessToken, "role");
+
+			if (!category.equals("access")) {
+
+				ResponseMessage.setBasicResponse(response, AuthResponseCode.INVALID_JWT_TOKEN);
+				return;
+			}
+			userDetails = adminDetailsService.loadUserByUsername(adminSeq);
 		}
 
-		UserDetails userDetails = userDetailsService.loadUserByUsername(userEntity.getUserId());
 		UsernamePasswordAuthenticationToken authenticationToken =
 				new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
 		SecurityContextHolder.getContext().setAuthentication(authenticationToken);

@@ -5,6 +5,7 @@ import com.ssafyhome.auth.filter.CustomLoginFilter;
 import com.ssafyhome.auth.filter.CustomLogoutFilter;
 import com.ssafyhome.auth.filter.JWTFilter;
 import com.ssafyhome.auth.handler.PreAuthorizeExceptionHandler;
+import com.ssafyhome.auth.service.CustomAdminDetailsService;
 import com.ssafyhome.user.dao.UserMapper;
 import com.ssafyhome.auth.dao.RefreshTokenRepository;
 import com.ssafyhome.auth.service.JWTService;
@@ -57,6 +58,7 @@ public class SecurityConfig {
   private final JWTUtil jwtUtil;
   private final CookieUtil cookieUtil;
   private final CustomUserDetailsService userDetailsService;
+  private final CustomAdminDetailsService adminDetailsService;
 
   
   public SecurityConfig(
@@ -67,7 +69,8 @@ public class SecurityConfig {
       JWTService jwtService,
       JWTUtil jwtUtil,
       CookieUtil cookieUtil,
-      CustomUserDetailsService userDetailsService
+      CustomUserDetailsService userDetailsService,
+      CustomAdminDetailsService adminDetailsService
   ) {
 
     this.authenticationConfiguration = authenticationConfiguration;
@@ -78,6 +81,7 @@ public class SecurityConfig {
     this.jwtUtil = jwtUtil;
     this.cookieUtil = cookieUtil;
     this.userDetailsService = userDetailsService;
+    this.adminDetailsService = adminDetailsService;
   }
 
   @Bean
@@ -186,7 +190,7 @@ public class SecurityConfig {
     /**
      * JWT가 유효한지 인증을 거치는 filter추가
      */
-    JWTFilter jwtFilter = new JWTFilter(jwtUtil, userMapper, userDetailsService);
+    JWTFilter jwtFilter = new JWTFilter(jwtUtil, userMapper, userDetailsService, adminDetailsService);
     http.addFilterBefore(jwtFilter, CustomLoginFilter.class);
 
     

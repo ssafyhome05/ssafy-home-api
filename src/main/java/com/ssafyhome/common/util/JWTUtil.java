@@ -51,12 +51,33 @@ public class JWTUtil {
       return expiration.before(new Date());
   }
 
-  public String createJWT(String category, String userSeq, String userEmail, Long expiration) {
+  public String createJWT(String category, String param1, String param2, String type, Long expiration) {
+
+    if (type.equals("user")) {
+      return createUserJWT(category, param1, param2, expiration);
+    } else {
+      return createAdminJWT(category, param1, param2, expiration);
+    }
+  }
+
+  public String createUserJWT(String category, String userSeq, String userEmail, Long expiration) {
 
     return Jwts.builder()
         .claim("category", category)
         .claim("userSeq", userSeq)
         .claim("userEmail", userEmail)
+        .issuedAt(new Date(System.currentTimeMillis()))
+        .expiration(new Date(System.currentTimeMillis() + expiration))
+        .signWith(secretKey)
+        .compact();
+  }
+
+  public String createAdminJWT(String category, String adminSeq, String role, Long expiration) {
+
+    return Jwts.builder()
+        .claim("category", category)
+        .claim("adminSeq", adminSeq)
+        .claim("role", role)
         .issuedAt(new Date(System.currentTimeMillis()))
         .expiration(new Date(System.currentTimeMillis() + expiration))
         .signWith(secretKey)

@@ -35,8 +35,16 @@ public class JWTServiceImpl implements JWTService {
     checkRefreshTokenError(refreshToken);
 
     String userSeq = jwtUtil.getKey(refreshToken, "userSeq");
-    String userEmail = jwtUtil.getKey(refreshToken, "userEmail");
-    return setTokens(userSeq, userEmail);
+
+    if (userSeq != null) {
+      String userEmail = jwtUtil.getKey(refreshToken, "userEmail");
+      return setTokens(userSeq, userEmail, "user");
+    }
+    else {
+      String adminSeq = jwtUtil.getKey(refreshToken, "adminSeq");
+      String role = jwtUtil.getKey(refreshToken, "role");
+      return setTokens(adminSeq, role, "admin");
+    }
   }
 
   @Override
@@ -66,10 +74,10 @@ public class JWTServiceImpl implements JWTService {
   }
 
   @Override
-  public JwtDto setTokens(String userSeq, String userEmail) {
+  public JwtDto setTokens(String userSeq, String userEmail, String type) {
 
-    String accessToken = jwtUtil.createJWT("access", userSeq, userEmail, 5 * 60 * 1000L);
-    String refreshToken = jwtUtil.createJWT("refresh", userSeq, userEmail, 24 * 60 * 60 * 1000L);
+    String accessToken = jwtUtil.createJWT("access", userSeq, userEmail, type, 5 * 60 * 1000L);
+    String refreshToken = jwtUtil.createJWT("refresh", userSeq, userEmail, type, 24 * 60 * 60 * 1000L);
     Cookie refreshTokenCookie = cookieUtil.createCookie("refresh", refreshToken);
 
     saveRefreshTokenToRedis(refreshToken, userSeq);

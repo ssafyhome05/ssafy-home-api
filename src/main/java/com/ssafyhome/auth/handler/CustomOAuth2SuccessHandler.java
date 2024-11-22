@@ -43,7 +43,7 @@ public class CustomOAuth2SuccessHandler implements AuthenticationSuccessHandler 
 
 		String userSeq = String.valueOf(customOAuth2User.getSeq());
 		String userEmail = customOAuth2User.getEmail();
-		JwtDto jwtDto = jwtService.setTokens(userSeq, userEmail);
+		JwtDto jwtDto = jwtService.setTokens(userSeq, userEmail, "user");
 
 		response.addCookie(jwtDto.getRefreshToken());
 		response.sendRedirect(frontEndUrl + "?token=" + jwtDto.getAccessToken());
@@ -53,7 +53,7 @@ public class CustomOAuth2SuccessHandler implements AuthenticationSuccessHandler 
 
 		String adminSeq = String.valueOf(adminOAuth2User.getName());
 		String adminRole = adminOAuth2User.getAuthorities().iterator().next().getAuthority();
-		JwtDto jwtDto = jwtService.setTokens(adminSeq, adminRole);
+		JwtDto jwtDto = jwtService.setTokens(adminSeq, adminRole, "admin");
 
 		response.addCookie(jwtDto.getRefreshToken());
 		response.sendRedirect(frontEndUrl + "/admin?token=" + jwtDto.getAccessToken());
