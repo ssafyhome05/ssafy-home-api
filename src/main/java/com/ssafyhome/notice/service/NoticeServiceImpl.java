@@ -2,6 +2,7 @@ package com.ssafyhome.notice.service;
 
 import com.ssafyhome.notice.dao.NoticeMapper;
 import com.ssafyhome.notice.dto.NoticeDto;
+import com.ssafyhome.notice.dto.NoticeListDto;
 import com.ssafyhome.notice.entity.NoticeEntity;
 import com.ssafyhome.common.util.ConvertUtil;
 import org.springframework.stereotype.Service;
@@ -36,33 +37,18 @@ public class NoticeServiceImpl implements NoticeService {
 
     NoticeEntity noticeEntity = noticeMapper.selectBySeq(noticeSeq);
 
-    return convertNoticeEntityToDto(noticeEntity);
+    return convertUtil.convert(noticeEntity, NoticeDto.class);
   }
 
   @Override
-  public List<NoticeDto> getNotices(int page) {
+  public NoticeListDto getNotices(int page, int size) {
 
-    List<NoticeEntity> noticeEntityList = noticeMapper.selectByPage(page);
+    List<NoticeEntity> noticeEntityList = noticeMapper.selectByPage((page - 1) * size, size);
 
-    return noticeEntityList.stream()
-        .map(this::convertNoticeEntityToDto)
-        .toList();
-  }
-
-  private NoticeDto convertNoticeEntityToDto(NoticeEntity noticeEntity) {
-
-    String title = noticeEntity.getNoticeTitle();
-
-    if (noticeEntity.getModifiedAt() != null) {
-
-      DateTimeFormatter formatter = DateTimeFormatter.ofPattern("(수정: yyyy-MM-dd HH:mm:ss)");
-      String modifiedString = noticeEntity.getModifiedAt().format(formatter);
-      title = title + " " + modifiedString;
-    }
-
-    NoticeDto noticeDto = convertUtil.convert(noticeEntity, NoticeDto.class);
-    noticeDto.setNoticeTitle(title);
-    return noticeDto;
+    return new NoticeListDto(
+        noticeMapper.getTotalRows(),
+        convertUtil.convert(noticeEntityList, NoticeDto.class)
+    );
   }
 
   @Override

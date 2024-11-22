@@ -18,13 +18,13 @@
     </update>
 
     <delete id="deleteBySeq"
-            parameterType="int">
+            parameterType="long">
         DELETE FROM notice
         WHERE notice_seq = #{noticeSeq}
     </delete>
 
     <select id="selectBySeq"
-            parameterType="int"
+            parameterType="long"
             resultType="com.ssafyhome.notice.entity.NoticeEntity">
         SELECT *
         FROM notice
@@ -36,6 +36,10 @@
             resultType="com.ssafyhome.notice.entity.NoticeEntity">
         SELECT *
         FROM notice
-        LIMIT #{page}, 10
+        LIMIT #{size} OFFSET #{startIdx}
+    </select>
+
+    <select id="getTotalRows" resultType="int">
+        SELECT COUNT(*) FROM notice;
     </select>
 </mapper>
