@@ -35,18 +35,18 @@ public class CustomUserDetails implements UserDetails {
 	public Collection<? extends GrantedAuthority> getAuthorities() {
 
 		Collection<GrantedAuthority> authorities = new ArrayList<>();
-		authorities.add(new SimpleGrantedAuthority(type.equals("user") ? "ROLE_USER" : "ROLE_ADMIN"));
+		authorities.add(new SimpleGrantedAuthority(type.equals("user") ? "ROLE_USER" : adminEntity.getAdminRole()));
 		return authorities;
 	}
 
 	@Override
 	public String getPassword() {
-		return type.equals("user") ? userEntity.getUserPw() : adminEntity.toString();
+		return type.equals("user") ? userEntity.getUserPw() : adminEntity.getAdminPw();
 	}
 
 	@Override
 	public String getUsername() {
-		return type.equals("user") ? String.valueOf(userEntity.getUserSeq()) : adminEntity.toString();
+		return type.equals("user") ? String.valueOf(userEntity.getUserSeq()) : adminEntity.getAdminSeq();
 	}
 
 	@Override

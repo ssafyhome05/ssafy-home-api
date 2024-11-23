@@ -27,9 +27,9 @@ public class CustomUserDetailsService implements UserDetailsService {
 		return new CustomUserDetails(userEntity);
 	}
 
-	public UserDetails loadAdminByUsername(String username) throws UsernameNotFoundException {
+	public UserDetails loadAdminByUsername(String username, String role) throws UsernameNotFoundException {
 
-		AdminEntity adminEntity = new AdminEntity();
+		AdminEntity adminEntity = new AdminEntity(username, role);
 		return new CustomUserDetails(adminEntity);
 	}
 }

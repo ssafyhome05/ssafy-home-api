@@ -93,7 +93,7 @@ public class JWTFilter extends OncePerRequestFilter {
 				ResponseMessage.setBasicResponse(response, AuthResponseCode.INVALID_JWT_TOKEN);
 				return;
 			}
-			userDetails = userDetailsService.loadAdminByUsername(adminSeq);
+			userDetails = userDetailsService.loadAdminByUsername(adminSeq, role);
 		}
 
 		UsernamePasswordAuthenticationToken authenticationToken =
