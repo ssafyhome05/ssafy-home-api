@@ -1,7 +1,6 @@
 package com.ssafyhome.auth.filter;
 
 import com.ssafyhome.auth.response.AuthResponseCode;
-import com.ssafyhome.auth.service.CustomAdminDetailsService;
 import com.ssafyhome.common.response.ResponseMessage;
 import com.ssafyhome.user.dao.UserMapper;
 import com.ssafyhome.user.entity.UserEntity;
@@ -25,19 +24,16 @@ public class JWTFilter extends OncePerRequestFilter {
 	private final JWTUtil jwtUtil;
 	private final UserMapper userMapper;
 	private final CustomUserDetailsService userDetailsService;
-	private final CustomAdminDetailsService adminDetailsService;
 
 	public JWTFilter(
 			JWTUtil jwtUtil,
 			UserMapper userMapper,
-			CustomUserDetailsService userDetailsService,
-			CustomAdminDetailsService adminDetailsService
+			CustomUserDetailsService userDetailsService
 	) {
 
 		this.jwtUtil = jwtUtil;
 		this.userMapper = userMapper;
 		this.userDetailsService = userDetailsService;
-		this.adminDetailsService = adminDetailsService;
 	}
 
 	@Override
@@ -97,7 +93,7 @@ public class JWTFilter extends OncePerRequestFilter {
 				ResponseMessage.setBasicResponse(response, AuthResponseCode.INVALID_JWT_TOKEN);
 				return;
 			}
-			userDetails = adminDetailsService.loadUserByUsername(adminSeq);
+			userDetails = userDetailsService.loadAdminByUsername(adminSeq);
 		}
 
 		UsernamePasswordAuthenticationToken authenticationToken =

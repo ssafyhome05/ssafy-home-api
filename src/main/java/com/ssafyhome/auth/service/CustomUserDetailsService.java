@@ -1,5 +1,6 @@
 package com.ssafyhome.auth.service;
 
+import com.ssafyhome.auth.entity.AdminEntity;
 import com.ssafyhome.user.dao.UserMapper;
 import com.ssafyhome.auth.dto.CustomUserDetails;
 import com.ssafyhome.user.entity.UserEntity;
@@ -24,5 +25,11 @@ public class CustomUserDetailsService implements UserDetailsService {
 		UserEntity userEntity = userMapper.getUserById(username);
 		if (userEntity == null) return null;
 		return new CustomUserDetails(userEntity);
+	}
+
+	public UserDetails loadAdminByUsername(String username) throws UsernameNotFoundException {
+
+		AdminEntity adminEntity = new AdminEntity();
+		return new CustomUserDetails(adminEntity);
 	}
 }
