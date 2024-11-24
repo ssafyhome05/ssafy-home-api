@@ -39,14 +39,14 @@ public class BookmarkController {
 	@PostMapping("/location")
 	@PreAuthorize("hasRole('ROLE_USER')")
 	public ResponseEntity<?> addLocation(
-			@RequestBody
+			@RequestParam("dongCode")
 			String dongCode
 	) {
 
 		Map<String, Object> params = new HashMap<>();
 		params.put("dongCode", dongCode);
 		params.put("userSeq", SecurityContextHolder.getContext().getAuthentication().getName());
-		//System.out.println(dongCode);
+		System.out.println(params);
 		bookmarkService.addLocationBookmark(params);
 
 		return new ResponseEntity<>("add location bookmark success", HttpStatus.OK);
@@ -101,7 +101,7 @@ public class BookmarkController {
 		Map<String, Object> params = new HashMap<>();
 		params.put("userSeq", SecurityContextHolder.getContext().getAuthentication().getName());
 
-		List<LocationDto> locationList = bookmarkService.getLocationList();
+		List<LocationDto> locationList = bookmarkService.getLocationList(params);
 		
 		return new ResponseEntity<>(locationList, HttpStatus.OK);
 		

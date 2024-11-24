@@ -54,9 +54,9 @@ public class BookmarkServiceImpl implements BookmarkService {
 	}
 
 	@Override
-	public List<LocationDto> getLocationList() {
+	public List<LocationDto> getLocationList(Map<String, Object> params) {
 		// TODO Auto-generated method stub
-		return bookmarkMapper.getLocationList();
+		return bookmarkMapper.getLocationList(params);
 	}
 
 	@Override

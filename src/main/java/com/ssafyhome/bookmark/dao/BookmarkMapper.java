@@ -17,7 +17,7 @@ public interface BookmarkMapper {
     void addCustomSpotBookmark(Map<String, Object> params);
 
     List<HouseDto> getHouseList(Map<String, Object> params);
-    List<LocationDto> getLocationList();
+    List<LocationDto> getLocationList(Map<String, Object> params);
     List<CustomSpotDto> getCustomSpotList(Map<String, Object> params);
     
     void deleteHouseBookmark(Map<String, Object> params);

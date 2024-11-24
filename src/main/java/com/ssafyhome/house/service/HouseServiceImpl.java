@@ -393,6 +393,7 @@ public class HouseServiceImpl implements HouseService {
 	@Override
 	public TopTenDto getTopTen() {
 
+
 		TopTenEntity topTenEntity = topTenRepository.findLastByOrderByRankTimeDesc().get();
 		return parseTopTenEntity(topTenEntity);
 	}
@@ -400,7 +401,6 @@ public class HouseServiceImpl implements HouseService {
 	private TopTenDto parseTopTenEntity(TopTenEntity topTenEntity) {
 
 		TopTenDto topTenDto = new TopTenDto(topTenEntity.getRankTime());
-
 		if (topTenEntity.getElements() != null) {
 
 			List<TopTenDto.Element> elements = convertUtil.convert(topTenEntity.getElements().values().stream().toList(), TopTenDto.Element.class);

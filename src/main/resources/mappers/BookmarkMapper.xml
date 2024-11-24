@@ -27,6 +27,19 @@
         WHERE fs.user_seq = #{userSeq};
     </select>
 
+    <select id="getLocationList" parameterType="map">
+        SELECT DISTINCT
+            fs.dong_code,
+            dc.sido_name,
+            dc.gugun_name,
+            dc.bdong_name AS dong_name
+        FROM
+            favorite_spot AS fs
+                JOIN dong_code AS dc ON fs.dong_code = dc.bdong_code
+        WHERE
+            fs.user_seq = #{userSeq};
+    </select>
+
     <insert id="addLocationBookmark" parameterType="map">
         INSERT INTO favorite_spot
         VALUES(#{dongCode}, #{userSeq})
@@ -35,7 +48,7 @@
     <delete id="deleteLocationBookmark" parameterType="map">
         DELETE
         FROM favorite_spot
-        WHERE dong_code = #{dongCode}
+        WHERE dong_code = #{dongCode} AND user_seq = #{userSeq}
     </delete>
 
     <select id="getCustomSpotList" parameterType="map">
