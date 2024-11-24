@@ -22,6 +22,7 @@ public interface KakaoClient {
 			@RequestParam("x") double lng,
 			@RequestParam("y") double lat,
 			@RequestParam("radius") int radius,
+			@RequestParam("size") int size,
 			@RequestParam("page") int page
 	);
 
@@ -41,6 +42,7 @@ public interface KakaoClient {
 			@RequestParam("x") double lng,
 			@RequestParam("y") double lat,
 			@RequestParam("radius") int radius,
+			@RequestParam("size") int size,
 			@RequestParam("page") int page
 	);
 

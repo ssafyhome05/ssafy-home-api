@@ -57,7 +57,8 @@ public class OpenFeignTest {
                 geometry.getCenterLng(),
                 geometry.getCenterLat(),
                 (int)geometry.getRadius() + 1,
-                15
+                15,
+                1
         );
         System.out.println(kakaoPlaceDto);
     }
@@ -71,7 +72,8 @@ public class OpenFeignTest {
                 geometry.getCenterLng(),
                 geometry.getCenterLat(),
                 (int)geometry.getRadius() + 1,
-                15
+                15,
+                1
         );
         System.out.println(kakaoPlaceDto);
     }
