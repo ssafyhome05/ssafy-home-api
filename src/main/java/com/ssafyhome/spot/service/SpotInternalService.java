@@ -82,19 +82,19 @@ public class SpotInternalService {
             else {
                 log.info(dongCode + " save task starting");
                 List<SpotEntity> spotEntityList = new ArrayList<>();
-                Map<String, KakaoPlaceDto> kakaoPlaceDtoMap = connectWithKakaoAPI(dongCode);
+                Map<String, List<KakaoPlaceDto.Document>> kakaoPlaceDtoMap = connectWithKakaoAPI(dongCode);
 
-                int size = kakaoPlaceDtoMap.values().stream().mapToInt(list -> list.getDocuments().size()).sum();
+                int size = kakaoPlaceDtoMap.values().stream().mapToInt(List::size).sum();
                 ConcurrentHashMap<String, Boolean> processingSpotMap = new ConcurrentHashMap<>();
                 CountDownLatch countDownLatch = new CountDownLatch(size);
 
                 for (String key : kakaoPlaceDtoMap.keySet()) {
-                    for(KakaoPlaceDto.Document document : kakaoPlaceDtoMap.get(key).getDocuments()) {
+                    for(KakaoPlaceDto.Document document : kakaoPlaceDtoMap.get(key)) {
                         executorService.submit(() -> {
-                            Boolean existingValue = processingSpotMap.putIfAbsent(document.getId(), true);
-                            if (existingValue != null) return;
-
                             try {
+                                Boolean existingValue = processingSpotMap.putIfAbsent(document.getId(), true);
+                                if (existingValue != null) return;
+
                                 spotEntityList.add(convertToSpotEntity(document, key));
                             } catch (Exception e) {
                                 log.error(e.getMessage());
@@ -128,32 +128,59 @@ public class SpotInternalService {
         return Boolean.TRUE.equals(isCompleted);
     }
 
-    private Map<String, KakaoPlaceDto> connectWithKakaoAPI(String dongCode) {
+    private Map<String, List<KakaoPlaceDto.Document>> connectWithKakaoAPI(String dongCode) {
 
-        Map<String, KakaoPlaceDto> kakaoPlaceDtoMap = new HashMap<>();
+        Map<String, List<KakaoPlaceDto.Document>> kakaoPlaceDtoMap = new HashMap<>();
         GeometryEntity geometry = geometryMapper.selectByDongCode(dongCode);
+        List<CategoryEntity> categoryEntities = spotMapper.getCategories();
+        CountDownLatch countDownLatch = new CountDownLatch(categoryEntities.size());
 
-        for (CategoryEntity category : spotMapper.getCategories()) {
-            KakaoPlaceDto kakaoPlaceDto = null;
-            if (category.isCategoryType()) {
-                kakaoPlaceDto = kakaoClient.searchCategoryPlace(
-                        category.getCategoryCode(),
-                        geometry.getCenterLng(),
-                        geometry.getCenterLat(),
-                        (int)geometry.getRadius() + 1,
-                        15
-                );
-            }
-            else {
-                kakaoPlaceDto = kakaoClient.searchKeywordPlace(
-                        category.getCategoryCode(),
-                        geometry.getCenterLng(),
-                        geometry.getCenterLat(),
-                        (int)geometry.getRadius() + 1,
-                        15
-                );
-            }
-            kakaoPlaceDtoMap.put(category.getCategoryName(), kakaoPlaceDto);
+        for (CategoryEntity category : categoryEntities) {
+            executorService.execute(() -> {
+                try{
+                    List<KakaoPlaceDto.Document> kakaoPlaceDtoList = new ArrayList<>();
+                    int pages = 1;
+                    int maxItems = 45;
+                    if (category.isCategoryType()) {
+                        do {
+                            KakaoPlaceDto kakaoPlaceDto = kakaoClient.searchCategoryPlace(
+                                category.getCategoryCode(),
+                                geometry.getCenterLng(),
+                                geometry.getCenterLat(),
+                                (int)geometry.getRadius() + 1,
+                                15,
+                                pages
+                            );
+                            kakaoPlaceDtoList.addAll(kakaoPlaceDto.getDocuments());
+                            log.info(kakaoPlaceDto.toString());
+                            maxItems = kakaoPlaceDto.getMeta().getPageableCount();
+                        } while (++pages * 15 <= maxItems);
+                    }
+                    else {
+                        do {
+                            KakaoPlaceDto kakaoPlaceDto = kakaoClient.searchKeywordPlace(
+                                category.getCategoryCode(),
+                                geometry.getCenterLng(),
+                                geometry.getCenterLat(),
+                                (int)geometry.getRadius() + 1,
+                                15,
+                                pages
+                            );
+                            log.info(kakaoPlaceDto.toString());
+                            maxItems = kakaoPlaceDto.getMeta().getPageableCount();
+                        } while (++pages * 15 <= maxItems);
+                    }
+                    kakaoPlaceDtoMap.put(category.getCategoryName(), kakaoPlaceDtoList);
+                } finally {
+                    countDownLatch.countDown();
+                }
+            });
+        }
+
+        try {
+            countDownLatch.await();
+        } catch (InterruptedException e) {
+            log.error(e.getMessage());
         }
 
         return kakaoPlaceDtoMap;
