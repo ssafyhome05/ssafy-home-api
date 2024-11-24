@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ssafyhome.ai.dao.AiMapper">
+
+    <select id="getHouseInfoEntityList" resultType="com.ssafyhome.house.entity.HouseInfoEntity">
+        SELECT
+            apt_seq,
+            sgg_cd,
+            umd_nm,
+            apt_nm,
+            build_year,
+            latitude,
+            longitude
+        FROM house_info
+        WHERE apt_seq IN
+            (
+                SELECT apt_seq
+                FROM favorite_house
+                WHERE user_seq = #{usrSeq}
+            )
+        ;
+    </select>
+
+    <select id="getHouseDealEntityList" resultType="com.ssafyhome.house.entity.HouseDealEntity">
+        SELECT
+            apt_seq,
+            deal_amount,
+            floor,
+            exclu_use_ar
+        FROM house_deal
+        WHERE apt_seq IN
+            <foreach collection="list" item="item" separator="," open="(" close=")">
+                #{item}
+            </foreach>
+        ;
+    </select>
+
+    <select id="getPopulationEntityList" resultType="com.ssafyhome.house.entity.PopulationEntity">
+        SELECT
+            dong_code,
+            tot_ppltn,
+            ppltn_dnsty,
+            age_under20_population,
+            age_2030_population,
+            age_4060_population,
+            age_over70_population
+        FROM population
+        WHERE dong_code IN
+            <foreach collection="list" item="item" separator="," open="(" close=")">
+                #{item}
+            </foreach>
+        ;
+    </select>
+
+    <select id="getSpotStatEntityList" resultType="com.ssafyhome.ai.dto.SpotStatEntity">
+        SELECT
+            umd_nm,
+            spot_type,
+            COUNT(*) AS count
+        FROM spot
+        WHERE umd_nm IN
+            <foreach collection="list" item="item" separator="," open="(" close=")">
+                #{item}
+            </foreach>
+        GROUP BY umd_nm, spot_type
+        ;
+    </select>
+</mapper>
