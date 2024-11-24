@@ -50,7 +50,7 @@ public class NavigateController {
 			@PathVariable
 			String type,
 
-			@RequestBody
+			@RequestParam("houseSeq")
 			String houseSeq
 	) {
 
