@@ -101,6 +101,14 @@
     	LIMIT 5;
     </select>
 
+    <select id="getUpdatedLogs" resultType="com.ssafyhome.house.entity.AdminLogsEntity">
+        SELECT *
+        FROM update_logs
+        WHERE task_name = #{task_name}
+        ORDER BY task_time
+        LIMIT 1;
+    </select>
+
     <insert id="insertHouseInfo" parameterType="java.util.List">
         INSERT IGNORE INTO house_info
         VALUES
@@ -139,5 +147,16 @@
         age_2030_population = VALUES(age_2030_population),
         age_4060_population = VALUES(age_4060_population),
         age_over70_population = VALUES(age_over70_population)
+    </insert>
+
+    <insert id="insertUpdateLogs" useGeneratedKeys="true" keyProperty="taskSeq">
+        INSERT INTO update_logs (admin_seq, task_name, task_data, ipv4, ipv6)
+        VALUE (#{adminSeq}, #{taskName}, #{taskData}, #{ipv4}, #{ipv6})
+
+        <selectKey keyProperty="taskTime" resultType="java.time.LocalDateTime" order="AFTER">
+            SELECT task_time
+            FROM update_logs
+            WHERE task_seq = LAST_INSERT_ID()
+        </selectKey>
     </insert>
 </mapper>

@@ -1,8 +1,10 @@
 package com.ssafyhome.config;
 
+import com.ssafyhome.common.interceptor.IPInterceptor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.PathMatchConfigurer;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
@@ -14,6 +16,13 @@ public class WebConfig implements WebMvcConfigurer {
 
   @Value("${front-end.url}")
   String frontEndUrl;
+
+  private final IPInterceptor ipInterceptor;
+
+  public WebConfig(IPInterceptor ipInterceptor) {
+
+    this.ipInterceptor = ipInterceptor;
+  }
 
   /**
    * 전역으로 RESTAPI에 api 접두사를 생성
@@ -32,5 +41,11 @@ public class WebConfig implements WebMvcConfigurer {
 
     registry.addMapping("/**")
         .allowedOrigins(frontEndUrl);
+  }
+
+  @Override
+  public void addInterceptors(InterceptorRegistry registry) {
+
+    registry.addInterceptor(ipInterceptor);
   }
 }

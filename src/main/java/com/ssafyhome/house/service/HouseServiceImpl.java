@@ -23,11 +23,14 @@ import com.ssafyhome.house.code.AgeCode;
 import com.ssafyhome.house.dao.repository.SearchKeywordRepository;
 import com.ssafyhome.house.dao.repository.TopTenRepository;
 import com.ssafyhome.house.dto.*;
+import com.ssafyhome.house.entity.AdminLogsEntity;
 import com.ssafyhome.house.entity.SearchKeywordEntity;
 import com.ssafyhome.house.entity.TopTenEntity;
 import com.ssafyhome.house.exception.RequestIdNotFoundException;
 import com.ssafyhome.house.code.SseMessageCode;
+import lombok.Synchronized;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
@@ -96,7 +99,7 @@ public class HouseServiceImpl implements HouseService {
 	}
 	
 	@Override
-	public String startHouseInfoTask(int dealYmd, int startCd, int endCd) {
+	public String startHouseInfoTask(int dealYmd, int startCd, int endCd, String clientIpv4, String clientIpv6) {
 
 		String requestId = UUID.randomUUID().toString();
 		SseEmitter sseEmitter = new SseEmitter(Long.MAX_VALUE);
@@ -110,7 +113,9 @@ public class HouseServiceImpl implements HouseService {
 					processingLawdMap,
 					dealYmd,
 					String.valueOf(startCd),
-					String.valueOf(endCd)
+					String.valueOf(endCd),
+					clientIpv4,
+					clientIpv6
 				)
 		);
 
@@ -128,7 +133,9 @@ public class HouseServiceImpl implements HouseService {
 			Map<Integer, Boolean> processingLawdMap,
 			int dealYmd,
 			String startCd,
-			String endCd
+			String endCd,
+			String clientIpv4,
+			String clientIpv6
 	) {
 
 		try {
@@ -182,6 +189,13 @@ public class HouseServiceImpl implements HouseService {
 		} finally {
 
 			sseEmitters.remove(requestId);
+			AdminLogsEntity adminLogsEntity = new AdminLogsEntity();
+			adminLogsEntity.setAdminSeq(Integer.parseInt(SecurityContextHolder.getContext().getAuthentication().getName()));
+			adminLogsEntity.setTaskName("HOUSE_INFO");
+			adminLogsEntity.setTaskData(String.valueOf(dealYmd));
+			adminLogsEntity.setIpv4(clientIpv4);
+			adminLogsEntity.setIpv6(clientIpv6);
+			houseMapper.insertUpdateLogs(adminLogsEntity);
 		}
 	}
 
@@ -278,7 +292,8 @@ public class HouseServiceImpl implements HouseService {
 	 *  SGISClient 사용
 	 */
 	@Override
-	public void updatePopulation(int year) {
+	@Synchronized
+	public AdminUpdatedInfoDto updatePopulation(int year, String clientIpv4, String clientIpv6) {
 
 		List<Integer> admCdList = AdmCode.getAllCodes();
 		List<PopulationEntity> populationList = new ArrayList<>();
@@ -301,6 +316,14 @@ public class HouseServiceImpl implements HouseService {
 		}
 
 		houseMapper.insertPopulation(populationList);
+		AdminLogsEntity adminLogsEntity = new AdminLogsEntity();
+		adminLogsEntity.setAdminSeq(Integer.parseInt(SecurityContextHolder.getContext().getAuthentication().getName()));
+		adminLogsEntity.setTaskName("POPULATION_INFO");
+		adminLogsEntity.setTaskData(String.valueOf(year));
+		adminLogsEntity.setIpv4(clientIpv4);
+		adminLogsEntity.setIpv6(clientIpv6);
+		houseMapper.insertUpdateLogs(adminLogsEntity);
+		return convertUtil.convert(adminLogsEntity, AdminUpdatedInfoDto.class);
 	}
 
 	private List<PopulationEntity> populationMultiTask(
@@ -385,9 +408,9 @@ public class HouseServiceImpl implements HouseService {
 	}
 
 	@Override
-	public void saveSearchKeyword(String dongCode) {
+	public void saveSearchKeyword(String dongCode, String clientIp) {
 
-		searchKeywordRepository.save(new SearchKeywordEntity(dongCode, LocalDateTime.now()));
+		searchKeywordRepository.save(new SearchKeywordEntity(dongCode, LocalDateTime.now(), clientIp));
 	}
 
 	@Override
@@ -442,6 +465,12 @@ public class HouseServiceImpl implements HouseService {
 	public List<Point> getPoints(String dongCode) {
 
 		return geometryUtil.getPoints(geometryMapper.selectByDongCode(dongCode));
+	}
+
+	@Override
+	public AdminUpdatedInfoDto getRecentLoginInfo(String taskName) {
+
+		return convertUtil.convert(houseMapper.getUpdatedLogs(taskName), AdminUpdatedInfoDto.class);
 	}
 }
 
