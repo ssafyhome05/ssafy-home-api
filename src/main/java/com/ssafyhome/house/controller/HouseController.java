@@ -1,5 +1,6 @@
 package com.ssafyhome.house.controller;
 
+import com.ssafyhome.common.interceptor.IPInterceptor;
 import com.ssafyhome.common.response.ResponseMessage;
 
 import com.ssafyhome.house.dto.HouseSearchWithTimeDto;
@@ -164,8 +165,15 @@ public class HouseController {
 		);
 	}
 
-	
-	
+	@GetMapping("/recent/logs")
+	@PreAuthorize("hasRole('ROLE_ADMIN')")
+	public ResponseEntity<ResponseMessage.CustomMessage> getRecentLogs() {
+
+		return ResponseMessage.responseDataEntity(
+				HouseResoponseCode.OK,
+				houseService.getRecentLoginInfo("POPULATION_INFO")
+		);
+	}
 	
 	
 	/**
@@ -194,11 +202,14 @@ public class HouseController {
 	)
 	@PostMapping("/search")
 	public ResponseEntity<ResponseMessage.CustomMessage> inputSearchKeyword(
+			@RequestAttribute(IPInterceptor.IPV4_ATTRIBUTE_KEY)
+			String clientIp,
+
 			@RequestParam
 			String dongCode
 	) {
 
-		houseService.saveSearchKeyword(dongCode);
+		houseService.saveSearchKeyword(dongCode, clientIp);
 		return ResponseMessage.responseBasicEntity(
 				HouseResoponseCode.KEYWORD_SUCCESS_SAVED
 		);
@@ -211,6 +222,12 @@ public class HouseController {
 	@PostMapping("/admin/house")
 	@PreAuthorize("hasRole('ROLE_ADMIN')")
 	public ResponseEntity<ResponseMessage.CustomMessage> updateHouseInfo(
+			@RequestAttribute(IPInterceptor.IPV4_ATTRIBUTE_KEY)
+			String clientIpv4,
+
+			@RequestAttribute(IPInterceptor.IPV6_ATTRIBUTE_KEY)
+			String clientIpv6,
+
 			@RequestParam(required = false, defaultValue = "11110")
 			int startCd,
 
@@ -223,7 +240,7 @@ public class HouseController {
 
 		return ResponseMessage.responseDataEntity(
 				HouseResoponseCode.TASK_STATUS_CREATED,
-				houseService.startHouseInfoTask(dealYmd, startCd, endCd)
+				houseService.startHouseInfoTask(dealYmd, startCd, endCd, clientIpv4, clientIpv6)
 		);
 	}
 
@@ -234,13 +251,19 @@ public class HouseController {
 	@PostMapping("/admin/population")
 	@PreAuthorize("hasRole('ROLE_ADMIN')")
 	public ResponseEntity<ResponseMessage.CustomMessage> updatePopulationInfo(
+			@RequestAttribute(IPInterceptor.IPV4_ATTRIBUTE_KEY)
+			String clientIpv4,
+
+			@RequestAttribute(IPInterceptor.IPV6_ATTRIBUTE_KEY)
+			String clientIpv6,
+
 			@RequestParam(defaultValue = "2022")
 			int year
 	) {
 
-		houseService.updatePopulation(year);
-		return ResponseMessage.responseBasicEntity(
-				HouseResoponseCode.POPULATION_UPDATED
+		return ResponseMessage.responseDataEntity(
+				HouseResoponseCode.POPULATION_UPDATED,
+				houseService.updatePopulation(year, clientIpv4, clientIpv6)
 		);
 	}
 }

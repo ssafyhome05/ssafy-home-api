@@ -20,7 +20,7 @@ public enum UserResponseCode implements ResponseCode {
 	USER_CREATED(201020, "회원가입 성공", HttpStatus.CREATED),
 	MAIL_SEND_SUCCESS(201021, "메일이 성공적으로 전송되었습니다", HttpStatus.CREATED),
 	//204 NO_CONTENT
-	USER_DELETED(204020, "회원정보 삭제", HttpStatus.NO_CONTENT),
+	USER_DELETED(204020, "회원정보 삭제", HttpStatus.OK),
 
 	//400 BAD_REQUEST
 	INVALID_PASSWORD(400020, "올바르지 않은 패스워드", HttpStatus.BAD_REQUEST),
