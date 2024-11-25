@@ -3,6 +3,7 @@ package com.ssafyhome.bookmark.service;
 import java.util.List;
 import java.util.Map;
 
+import com.ssafyhome.bookmark.dto.BookmarkStatusDto;
 import com.ssafyhome.house.dto.HouseDto;
 import com.ssafyhome.spot.dto.CustomSpotDto;
 import com.ssafyhome.spot.dto.LocationDto;
@@ -13,9 +14,10 @@ public interface BookmarkService {
     void addLocationBookmark(Map<String, Object> params);
     void addCustomSpotBookmark(Map<String, Object> params);
 
-    List<HouseDto> getHouseList(Map<String, Object> params);
-    List<LocationDto> getLocationList(Map<String, Object> params);
-    List<CustomSpotDto> getCustomSpotList(Map<String, Object> params);
+    List<HouseDto> getHouseList();
+    List<LocationDto> getLocationList();
+    List<CustomSpotDto> getCustomSpotList();
+    BookmarkStatusDto getBookmarkStatus();
     
     void deleteHouseBookmark(Map<String, Object> params);
     void deleteLocationBookmark(Map<String, Object> params);

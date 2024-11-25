@@ -1,19 +1,42 @@
 package com.ssafyhome.bookmark.dto;
 
-import com.ssafyhome.navigate.dto.NavigateDto;
-import com.ssafyhome.house.dto.HouseDto;
-import com.ssafyhome.spot.dto.CustomSpotDto;
+import com.ssafyhome.house.dto.PopulationDto;
 import com.ssafyhome.spot.dto.LocationDto;
-import com.ssafyhome.spot.dto.LocationStatusDto;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 
+import java.util.List;
 import java.util.Map;
 
 @Data
 public class BookmarkStatusDto {
 
-	//애매함
-	private Map<LocationDto, LocationStatusDto> locationStatuses;
-	private Map<HouseDto, NavigateDto> houseStatuses;
-	private Map<CustomSpotDto, NavigateDto> customSpotStatuses;
+	private Map<String, PopulationWithLocation> populations;
+	private Map<String, List<RankItem>> customSpotRank;
+
+	@Data
+	@AllArgsConstructor
+	public static class PopulationWithLocation {
+
+		private LocationDto location;
+		private PopulationDto population;
+	}
+
+	@Data
+	@Builder
+	public static class RankItem implements Comparable<RankItem> {
+
+		private String houseSeq;
+		private String houseName;
+		private String address;
+		private int carTime;
+		private int walkTime;
+		private int transportTime;
+
+		@Override
+		public int compareTo(RankItem o) {
+			return this.transportTime - o.transportTime;
+		}
+	}
 }

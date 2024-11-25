@@ -13,7 +13,7 @@
         WHERE user_seq = #{userSeq} AND apt_seq = #{aptSeq}
     </delete>
 
-    <select id="getHouseList" parameterType="map">
+    <select id="getHouseList" resultType="com.ssafyhome.house.dto.HouseDto">
         SELECT hi.*,
                (SELECT COUNT(*)
                 FROM house_deal
@@ -27,7 +27,7 @@
         WHERE fs.user_seq = #{userSeq};
     </select>
 
-    <select id="getLocationList" parameterType="map">
+    <select id="getLocationList" resultType="com.ssafyhome.spot.dto.LocationDto">
         SELECT DISTINCT
             fs.dong_code,
             dc.sido_name,
@@ -51,7 +51,7 @@
         WHERE dong_code = #{dongCode} AND user_seq = #{userSeq}
     </delete>
 
-    <select id="getCustomSpotList" parameterType="map">
+    <select id="getCustomSpotList" resultType="com.ssafyhome.spot.dto.CustomSpotDto">
         SELECT *
         FROM custom_spot
         WHERE user_seq = #{userSeq}
