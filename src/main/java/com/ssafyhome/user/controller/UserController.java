@@ -114,7 +114,7 @@ public class UserController {
 			String email
 	) {
 
-		userService.sendEmail(email);
+		userService.signWithEmail(email);
 		return ResponseMessage.responseBasicEntity(UserResponseCode.MAIL_SEND_SUCCESS);
 	}
 
