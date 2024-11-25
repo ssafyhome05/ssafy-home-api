@@ -18,6 +18,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
 
 @Service
 public class BookmarkServiceImpl implements BookmarkService {
@@ -25,16 +27,19 @@ public class BookmarkServiceImpl implements BookmarkService {
     private final BookmarkMapper bookmarkMapper;
     private final HouseService houseService;
     private final NavigateService navigateService;
+		private final ExecutorService executorService;
 
     public BookmarkServiceImpl(
             BookmarkMapper bookmarkMapper,
             HouseService houseService,
-            NavigateService navigateService
+            NavigateService navigateService,
+            ExecutorService executorService
     ) {
 
         this.bookmarkMapper = bookmarkMapper;
         this.houseService = houseService;
         this.navigateService = navigateService;
+				this.executorService = executorService;
     }
 
   @Override
@@ -46,50 +51,86 @@ public class BookmarkServiceImpl implements BookmarkService {
       List<CustomSpotDto> customSpotDtoList = getCustomSpotList();
       List<HouseDto> houseDtoList = getHouseList();
 
+			CountDownLatch countDownLatch = new CountDownLatch(dongCodeList.size() + customSpotDtoList.size());
+
       bookmarkStatusDto.setPopulations(new HashMap<>());
       bookmarkStatusDto.setCustomSpotRank(new HashMap<>());
 
       for (LocationDto locationDto : dongCodeList) {
+	      executorService.execute(() -> {
+		      try{
 
-        bookmarkStatusDto.getPopulations().put(
-            locationDto.getDongCode(),
-            new BookmarkStatusDto.PopulationWithLocation(
-                locationDto,
-                houseService.getPopulation(locationDto.getDongCode())
-            )
-        );
+			      bookmarkStatusDto.getPopulations().put(
+					      locationDto.getDongCode(),
+					      new BookmarkStatusDto.PopulationWithLocation(
+							      locationDto,
+							      houseService.getPopulation(locationDto.getDongCode())
+					      )
+			      );
+
+		      } finally {
+			      countDownLatch.countDown();
+		      }
+	      });
       }
 
       for (CustomSpotDto customSpotDto : customSpotDtoList) {
 
-        List<BookmarkStatusDto.RankItem> rank = new ArrayList<>();
+	      executorService.execute(() -> {
+		      try{
 
-        for (HouseDto houseDto : houseDtoList) {
+			      List<BookmarkStatusDto.RankItem> rank = new ArrayList<>();
+						CountDownLatch innerCountDownLatch = new CountDownLatch(houseDtoList.size());
 
-          NavigateDto navigateDto = navigateService.getNavigate(
-              "custom",
-              houseDto.getAptSeq(),
-              TMapPoint.builder()
-                  .x(Double.parseDouble(customSpotDto.getLongitude()))
-                  .y(Double.parseDouble(customSpotDto.getLatitude()))
-                  .name(customSpotDto.getSpotName())
-                  .build()
-          );
+			      for (HouseDto houseDto : houseDtoList) {
 
-          rank.add(
-              BookmarkStatusDto.RankItem.builder()
-                  .address(houseDto.getJibun())
-                  .houseName(houseDto.getAptNm())
-                  .houseSeq(houseDto.getAptSeq())
-                  .carTime(navigateDto.getRoutes().get("car").getFirst().getTotalTime())
-                  .walkTime(navigateDto.getRoutes().get("walk").getFirst().getTotalTime())
-                  .transportTime(navigateDto.getRoutes().get("transport").getFirst().getTotalTime())
-                  .build()
-          );
-        }
-        rank.sort(BookmarkStatusDto.RankItem::compareTo);
-        bookmarkStatusDto.getCustomSpotRank().put(customSpotDto.getSpotName(), rank);
+				      executorService.execute(() -> {
+					      try {
+
+						      NavigateDto navigateDto = navigateService.getNavigate(
+								      "custom",
+								      houseDto.getAptSeq(),
+								      TMapPoint.builder()
+										      .x(Double.parseDouble(customSpotDto.getLongitude()))
+										      .y(Double.parseDouble(customSpotDto.getLatitude()))
+										      .name(customSpotDto.getSpotName())
+										      .build()
+						      );
+
+						      rank.add(
+								      BookmarkStatusDto.RankItem.builder()
+										      .address(houseDto.getJibun())
+										      .houseName(houseDto.getAptNm())
+										      .houseSeq(houseDto.getAptSeq())
+										      .carTime(navigateDto.getRoutes().get("car").getFirst().getTotalTime())
+										      .walkTime(navigateDto.getRoutes().get("walk").getFirst().getTotalTime())
+										      .transportTime(navigateDto.getRoutes().get("transport").getFirst().getTotalTime())
+										      .build()
+						      );
+
+					      } catch (Exception e) {
+					      } finally {
+						      innerCountDownLatch.countDown();
+					      }
+				      });
+			      }
+
+			      try {
+				      innerCountDownLatch.await();
+			      } catch (InterruptedException e) {}
+
+			      rank.sort(BookmarkStatusDto.RankItem::compareTo);
+			      bookmarkStatusDto.getCustomSpotRank().put(customSpotDto.getSpotName(), rank);
+
+		      } finally {
+			      countDownLatch.countDown();
+		      }
+	      });
       }
+
+			try {
+				countDownLatch.await();
+			} catch (InterruptedException e) {}
 
       return bookmarkStatusDto;
   }
