@@ -245,7 +245,7 @@ public class UserController {
 			description = "userSeq 와 UserDto 로 회원정보를 수정합니다."
 	)
 	@PutMapping("/{userSeq}")
-	@PreAuthorize("hasRole('ROLE_ADMIN') or  #userSeq == authentication.name")
+	@PreAuthorize("#userSeq == authentication.name")
 	public ResponseEntity<ResponseMessage.CustomMessage> updateUserInfo(
 			@PathVariable("userSeq")
 			@Parameter(
@@ -253,7 +253,7 @@ public class UserController {
 			          description = "user 의 userSeq",
 			          example = "13"
 			      )
-      long userSeq,
+      String userSeq,
 
 			@RequestBody
 			@Schema(
@@ -276,7 +276,7 @@ public class UserController {
 			UserDto userDto
 	) {
 
-		userService.updateUser(userSeq, userDto);
+		userService.updateUser(Long.parseLong(userSeq), userDto);
 		return ResponseMessage.responseBasicEntity(UserResponseCode.USER_UPDATED);
 	}
 
@@ -294,10 +294,10 @@ public class UserController {
 			          example="1"
 			      )
 			@PathVariable("userSeq")
-			long userSeq
+			String userSeq
 	) {
 
-		userService.deleteUser(userSeq);
+		userService.deleteUser(Long.parseLong(userSeq));
 		return ResponseMessage.responseBasicEntity(UserResponseCode.USER_DELETED);
 	}
 }
