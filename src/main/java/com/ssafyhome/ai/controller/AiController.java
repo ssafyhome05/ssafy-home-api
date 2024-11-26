@@ -1,5 +1,6 @@
 package com.ssafyhome.ai.controller;
 
+import com.ssafyhome.ai.dto.PromptDealDto;
 import com.ssafyhome.ai.dto.PromptResourceDto;
 import com.ssafyhome.ai.service.AiChatService;
 import com.ssafyhome.common.response.ResponseMessage;
@@ -20,14 +21,28 @@ public class AiController {
 
 	@PostMapping("/house")
 	@PreAuthorize("hasRole('ROLE_USER')")
-	public ResponseEntity<ResponseMessage.CustomMessage> RecommendHouse(
+	public ResponseEntity<ResponseMessage.CustomMessage> recommendHouse(
 			@RequestBody
 			PromptResourceDto promptResourceDto
 	) {
-
+		System.out.println(promptResourceDto.getNativePrompt());
 		return ResponseMessage.responseDataEntity(
 				HouseResoponseCode.OK,
 				aiChatService.generateResponse(promptResourceDto)
+		);
+	}
+	
+	@PostMapping("/deal")
+	@PreAuthorize("hasRole('ROLE_USER')")
+	public ResponseEntity<ResponseMessage.CustomMessage> predictHouse(
+			@RequestBody
+			PromptDealDto promptDealDto
+	) {
+		System.out.println(promptDealDto.getNativePrompt());
+		System.out.println("deal 처리 댐니다 =======================================");
+		return ResponseMessage.responseDataEntity(
+				HouseResoponseCode.OK,
+				aiChatService.generateDealResponse(promptDealDto)
 		);
 	}
 

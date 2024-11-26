@@ -1,5 +1,6 @@
 package com.ssafyhome.ai.util;
 
+import com.ssafyhome.ai.dto.PromptDealDto;
 import com.ssafyhome.ai.dto.PromptResourceDto;
 import com.ssafyhome.ai.dto.SpotStatEntity;
 import com.ssafyhome.house.entity.HouseDealEntity;
