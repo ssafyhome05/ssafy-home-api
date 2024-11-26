@@ -166,7 +166,8 @@ public class SecurityConfig {
     CustomLoginFilter customLoginFilter = new CustomLoginFilter(
         authenticationManager(authenticationConfiguration),
         jwtService,
-        userMapper
+        userMapper,
+        cookieUtil
     );
     
     

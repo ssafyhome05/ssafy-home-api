@@ -2,6 +2,7 @@ package com.ssafyhome.auth.filter;
 
 import com.ssafyhome.auth.response.AuthResponseCode;
 import com.ssafyhome.common.response.ResponseMessage;
+import com.ssafyhome.common.util.CookieUtil;
 import com.ssafyhome.user.dao.UserMapper;
 import com.ssafyhome.auth.dto.JwtDto;
 import com.ssafyhome.user.entity.UserEntity;
@@ -24,16 +25,19 @@ public class CustomLoginFilter extends UsernamePasswordAuthenticationFilter {
 	private final AuthenticationManager authenticationManager;
 	private final JWTService jwtService;
 	private final UserMapper userMapper;
+	private final CookieUtil cookieUtil;
 
 	public CustomLoginFilter(
 			AuthenticationManager authenticationManager,
 			JWTService jwtService,
-			UserMapper userMapper
+			UserMapper userMapper,
+			CookieUtil cookieUtil
 	) {
 
 		this.authenticationManager = authenticationManager;
 		this.jwtService = jwtService;
 		this.userMapper = userMapper;
+		this.cookieUtil = cookieUtil;
 	}
 
 	@Override
@@ -59,7 +63,7 @@ public class CustomLoginFilter extends UsernamePasswordAuthenticationFilter {
 
 		HttpHeaders headers = new HttpHeaders();
 		headers.add(HttpHeaders.AUTHORIZATION, "Bearer " + jwtDto.getAccessToken());
-		headers.add(HttpHeaders.SET_COOKIE, jwtDto.getAccessToken());
+		headers.add(HttpHeaders.SET_COOKIE, cookieUtil.convertToString(jwtDto.getRefreshToken()));
 
 		ResponseMessage.setHeadersResponse(response, AuthResponseCode.LOGIN_SUCCESS, headers);
 	}
