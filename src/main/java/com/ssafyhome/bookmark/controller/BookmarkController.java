@@ -1,6 +1,8 @@
 package com.ssafyhome.bookmark.controller;
 
 import com.ssafyhome.bookmark.dto.BookmarkStatusDto;
+import com.ssafyhome.common.response.ResponseMessage;
+import com.ssafyhome.house.code.HouseResoponseCode;
 import com.ssafyhome.house.dto.HouseDto;
 import com.ssafyhome.spot.dto.CustomSpotDto;
 import com.ssafyhome.spot.dto.LocationDto;
@@ -98,10 +100,8 @@ public class BookmarkController {
 	@GetMapping("/location")
 	@PreAuthorize("hasRole('ROLE_USER')")
 	public ResponseEntity<List<LocationDto>> getLocationList() {
-		Map<String, Object> params = new HashMap<>();
-		params.put("userSeq", SecurityContextHolder.getContext().getAuthentication().getName());
 
-		List<LocationDto> locationList = bookmarkService.getLocationList(params);
+		List<LocationDto> locationList = bookmarkService.getLocationList();
 		
 		return new ResponseEntity<>(locationList, HttpStatus.OK);
 		
@@ -114,12 +114,8 @@ public class BookmarkController {
 	@GetMapping("/house")
 	@PreAuthorize("hasRole('ROLE_USER')")
 	public ResponseEntity<List<HouseDto>> getHouseList() {
-		Map<String, Object> params = new HashMap<>();
-		
-		params.put("userSeq", SecurityContextHolder.getContext().getAuthentication().getName());
 
-		List<HouseDto> houseList = bookmarkService.getHouseList(params);
-		
+		List<HouseDto> houseList = bookmarkService.getHouseList();
 		return new ResponseEntity<>(houseList, HttpStatus.OK);
 	}
 
@@ -130,9 +126,8 @@ public class BookmarkController {
 	@GetMapping("/custom")
 	@PreAuthorize("hasRole('ROLE_USER')")
 	public ResponseEntity<List<CustomSpotDto>> getCustomSpotList() {
-		Map<String, Object> params = new HashMap<>();
-		params.put("userSeq", SecurityContextHolder.getContext().getAuthentication().getName());
-		List<CustomSpotDto> customSpotList = bookmarkService.getCustomSpotList(params);
+
+		List<CustomSpotDto> customSpotList = bookmarkService.getCustomSpotList();
 		return new ResponseEntity<>(customSpotList, HttpStatus.OK);
 	}
 
@@ -142,9 +137,12 @@ public class BookmarkController {
 	)
 	@GetMapping("/status")
 	@PreAuthorize("hasRole('ROLE_USER')")
-	public ResponseEntity<List<BookmarkStatusDto>> getStatus() {
+	public ResponseEntity<ResponseMessage.CustomMessage> getStatus() {
 
-		return null;
+		return ResponseMessage.responseDataEntity(
+				HouseResoponseCode.OK,
+				bookmarkService.getBookmarkStatus()
+		);
 	}
 
 	@Operation(

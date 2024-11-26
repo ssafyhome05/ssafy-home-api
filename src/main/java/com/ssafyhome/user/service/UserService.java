@@ -9,7 +9,7 @@ public interface UserService {
   void register(UserDto userDto);
   String findUserId(FindUserDto findUserDto);
   void findPassword(FindUserDto findUserDto);
-  void sendEmail(String email);
+  void signWithEmail(String email);
   UserDto getUserInfo(String userSeq);
   UserListDto getUserList(int page, int size);
   String checkEmailSecret(EmailSecretDto emailSecretDto);

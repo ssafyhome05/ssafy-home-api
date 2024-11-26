@@ -22,7 +22,12 @@
                 separator=",">
                 (#{item.aptSeq},#{item.categoryName},#{item.spotName},#{item.latitude},#{item.longitude})
         </foreach>
-
+        ON DUPLICATE KEY UPDATE
+        apt_seq = VALUES(apt_seq),
+        category_name = VALUES(category_name),
+        spot_name = VALUES(spot_name),
+        latitude = VALUES(latitude),
+        longitude = VALUES(longitude)
     </insert>
     <select id="getCategories"
             resultType="com.ssafyhome.spot.entity.CategoryEntity">

@@ -19,6 +19,7 @@ public interface UserMapper {
   void deleteUser(long userSeq);
   String getIdByNameAndEmail(FindUserDto findUserDto);
   boolean isUserExist(FindUserDto findUserDto);
+  boolean isEmailExist(String email);
   boolean checkPassword(@Param("userSeq") String seq, @Param("password") String password);
   void patchPassword(@Param("userSeq") String userSeq, @Param("password") String newPassword);
   List<UserEntity> getUserList(@Param("startIdx") int startIdx, @Param("size") int size);

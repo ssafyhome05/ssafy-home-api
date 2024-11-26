@@ -17,7 +17,11 @@
     <update id="updateUser"
             parameterType="com.ssafyhome.user.entity.UserEntity">
         UPDATE user
-        SET user_name = #{userName}
+        SET user_name = #{userName},
+            user_phone = #{userPhone},
+            user_zipcode = #{userZipcode},
+            user_address = #{userAddress},
+            user_address2 = #{userAddress2}
         WHERE user_seq = #{userSeq}
     </update>
 
@@ -64,6 +68,13 @@
         WHERE user_id = #{userId} AND user_name = #{userName} AND user_email = #{userEmail}
     </select>
 
+    <select id="isEmailExist"
+            resultType="java.lang.Boolean">
+        SELECT COUNT(*) > 0
+        FROM user
+        WHERE user_email = #{useEmail} AND social_type = 0;
+    </select>
+
     <select id="checkPassword"
             resultType="java.lang.Boolean">
         SELECT  COUNT(*) > 0
@@ -84,11 +95,13 @@
         FROM user
         WHERE user_seq = #{userSeq}
     </select>
+
     <select id="getSeqByEmail" resultType="java.lang.Long">
         SELECT user_seq
         FROM user
-        WHERE user_email = #{userEmail}
+        WHERE user_email = #{userEmail} AND social_type = 0
     </select>
+
     <select id="getTotalUsers" resultType="java.lang.Integer">
         SELECT COUNT(*) FROM user;
     </select>

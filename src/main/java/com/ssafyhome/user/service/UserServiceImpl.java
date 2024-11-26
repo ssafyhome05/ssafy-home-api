@@ -81,7 +81,17 @@ public class UserServiceImpl implements UserService {
   }
 
   @Override
-  public void sendEmail(String email) {
+  public void signWithEmail(String email) {
+
+    if (!userMapper.isEmailExist(email)) {
+      sendEmail(email);
+    } else {
+      throw new RuntimeException();
+    }
+  }
+
+
+  private void sendEmail(String email) {
 
     String secret = secretUtil.makeRandomString(15);
     MimeMessage mimeMessage = mailSender.createMimeMessage();
@@ -137,7 +147,12 @@ public class UserServiceImpl implements UserService {
 
     if (secretUtil.checkSecret(emailSecretDto.getEmail(), emailSecretDto.getSecret())) {
       secretUtil.removeSecretOnRedis(emailSecretDto.getEmail());
-      long userSeq = userMapper.getSeqByEmail(emailSecretDto.getEmail());
+      long userSeq = 0;
+      try{
+        userSeq = userMapper.getSeqByEmail(emailSecretDto.getEmail());
+      } catch (Exception e) {
+        return "success_check_email_secret";
+      }
       try {
         return secretUtil.encrypt(String.valueOf(userSeq));
       } catch (Exception e) {
